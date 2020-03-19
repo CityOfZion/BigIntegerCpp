@@ -106,9 +106,52 @@ BigInteger operator -(BigInteger& lhs, BigInteger& rhs)
 
 }
 
-BigInteger Subtract(BigInteger lhs, BigInteger rhs) 
+BigInteger Add(BigInteger lhs, BigInteger rhs)
+{
+    return lhs + rhs;
+}
+
+BigInteger Subtract(BigInteger lhs, BigInteger rhs)
 {
     return lhs - rhs;
+}
+
+BigInteger Add(uint_array& lhs, int lhsSign, uint_array& rhs, int rhsSign)
+{
+    bool trivialLeft = lhs.empty();
+    bool trivialRight = rhs.empty();
+
+    if (trivialLeft && trivialRight)
+    {
+        return (long)lhsSign + rhsSign;
+    }
+
+    if (trivialLeft)
+    {
+        assert(!rhs.empty());
+        uint_array bits = BigInteger::Add(rhs, abs(lhsSign));
+        return BigInteger(bits, lhsSign < 0);
+    }
+
+    if (trivialRight)
+    {
+        assert(!lhs.empty());
+        uint_array bits = BigInteger::Add(lhs, abs(rhsSign));
+        return BigInteger(bits, lhsSign < 0);
+    }
+
+    assert(!lhs.empty() && !rhs.empty());
+
+    if (lhs.size() < rhs.size())
+    {
+        uint_array bits = BigInteger::Add(rhs, lhs);
+        return BigInteger(bits, lhsSign < 0);
+    }
+    else
+    {
+        uint_array bits = BigInteger::Add(lhs, rhs);
+        return BigInteger(bits, lhsSign < 0);
+    }
 }
 
 BigInteger Subtract(uint_array& lhs, int lhsSign, uint_array& rhs, int rhsSign)
@@ -159,7 +202,107 @@ BigInteger operator +(BigInteger& lhs, BigInteger& rhs)
     {
         return Subtract(lhs._bits, lhs._sign, rhs._bits, -1 * rhs._sign);
     }
-    //return Add(lhs._bits, lhs._sign, rhs._bits, rhs._sign);
+    return Add(lhs._bits, lhs._sign, rhs._bits, rhs._sign);
+}
+
+static uint_array Add(uint_array& lhs, uint32_t rhs)
+{
+    assert(!lhs.empty());
+    assert(lhs.size() >= 1);
+
+    // Executes the addition for one big and one 32-bit integer.
+    // Thus, we've similar code than below, but there is no loop for
+    // processing the 32-bit integer, since it's a single element.
+
+    uint_array bits(lhs.size());
+
+    long digit = (long)lhs[0] - rhs;
+    bits[0] = static_cast<uint32_t>(digit);
+    long carry = digit >> 32;
+
+    for (size_t i = 1; i < lhs.size(); i++)
+    {
+        digit = lhs[i] + carry;
+        bits[i] = static_cast<uint32_t>(digit);
+        carry = digit >> 32;
+    }
+    bits[lhs.size()] = static_cast<uint32_t>(carry);
+
+    return bits;
+}
+
+static uint_array Add(uint_array& lhs, uint_array& rhs)
+{
+    assert(!lhs.empty());
+    assert(!rhs.empty());
+    assert(lhs.size() >= rhs.size());
+
+    uint_array bits(lhs.size() + 1);
+
+    uint_array* l = &lhs;
+    uint_array* r = &rhs;
+    uint_array* b = &bits;
+    BigInteger::Add(l, lhs.size(), r, rhs.size(), b, bits.size());
+
+    return bits;
+}
+
+static void Add(uint_array* lhs, int lhsLength
+        , uint_array* rhs, int rhsLength, uint_array* bits, int bitsLength)
+{
+    assert(lhsLength >= 0);
+    assert(rhsLength >= 0);
+    assert(lhsLength >= rhsLength);
+    assert(bitsLength == lhsLength + 1);
+
+    int i = 0;
+    long carry = 0L;
+
+    uint_array lhsr = *lhs;
+    uint_array rhsr = *rhs;
+    uint_array bitsr = *bits;
+
+    for (; i < rhsLength; i++)
+    {
+        long digit = (lhsr[i] + carry) + rhsr[i];
+        bitsr[i] = static_cast<uint32_t>(digit);
+        carry = digit >> 32;
+    }
+
+    for (; i < lhsLength; i++)
+    {
+        long digit = lhsr[i] + carry;
+        bitsr[i] = static_cast<uint32_t>(digit);
+        carry = digit >> 32;
+    }
+
+    assert(carry == 0);
+}
+
+static uint_array Subtract(uint_array& lhs, uint32_t rhs)
+{
+    assert(!lhs.empty());
+    assert(lhs.size() >= 1);
+    assert(lhs[0] >= rhs || lhs.size() >= 2);
+
+    // Executes the subtraction for one big and one 32-bit integer.
+    // Thus, we've similar code than below, but there is no loop for
+    // processing the 32-bit integer, since it's a single element.
+
+    uint_array bits(lhs.size());
+
+    long digit = (long)lhs[0] - rhs;
+    bits[0] = static_cast<uint32_t>(digit);
+    long carry = digit >> 32;
+
+    for (size_t i = 1; i < lhs.size(); i++)
+    {
+        digit = lhs[i] + carry;
+        bits[i] = static_cast<uint32_t>(digit);
+        carry = digit >> 32;
+    }
+
+    return bits;
 }
 
 static uint_array Subtract(uint_array& lhs, uint_array& rhs)
@@ -168,43 +311,17 @@ static uint_array Subtract(uint_array& lhs, uint_array& rhs)
     assert(!rhs.empty());
     assert(lhs.size() >= rhs.size());
     assert(BigInteger::Compare(lhs, rhs) >= 0);
-    
+
     // Switching to unsafe pointers helps sparing
     // some nasty index calculations...
-    
+
     uint_array bits(lhs.size());
-    
+
     uint_array* l = &lhs;
     uint_array* r = &rhs;
     uint_array* b = &bits;
     BigInteger::Subtract(l, lhs.size(), r, rhs.size(), b, bits.size());
-    
-    return bits;
-}
 
-static uint_array Subtract(uint_array& lhs, uint32_t rhs)
-{
-    assert(!lhs.empty());
-    assert(lhs.size() >= 1);
-    assert(lhs[0] >= rhs || lhs.size() >= 2);
-    
-    // Executes the subtraction for one big and one 32-bit integer.
-    // Thus, we've similar code than below, but there is no loop for
-    // processing the 32-bit integer, since it's a single element.
-    
-    uint_array bits(lhs.size());
-    
-    long digit = (long)lhs[0] - rhs;
-    bits[0] = static_cast<uint32_t>(digit);
-    long carry = digit >> 32;
-    
-    for (size_t i = 1; i < lhs.size(); i++)
-    {
-        digit = lhs[i] + carry;
-        bits[i] = static_cast<uint32_t>(digit);
-        carry = digit >> 32;
-    }
-    
     return bits;
 }
 
@@ -216,15 +333,15 @@ static void Subtract(uint_array* lhs, int lhsLength
     assert(lhsLength >= rhsLength);
     assert(BigInteger::Compare(lhs, lhsLength, rhs, rhsLength) >= 0);
     assert(bitsLength == lhsLength);
-    
+
     // Executes the "grammar-school" algorithm for computing z = a - b.
     // While calculating z_i = a_i - b_i we take care of overflow
     // Since a_i - b_i doesn't need any additional bit, our carry c
     // has always the value -1 or 0; hence, we're safe here.
-    
+
     int i = 0;
     long carry = 0L;
-    
+
     uint_array lhsr = *lhs;
     uint_array rhsr = *rhs;
     uint_array bitsr = *bits;
@@ -237,10 +354,10 @@ static void Subtract(uint_array* lhs, int lhsLength
     for (; i < lhsLength; i++)
     {
         long digit = lhsr[i] + carry;
-        bitsr[i] = (uint)digit;
+        bitsr[i] = static_cast<uint32_t>(digit);
         carry = digit >> 32;
     }
-    
+
     assert(carry == 0);
 }
 
@@ -272,13 +389,13 @@ int BigInteger::CompareTo(BigInteger& other)
 {
     AssertValid();
     other.AssertValid();
-    
+
     if ((_sign ^ other._sign) < 0)
     {
         // Different signs, so the comparison is easy.
         return _sign < 0 ? -1 : +1;
     }
-    
+
     // Same signs
     if (!_bits.empty())
     {
@@ -291,7 +408,7 @@ int BigInteger::CompareTo(BigInteger& other)
         return _sign;
     if (cuThis < cuOther)
         return -_sign;
-    
+
     int cuDiff = GetDiffLength(_bits, other._bits, cuThis);
     if (cuDiff == 0)
         return 0;
@@ -332,12 +449,12 @@ static int Compare(uint_array* lhs, int lhsLength, uint_array* rhs, int rhsLengt
 {
     assert(lhsLength >= 0);
     assert(rhsLength >= 0);
-    
+
     if (lhsLength < rhsLength)
         return -1;
     if (lhsLength > rhsLength)
         return 1;
-    
+
     for (int i = lhsLength - 1; i >= 0; i--)
     {
         if (lhs[i] < rhs[i])
@@ -345,7 +462,7 @@ static int Compare(uint_array* lhs, int lhsLength, uint_array* rhs, int rhsLengt
         if (lhs[i] > rhs[i])
             return 1;
     }
-    
+
     return 0;
 }
 
