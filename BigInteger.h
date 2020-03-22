@@ -130,6 +130,7 @@ class BigInteger {
         // Divide & Modulo
         friend BigInteger operator %(BigInteger& lhs, BigInteger& rhs);
         friend BigInteger operator /(BigInteger& dividend, BigInteger& divisor);
+
         static BigInteger Divide(BigInteger& dividend, BigInteger& divisor);
         static uint_array Divide(uint_array& lhs, uint32_t rhs);
         static uint_array Divide(uint_array& lhs, uint32_t rhs, uint32_t& remainder); // maybe change to a more explicit out parameter

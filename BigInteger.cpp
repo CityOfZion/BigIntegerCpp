@@ -1,6 +1,5 @@
 #include "BigInteger.h"
 #include "BigNumber.h"
-#include "tcb/span.h"
 
 #include <limits>
 #include <cassert>
