@@ -11,9 +11,9 @@ class Number
             int precision;
             int scale;
             int sign;
-            char* overrideDigits;
+            std::string overrideDigits;
 
-            char* digits()
+            std::string digits()
             {
                 return overrideDigits;
             }

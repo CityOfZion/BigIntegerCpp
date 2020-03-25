@@ -93,7 +93,7 @@ static bool ParseNumber(char* str, char* strEnd, Number::NumberBuffer& number, s
     char ch = p < strEnd ? *p : '\0';
     char* next;
 
-    char* dig = number.digits();
+    std::string dig = number.digits();
     char const * NegativeSign = "-";
     char const * PositiveSign = "+";
 
@@ -240,7 +240,7 @@ static bool TryStringToNumber(std::string value, Number::NumberBuffer& buffer, s
 static bool TryStringToBigInteger(std::string value, std::stringstream& receiver, int& precision, int& scale, int& sign)
 {
     Number::NumberBuffer numberBuffer;
-    numberBuffer.overrideDigits = (char*)0x1;
+    numberBuffer.overrideDigits.append((const char *)0x1);
 
     if (!TryStringToNumber(value, numberBuffer, receiver))
     {
