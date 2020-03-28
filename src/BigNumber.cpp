@@ -4,17 +4,14 @@
 #include <limits>
 #include <cassert>
 
-static bool TryParseBigInteger(std::string value, BigInteger& result);
-//static bool NumberToBigInteger(BigNumber::BigNumberBuffer& bignumber, BigInteger& result);
-
-static BigNumber::BigNumberBuffer Create()
+BigNumber::BigNumberBuffer BigNumber::Create()
 {
     BigNumber::BigNumberBuffer number;
     number.digits = std::stringstream("", std::ios_base::ate | std::ios_base::in | std::ios_base::out);
     return number;
 }
 
-static BigInteger ParseBigInteger(std::string value)
+BigInteger BigNumber::ParseBigInteger(std::string value)
 {
     if (value.empty())
     {
@@ -22,7 +19,7 @@ static BigInteger ParseBigInteger(std::string value)
     }
 
     BigInteger result = BigInteger::Zero();
-    if (!TryParseBigInteger(value, result))
+    if (!BigNumber::TryParseBigInteger(value, result))
     {
         throw std::runtime_error("value could not be parsed to a BigInteger");
     }
@@ -260,7 +257,7 @@ static bool TryStringToBigInteger(std::string value, std::stringstream& receiver
     }
 }
 
-static bool NumberToBigInteger(BigNumber::BigNumberBuffer& number, BigInteger& value)
+bool BigNumber::NumberToBigInteger(BigNumber::BigNumberBuffer& number, BigInteger& value)
 {
     int i = number.scale;
     int cur = 0;
@@ -269,10 +266,10 @@ static bool NumberToBigInteger(BigNumber::BigNumberBuffer& number, BigInteger& v
     value = 0;
     while (--i >= 0)
     {
-        value *= ten; // todo *= operator
+        value *= ten;
         if (number.digits.str()[cur] != '\0')
         {
-            value += number.digits.str()[cur++] - '0'; // todo += biginit + int
+            value += number.digits.str()[cur++] - '0';
         }
     }
     while (number.digits.str()[cur] != '\0')
@@ -281,26 +278,26 @@ static bool NumberToBigInteger(BigNumber::BigNumberBuffer& number, BigInteger& v
     }
     if (number.sign)
     {
-        value = value * (-1); // todod -operator
+        value = -value;
     }
     return true;
 }
 
 
-static bool TryParseBigInteger(std::string value, BigInteger& result)
+bool BigNumber::TryParseBigInteger(std::string value, BigInteger& result)
 {
     BigNumber::BigNumberBuffer bignumber = BigNumber::Create();
     int precision;
     int scale;
     int sign;
 
-    if (!TryStringToBigInteger(value, bignumber.digits, precision, scale, sign));
+    if (!TryStringToBigInteger(value, bignumber.digits, precision, scale, sign))
     {
         return false;
     }
 
     // TODO HexNumberToBigInteger
-    if (!NumberToBigInteger(bignumber, result));
+    if (!NumberToBigInteger(bignumber, result))
     {
         return false;
     }
@@ -308,9 +305,145 @@ static bool TryParseBigInteger(std::string value, BigInteger& result)
     return true;
 }
 
-static bool NumberToBigInteger(BigNumber::BigNumberBuffer& bignumber, BigInteger& result)
+
+std::string BigNumber::FormatBigInteger(BigInteger& value)
 {
+    //TODO HEX
+    //assert(formatString == null || formatString.Length == formatSpan.Length);
+
+    int digits = 0;
+    //char fmt = ParseFormatSpecifier(formatSpan, out digits);
+    //if (fmt == 'x' || fmt == 'X')
+    //{
+    //    return FormatBigIntegerToHex(targetSpan, value, fmt, digits, info, destination, out charsWritten, out spanSuccess);
+    //}
+
+
+    if (value.GetBits().size() == 0)
+    {
+        return std::to_string(value.GetSign());
+    }
+
+    // First convert to base 10^9.
+    const uint32_t kuBase = 1000000000; // 10^9
+    const int kcchBase = 9;
+
+    int cuSrc = value.GetBits().size();
+    int cuTemp;
+    int cuMax;
+    if (((cuTemp = cuSrc * 10) < cuSrc))
+    {
+        throw std::overflow_error("Overflow during string conversion [cuTemp]");
+    }
+    else
+    {
+        cuMax = cuTemp / 9 + 2;
+    }
+
+    uint_array rguDst(cuMax);
+    int cuDst = 0;
+
+    for (int iuSrc = cuSrc; --iuSrc >= 0;)
+    {
+        uint32_t uCarry = value.GetBits()[iuSrc];
+        for (int iuDst = 0; iuDst < cuDst; iuDst++)
+        {
+            assert(rguDst[iuDst] < kuBase);
+            uint64_t uuRes = BigInteger::MakeUlong(rguDst[iuDst], uCarry);
+            rguDst[iuDst] = static_cast<uint32_t>(uuRes % kuBase);
+            uCarry = static_cast<uint32_t>(uuRes / kuBase);
+        }
+        if (uCarry != 0)
+        {
+            rguDst[cuDst++] = uCarry % kuBase;
+            uCarry /= kuBase;
+            if (uCarry != 0)
+                rguDst[cuDst++] = uCarry;
+        }
+    }
+
+    int cchMax;
+    if (((cchMax = cuDst * kcchBase) < cuDst))
+    {
+        throw std::overflow_error("Overflow during string conversion [cchMax]");
+    }
+
+    int rgchBufSize;
+
+    // We'll pass the rgch buffer to native code, which is going to treat it like a string of digits, so it needs
+    // to be null terminated.  Let's ensure that we can allocate a buffer of that size.
+    if (((rgchBufSize = cchMax + 1) < cchMax))
+    {
+        throw std::overflow_error("Overflow during string conversion [rgchBufSize]");
+    }
+
+    char rgch[rgchBufSize];
+
+    int ichDst = cchMax;
+
+    for (int iuDst = 0; iuDst < cuDst - 1; iuDst++)
+    {
+        uint32_t uDig = rguDst[iuDst];
+        assert(uDig < kuBase);
+        for (int cch = kcchBase; --cch >= 0;)
+        {
+            rgch[--ichDst] = (char)('0' + uDig % 10);
+            uDig /= 10;
+        }
+    }
+    for (uint32_t uDig = rguDst[cuDst - 1]; uDig != 0;)
+    {
+        rgch[--ichDst] = (char)('0' + uDig % 10);
+        uDig /= 10;
+    }
+
+    //if (!decimalFmt)
+    //{
+    //    // sign = true for negative and false for 0 and positive values
+    //    bool sign = (value._sign < 0);
+    //    // The cut-off point to switch (G)eneral from (F)ixed-point to (E)xponential form
+    //    int precision = 29;
+    //    int scale = cchMax - ichDst;
+
+    //    Span<char> stackSpace = stackalloc char[128]; // arbitrary stack cut-off
+    //    var sb = new ValueStringBuilder(stackSpace);
+    //    FormatProvider.FormatBigInteger(ref sb, precision, scale, sign, formatSpan, info, rgch, ichDst);
+
+    //    if (targetSpan)
+    //    {
+    //        spanSuccess = sb.TryCopyTo(destination, out charsWritten);
+    //        return null;
+    //    }
+    //    else
+    //    {
+    //        charsWritten = 0;
+    //        spanSuccess = false;
+    //        return sb.ToString();
+    //    }
+    //}
+
+    // Format Round-trip decimal
+    // This format is supported for integral types only. The number is converted to a string of
+    // decimal digits (0-9), prefixed by a minus sign if the number is negative. The precision
+    // specifier indicates the minimum number of digits desired in the resulting string. If required,
+    // the number is padded with zeros to its left to produce the number of digits given by the
+    // precision specifier.
+    int numDigitsPrinted = cchMax - ichDst;
+    while (digits > 0 && digits > numDigitsPrinted)
+    {
+        // pad leading zeros
+        rgch[--ichDst] = '0';
+        digits--;
+    }
+    if (value.GetSign() < 0)
+    {
+        std::string negativeSign = "-";
+        for (int i = negativeSign.size() - 1; i > -1; i--)
+            rgch[--ichDst] = negativeSign[i];
+    }
+
+    //int resultLength = cchMax - ichDst;
+
+    return std::string(rgch, ichDst, cchMax - ichDst);
 
 }
-
-
