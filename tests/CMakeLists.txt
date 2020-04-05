@@ -1,18 +1,19 @@
-cmake_minimum_required(VERSION 3.15)
+add_executable(
+    unit_tests
+    #bigint_test_sa.cpp
+    #bigint_test_add.cpp
+    bigint_test_sub.cpp
+    )
 
-set(This BigIntegerTests)
-
-set(Sources
-    BigIntegerTests.cpp
-)
-
-add_executable(${This} ${Sources})
-target_link_libraries(${This} PUBLIC
+target_link_libraries(
+    unit_tests
     gtest_main
     BigInteger
-)
+    )
 
 add_test(
-    NAME ${This}
-    COMMAND ${This}
+    NAME 
+        add
+    COMMAND 
+        ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/unit_tests
 )

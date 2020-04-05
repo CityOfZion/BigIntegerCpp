@@ -3,6 +3,7 @@
 #include <sstream>
 #include <limits>
 #include <cassert>
+#include <iostream>
 
 BigNumber::BigNumberBuffer BigNumber::Create()
 {
@@ -32,14 +33,7 @@ static bool IsWhite(char ch)
     return (((ch) == 0x20) || ((ch) >= 0x09 && (ch) <= 0x0D));
 }
 
-static char* MatchChars(char* p, char* pEnd, std::string str)
-{
-    char *stringPointer = &str[0];
-
-    return MatchChars(p, pEnd, stringPointer);
-}
-
-static char* MatchChars(char* p, char* pEnd, char* str)
+static char* MatchChar(char* p, char* pEnd, char* str)
 {
     assert(p != nullptr && pEnd != nullptr && p <= pEnd && str != nullptr);
 
@@ -54,7 +48,7 @@ static char* MatchChars(char* p, char* pEnd, char* str)
     while (true)
     {
         char cp = p < pEnd ? *p : '\0';
-        if (cp != *str && !(*str == u'\u00a0' && cp == '\u0020'))
+        if (cp != *str && !(*str == u'\u00a0' && cp == u'\u0020'))
         {
             break;
         }
@@ -63,6 +57,13 @@ static char* MatchChars(char* p, char* pEnd, char* str)
         if (*str == '\0') return p;
     }
     return nullptr;
+}
+
+static char* MatchChars(char* p, char* pEnd, std::string str)
+{
+    char *stringPointer = &str[0];
+
+    return MatchChar(p, pEnd, stringPointer);
 }
 
 static bool ParseNumber(char* str, char* strEnd, Number::NumberBuffer& number, std::stringstream& sb)
@@ -83,8 +84,8 @@ static bool ParseNumber(char* str, char* strEnd, Number::NumberBuffer& number, s
     std::string groupSep = ""; // Group separator from NumberFormatInfo.
 
     int state = 0;
-    bool bigNumber = (!sb.str().empty()); // When a StringBuilder is provided then we use it in place of the number.digits char[50]
-    int maxParseDigits = bigNumber ? std::numeric_limits<int>::max() : 32; // NumberMaxDigits
+    bool bigNumber = true; //(!sb.str().empty()); // When a StringBuilder is provided then we use it in place of the number.digits char[50]
+    int maxParseDigits = std::numeric_limits<int>::max(); // NumberMaxDigits
 
     char* p = str;
     char ch = p < strEnd ? *p : '\0';
@@ -101,8 +102,6 @@ static bool ParseNumber(char* str, char* strEnd, Number::NumberBuffer& number, s
 
     while (true)
     {
-        // Eat whitespace unless we've found a sign which isn't followed by a currency symbol.
-        // "-Kr 1231.47" is legal but "- 1231.47" is not.
         if (!IsWhite(ch) || ((state & StateSign) != 0 ))
         {
             if (((state & StateSign) == 0) && ((next = MatchChars(p, strEnd, PositiveSign)) != nullptr
@@ -123,6 +122,7 @@ static bool ParseNumber(char* str, char* strEnd, Number::NumberBuffer& number, s
     int digEnd = 0;
     while (true)
     {
+        //std::cout << "char: " << ch << std::endl;
         if ((ch >= '0' && ch <= '9') || (AllowHexSpecifier && ((ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'))))
         {
             state |= StateDigits;
@@ -131,16 +131,8 @@ static bool ParseNumber(char* str, char* strEnd, Number::NumberBuffer& number, s
             {
                 if (digCount < maxParseDigits)
                 {
-                    if (bigNumber)
-                    {
-                        sb << ch;
-                    }
-                    else
-                    {
-                        dig[digCount++] = ch;
-                    }
+                    sb << ch;
 
-                    //if (ch != '0' || parseDecimal)
                     if (ch != '0')
                     {
                         digEnd = digCount;
@@ -175,10 +167,9 @@ static bool ParseNumber(char* str, char* strEnd, Number::NumberBuffer& number, s
     }
 
     number.precision = digEnd;
-    if (bigNumber)
-        sb << '\0';
-    else
-        dig[digEnd] = '\0';
+
+    sb << '\0';
+
     if ((state & StateDigits) != 0)
     {
         //while (true)
@@ -226,24 +217,24 @@ static bool TryStringToNumber(std::string value, Number::NumberBuffer& buffer, s
     char* stringPointer = &value[0];
     char* p = stringPointer;
 
-    if (!ParseNumber(p, p+value.length(), buffer, receiver))
+    if (!ParseNumber(p, p + value.length(), buffer, receiver))
     {
         return false;
     }
-
+    //std::cout << "after ParseNumber: " << receiver.str() << std::endl;
     return true;
 }
 
 static bool TryStringToBigInteger(std::string value, std::stringstream& receiver, int& precision, int& scale, int& sign)
 {
     Number::NumberBuffer numberBuffer;
-    numberBuffer.overrideDigits.append((const char *)0x1);
+    numberBuffer.overrideDigits.append(static_cast<unsigned char>(0x01), 1);
 
     if (!TryStringToNumber(value, numberBuffer, receiver))
     {
         precision = 0;
         scale = 0;
-        sign = false;
+        sign = 0;
 
         return false;
     }
@@ -252,6 +243,7 @@ static bool TryStringToBigInteger(std::string value, std::stringstream& receiver
         precision = numberBuffer.precision;
         scale = numberBuffer.scale;
         sign = numberBuffer.sign;
+        //std::cout << "scale: " << scale << std::endl;
 
         return true;
     }
@@ -262,24 +254,40 @@ bool BigNumber::NumberToBigInteger(BigNumber::BigNumberBuffer& number, BigIntege
     int i = number.scale;
     int cur = 0;
 
+    //BigInteger ten = BigInteger(10);
     BigInteger ten = 10;
+    //std::cout << "ten: sign: " << ten.GetSign() << "bits size: " << ten.GetBits().size() << std::endl;
     value = 0;
+    //std::cout << "value: sign: " << value.GetSign() << "bits size: " << value.GetBits().size() << std::endl;
+
+    //std::cout << "========================================NumberToBigInteger start" << std::endl;
     while (--i >= 0)
     {
+        //std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ while start value:" << value.ToString() << std::endl;
         value *= ten;
+        //std::cout << "value*ten: " << value.ToString()  << std::endl;
         if (number.digits.str()[cur] != '\0')
         {
-            value += number.digits.str()[cur++] - '0';
+            //std::cout << "number: " << number.digits.str()[cur] - '0' << std::endl;
+            BigInteger temp = BigInteger(static_cast<int>(number.digits.str()[cur++] - '0'));
+            //std::cout << "sign: " << temp.GetSign() << " bits size: " << temp.GetBits().size() << std::endl;
+            value += temp;
         }
+        //std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ while end" << std::endl;
     }
+    //std::cout << "========================================NumberToBigInteger mid" << std::endl;
+
     while (number.digits.str()[cur] != '\0')
     {
         if (number.digits.str()[cur++] != '0') return false; // Disallow non-zero trailing decimal places
     }
+
     if (number.sign)
     {
         value = -value;
     }
+
+    //std::cout << "========================================NumberToBigInteger end" << std::endl;
     return true;
 }
 
@@ -295,6 +303,10 @@ bool BigNumber::TryParseBigInteger(std::string value, BigInteger& result)
     {
         return false;
     }
+
+    bignumber.scale = scale;
+    bignumber.precision = precision;
+    bignumber.sign = sign;
 
     // TODO HexNumberToBigInteger
     if (!NumberToBigInteger(bignumber, result))
@@ -329,6 +341,7 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
     const int kcchBase = 9;
 
     int cuSrc = value.GetBits().size();
+    //std::cout << "bits len: " << value.GetBits().size() << std::endl;
     int cuTemp;
     int cuMax;
     if (((cuTemp = cuSrc * 10) < cuSrc))
@@ -346,20 +359,27 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
     for (int iuSrc = cuSrc; --iuSrc >= 0;)
     {
         uint32_t uCarry = value.GetBits()[iuSrc];
+        //std::cout << "uCarry: " << uCarry << std::endl;
         for (int iuDst = 0; iuDst < cuDst; iuDst++)
         {
             assert(rguDst[iuDst] < kuBase);
             uint64_t uuRes = BigInteger::MakeUlong(rguDst[iuDst], uCarry);
+            //std::cout << "uuRes: " << uCarry << std::endl;
             rguDst[iuDst] = static_cast<uint32_t>(uuRes % kuBase);
             uCarry = static_cast<uint32_t>(uuRes / kuBase);
         }
+
         if (uCarry != 0)
         {
+            //std::cout << "cuDst: " << cuDst << std::endl;
             rguDst[cuDst++] = uCarry % kuBase;
+            //std::cout << "2cuDst: " << cuDst << std::endl;
             uCarry /= kuBase;
+            //std::cout << "ucarry" << uCarry<< std::endl;
             if (uCarry != 0)
                 rguDst[cuDst++] = uCarry;
         }
+
     }
 
     int cchMax;
@@ -377,25 +397,30 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
         throw std::overflow_error("Overflow during string conversion [rgchBufSize]");
     }
 
-    char rgch[rgchBufSize];
+    //std::cout << "bufSize: " << rgchBufSize << std::endl;
+    char rgch[rgchBufSize] = "";
 
     int ichDst = cchMax;
 
     for (int iuDst = 0; iuDst < cuDst - 1; iuDst++)
     {
         uint32_t uDig = rguDst[iuDst];
+        //std::cout << "uDig: " << uDig << std::endl;
         assert(uDig < kuBase);
         for (int cch = kcchBase; --cch >= 0;)
         {
-            rgch[--ichDst] = (char)('0' + uDig % 10);
+            rgch[--ichDst] = static_cast<char>('0' + (uDig % 10));
             uDig /= 10;
+            //std::cout << "uDig/10: " << uDig << std::endl;
         }
     }
+
     for (uint32_t uDig = rguDst[cuDst - 1]; uDig != 0;)
     {
         rgch[--ichDst] = (char)('0' + uDig % 10);
         uDig /= 10;
     }
+
 
     //if (!decimalFmt)
     //{
@@ -435,15 +460,23 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
         rgch[--ichDst] = '0';
         digits--;
     }
+
     if (value.GetSign() < 0)
     {
         std::string negativeSign = "-";
         for (int i = negativeSign.size() - 1; i > -1; i--)
             rgch[--ichDst] = negativeSign[i];
     }
+    for (auto a : rgch)
+    {
+        //std::cout << "rgch: " << a << std::endl;
+    }
 
-    //int resultLength = cchMax - ichDst;
-
-    return std::string(rgch, ichDst, cchMax - ichDst);
-
+    //19 
+    //9
+    //18
+    //std::cout << cchMax << " " << ichDst << std::endl;
+    std::string a = std::string(rgch);
+    //std::cout << "string: " << a.size() << std::endl;
+    return std::string(rgch, cchMax + 1);
 }

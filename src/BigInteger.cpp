@@ -24,6 +24,7 @@ BigInteger::BigInteger()
 BigInteger::BigInteger(int value)
 {
 
+    //std::cout << "int constructor value: " << value << " minint: " << std::numeric_limits<int>::min() << std::endl;
 	if (value == std::numeric_limits<int>::min())
 	{
 		*this = s_bnMinInt;
@@ -36,16 +37,406 @@ BigInteger::BigInteger(int value)
 	AssertValid();
 }
 
+BigInteger::BigInteger(uint32_t value) {
+    //std::cout << "uint32_t constructor: " << value << std::endl;
+    //std::cout << "uint32_t limit: " << std::numeric_limits<uint32_t>::min() << std::endl;
+    if (value <= static_cast<uint32_t>(std::numeric_limits<int>::max()))
+    {
+        _sign = value;
+        //_bits = uint_array();
+    }
+    else
+    {
+        _sign = +1;
+        _bits.push_back(value);
+    }
+    AssertValid();
+}
+
+BigInteger::BigInteger(long value)
+{
+    *this = BigInteger(static_cast<long long>(value));
+}
+
+BigInteger::BigInteger(long long value)
+{
+    //std::cout << "long long constructor: " << value << std::endl;
+    //std::cout << "int min: " << std::numeric_limits<int>::min() << std::endl;
+    //std::cout << "int min: " << std::numeric_limits<int>::max() << std::endl;
+    if (std::numeric_limits<int>::min() < value
+            && value <= std::numeric_limits<int>::max())
+    {
+        //std::cout << "if " << std::endl;
+        _sign = static_cast<int>(value);
+        //_bits = ;
+    }
+    else if (value == std::numeric_limits<int>::min())
+    {
+        *this = s_bnMinInt;
+    }
+    else
+    {
+        //std::cout << "else " << value << std::endl;
+        uint64_t x = 0;
+        if (value < 0)
+        {
+            x = static_cast<uint64_t>(-value);
+            _sign = -1;
+        }
+        else
+        {
+            x = static_cast<uint64_t>(value);
+            _sign = +1;
+        }
+
+        if (x <= std::numeric_limits<uint32_t>::max())
+        {
+            _bits.push_back(static_cast<uint32_t>(x));
+        }
+        else
+        {
+            //std::cout << "uint cast: " << static_cast<uint32_t>(x) << std::endl;
+            //std::cout << "uint cast2: " << static_cast<uint32_t>(x >> kcbitUint) << std::endl;
+            _bits.push_back(static_cast<uint32_t>(x));
+            _bits.push_back(static_cast<uint32_t>(x >> kcbitUint));
+        }
+    }
+
+    AssertValid();
+}
+
+BigInteger::BigInteger(uint64_t value)
+{
+    //std::cout << "uint64_t constructor" << std::endl;
+    if (value <= static_cast<uint64_t>(std::numeric_limits<int>::max()))
+    {
+        _sign = static_cast<int>(value);
+    }
+    else if (value <= std::numeric_limits<uint32_t>::max())
+    {
+        _sign = +1;
+        _bits.push_back(static_cast<uint32_t>(value));
+    }
+    else
+    {
+        _sign = +1;
+        _bits.push_back(static_cast<uint32_t>(value));
+        _bits.push_back(static_cast<uint32_t>(value >> kcbitUint));
+    }
+
+    AssertValid();
+}
+
 BigInteger::BigInteger(int n, uint_array value) {
      _sign = n;
     _bits = value;
     AssertValid();
 }
 
-//BigInteger::BigInteger(uint_array value)
-//{
-//
-//}
+BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
+{
+    int byteCount = value.size();
+
+    bool isNegative;
+    if (byteCount > 0)
+    {
+        byte mostSignificantByte = isBigEndian ? value[0] : value[byteCount - 1];
+        isNegative = (mostSignificantByte & 0x80) != 0 && !isUnsigned;
+
+        if (mostSignificantByte == 0)
+        {
+            // Try to conserve space as much as possible by checking for wasted leading byte[] entries
+            if (isBigEndian)
+            {
+                int offset = 1;
+
+                while (offset < byteCount && value[offset] == 0)
+                {
+                    offset++;
+                }
+
+                value = byte_array(value.begin() + offset, value.end());
+                byteCount = value.size();
+            }
+            else
+            {
+                byteCount -= 2;
+                while (byteCount >= 0 && value[byteCount] == 0)
+                {
+                    byteCount--;
+                }
+                byteCount++;
+            }
+        }
+    }
+    else
+    {
+        isNegative = false;
+    }
+
+    if (byteCount == 0)
+    {
+        // BigInteger.Zero
+        _sign = 0;
+        _bits = uint_array();
+        AssertValid();
+        return;
+    }
+
+    if (byteCount <= 4)
+    {
+        _sign = isNegative ? static_cast<int>(0xffffffff) : 0;
+
+        if (isBigEndian)
+        {
+            for (int i = 0; i < byteCount; i++)
+            {
+                _sign = (_sign << 8) | value[i];
+            }
+        }
+        else
+        {
+            for (int i = byteCount - 1; i >= 0; i--)
+            {
+                _sign = (_sign << 8) | value[i];
+            }
+        }
+
+        _bits = uint_array();
+        if (_sign < 0 && !isNegative)
+        {
+            // Int32 overflow
+            // Example: Int64 value 2362232011 (0xCB, 0xCC, 0xCC, 0x8C, 0x0)
+            // can be naively packed into 4 bytes (due to the leading 0x0)
+            // it overflows into the int32 sign bit
+            _bits.push_back(static_cast<uint32_t>(_sign));
+            _sign = +1;
+        }
+        if (_sign == std::numeric_limits<int>::min())
+        {
+            *this = s_bnMinInt;
+        }
+    }
+    else
+    {
+        int unalignedBytes = byteCount % 4;
+        int dwordCount = byteCount / 4 + (unalignedBytes == 0 ? 0 : 1);
+        uint_array val(dwordCount);
+        int byteCountMinus1 = byteCount - 1;
+
+        // Copy all dwords, except don't do the last one if it's not a full four bytes
+        int curDword, curByte;
+
+        if (isBigEndian)
+        {
+            curByte = byteCount - sizeof(int);
+            for (curDword = 0; curDword < dwordCount - (unalignedBytes == 0 ? 0 : 1); curDword++)
+            {
+                for (int byteInDword = 0; byteInDword < 4; byteInDword++)
+                {
+                    byte curByteValue = value[curByte];
+                    val[curDword] = (val[curDword] << 8) | curByteValue;
+                    curByte++;
+                }
+
+                curByte -= 8;
+            }
+        }
+        else
+        {
+            curByte = sizeof(int) - 1;
+            for (curDword = 0; curDword < dwordCount - (unalignedBytes == 0 ? 0 : 1); curDword++)
+            {
+                for (int byteInDword = 0; byteInDword < 4; byteInDword++)
+                {
+                    byte curByteValue = value[curByte];
+                    val[curDword] = (val[curDword] << 8) | curByteValue;
+                    curByte--;
+                }
+
+                curByte += 8;
+            }
+        }
+
+        // Copy the last dword specially if it's not aligned
+        if (unalignedBytes != 0)
+        {
+            if (isNegative)
+            {
+                val[dwordCount - 1] = 0xffffffff;
+            }
+
+            if (isBigEndian)
+            {
+                for (curByte = 0; curByte < unalignedBytes; curByte++)
+                {
+                    byte curByteValue = value[curByte];
+                    val[curDword] = (val[curDword] << 8) | curByteValue;
+                }
+            }
+            else
+            {
+                for (curByte = byteCountMinus1; curByte >= byteCount - unalignedBytes; curByte--)
+                {
+                    byte curByteValue = value[curByte];
+                    val[curDword] = (val[curDword] << 8) | curByteValue;
+                }
+            }
+        }
+
+        if (isNegative)
+        {
+            BigInteger::DangerousMakeTwosComplement(val); // Mutates val
+
+            // Pack _bits to remove any wasted space after the twos complement
+            int len = val.size() - 1;
+            while (len >= 0 && val[len] == 0) len--;
+            len++;
+
+            if (len == 1)
+            {
+                switch (val[0])
+                {
+                    case 1: // abs(-1)
+                        *this = s_bnMinusOneInt;
+                        return;
+
+                    case kuMaskHighBit: // abs(Int32.MinValue)
+                        *this = s_bnMinInt;
+                        return;
+
+                    default:
+                        if (static_cast<int>(val[0]) > 0)
+                        {
+                            _sign = (-1) * ((int)val[0]);
+                            _bits = uint_array();
+                            AssertValid();
+                            return;
+                        }
+
+                        break;
+                }
+            }
+
+            if (static_cast<size_t>(len) != val.size())
+            {
+                _sign = -1;
+                _bits = uint_array();
+                _bits = uint_array(val.begin(), val.begin() + len);
+            }
+            else
+            {
+                _sign = -1;
+                _bits = val;
+            }
+        }
+        else
+        {
+            _sign = +1;
+            _bits = val;
+        }
+    }
+    AssertValid();
+}
+
+BigInteger::BigInteger(uint_array value)
+{
+    // TODO
+    if (value.size() == 0)
+        throw std::runtime_error("value cannot be null");
+
+    int dwordCount = value.size();
+    bool isNegative = dwordCount > 0 && ((value[dwordCount - 1] & 0x80000000) == 0x80000000);
+
+    // Try to conserve space as much as possible by checking for wasted leading uint[] entries
+    while (dwordCount > 0 && value[dwordCount - 1] == 0) dwordCount--;
+
+    if (dwordCount == 0)
+    {
+        // BigInteger.Zero
+        *this = BigInteger::s_bnZeroInt;
+        AssertValid();
+        return;
+    }
+    if (dwordCount == 1)
+    {
+        if (static_cast<int>(value[0]) < 0 && !isNegative)
+        {
+            _bits.push_back(value[0]);
+            _sign = +1;
+        }
+        // Handle the special cases where the BigInteger likely fits into _sign
+        else if (std::numeric_limits<int>::min() == static_cast<int>(value[0]))
+        {
+            *this = BigInteger::s_bnMinInt;
+        }
+        else
+        {
+            _sign = static_cast<int>(value[0]);
+        }
+        AssertValid();
+        return;
+    }
+
+    if (!isNegative)
+    {
+        // Handle the simple positive value cases where the input is already in sign magnitude
+        if (dwordCount != static_cast<int>(value.size()))
+        {
+            _sign = +1;
+            _bits = uint_array(value.begin(), value.begin() + dwordCount);
+        }
+        // No trimming is possible.  Assign value directly to _bits.
+        else
+        {
+            _sign = +1;
+            _bits = value;
+        }
+        AssertValid();
+        return;
+    }
+
+    // Finally handle the more complex cases where we must transform the input into sign magnitude
+    BigInteger::DangerousMakeTwosComplement(value); // mutates val
+
+    // Pack _bits to remove any wasted space after the twos complement
+    int len = value.size();
+    while (len > 0 && value[len - 1] == 0) len--;
+
+    // The number is represented by a single dword
+    if (len == 1 && static_cast<int>((value[0])) > 0)
+    {
+        if (value[0] == 1 /* abs(-1) */)
+        {
+            *this = s_bnMinusOneInt;
+        }
+        else if (value[0] == kuMaskHighBit /* abs(Int32.MinValue) */)
+        {
+            *this = s_bnMinInt;
+        }
+        else
+        {
+            _sign = (-1) * ((int)value[0]);
+        }
+    }
+    // The number is represented by multiple dwords.
+    // Trim off any wasted uint values when possible.
+    else if (len != static_cast<int>(value.size()))
+    {
+        _sign = -1;
+        _bits = uint_array(value.begin(), value.begin() + len);
+    }
+    // No trimming is possible.  Assign value directly to _bits.
+    else
+    {
+        _sign = -1;
+        _bits = value;
+    }
+    AssertValid();
+    return;
+}
+
+
 
 BigInteger::BigInteger(uint_array value, bool negative)
 {
@@ -53,11 +444,11 @@ BigInteger::BigInteger(uint_array value, bool negative)
         throw std::runtime_error("value is empty");
 
     int len;
-    
+
     // Try to conserve space as much as possible by checking for wasted leading uint[] entries
     // sometimes the uint[] has leading zeros from bit manipulation operations & and ^
     for (len = value.size(); len > 0 && value[len - 1] == 0; len--);
-    
+
     if (len == 0)
         *this = s_bnZeroInt;
     // Values like (Int32.MaxValue+1) are stored as "0x80000000" and as such cannot be packed into _sign
@@ -72,70 +463,57 @@ BigInteger::BigInteger(uint_array value, bool negative)
     else
     {
         _sign = negative ? -1 : +1;
-        std::vector<uint32_t>::const_iterator first = _bits.begin();
-        std::vector<uint32_t>::const_iterator last = _bits.begin() + len;
-        _bits = uint_array(first, last);
+        _bits.swap(value);
+    }
+
+    while (!_bits.empty() && _bits[_bits.size() - 1] == 0) {
+        _bits.pop_back();
     }
     AssertValid();
 }
 
-
-BigInteger::BigInteger(uint32_t value) {
-    if (value <= std::numeric_limits<uint32_t>::min())
-    {
-        _sign = (int)value;
-        _bits = uint_array();
-    }
-    else
-    {
-        _sign = +1;
-        _bits = uint_array();
-        _bits[0] = value;
-    }
+bool BigInteger::IsPowerOfTwo()
+{
     AssertValid();
+
+    if (_bits.size() == 0)
+        return (_sign & (_sign - 1)) == 0 && _sign != 0;
+
+    if (_sign != 1)
+        return false;
+
+    int iu = _bits.size() - 1;
+    if ((_bits[iu] & (_bits[iu] - 1)) != 0)
+        return false;
+
+    while (--iu >= 0)
+    {
+        if (_bits[iu] != 0)
+            return false;
+    }
+
+    return true;
 }
 
-BigInteger::BigInteger(long long value) {
-    if (std::numeric_limits<int>::min() < value && value <= std::numeric_limits<int>::max())
-    {
-        _sign = (int)value;
-        _bits = uint_array();
-    }
-    else if (value == std::numeric_limits<int>::min())
-    {
-        *this = s_bnMinInt;
-    }
-    else
-    {
-        uint64_t x = 0;
-        if (value < 0)
-        {
-            x = static_cast<uint64_t>(-value);
-            _sign = -1;
-        }
-        else
-        {
-            x = static_cast<uint64_t>(value);
-            _sign = +1;
-        }
-
-        if (x <= std::numeric_limits<uint32_t >::max())
-        {
-            _bits = uint_array();
-            _bits[0] = (uint)x;
-        }
-        else
-        {
-            _bits = uint_array();
-            _bits[0] = (uint32_t)x;
-            _bits[1] = (uint32_t)(x >> kcbitUint);
-        }
-    }
-
-    //AssertValid();
+bool BigInteger::IsZero()
+{
+    AssertValid();
+    return _sign == 0;
 }
 
-BigInteger& BigInteger::Add(BigInteger& lhs, BigInteger& rhs)
+bool BigInteger::IsOne()
+{
+    AssertValid();
+    return _sign == 1 && _bits.size() == 0;
+}
+
+bool BigInteger::IsEven()
+{
+    AssertValid();
+    return _bits.size() == 0 ? (_sign & 1) == 0 : (_bits[0] & 1) == 0;
+}
+
+BigInteger BigInteger::Add(BigInteger& lhs, BigInteger& rhs)
 {
     lhs.AssertValid();
     return lhs + rhs;
@@ -148,12 +526,16 @@ BigInteger BigInteger::Subtract(BigInteger& lhs, BigInteger& rhs)
 
 BigInteger BigInteger::Add(uint_array& lhs, int lhsSign, uint_array& rhs, int rhsSign)
 {
+    //std::cout << "add now " << std::endl;
+    //std::cout << "lhsSign: " << lhsSign << std::endl;
+    //std::cout << "rhsSign: " << rhsSign << std::endl;
     bool trivialLeft = lhs.empty();
     bool trivialRight = rhs.empty();
+    //std::cout << "trivial: " << trivialLeft << " " << trivialRight <<  std::endl;
 
     if (trivialLeft && trivialRight)
     {
-        return BigInteger(static_cast<long long>(lhsSign + rhsSign));
+        return BigInteger(static_cast<long long>(lhsSign) + rhsSign);
     }
 
     if (trivialLeft)
@@ -167,6 +549,10 @@ BigInteger BigInteger::Add(uint_array& lhs, int lhsSign, uint_array& rhs, int rh
     {
         assert(!lhs.empty());
         uint_array bits = BigInteger::Add(lhs, abs(rhsSign));
+        //for (auto a : bits)
+        //{
+        //    std::cout << "auto: " << a << std::endl;
+        //}
         return BigInteger(bits, lhsSign < 0);
     }
 
@@ -180,6 +566,10 @@ BigInteger BigInteger::Add(uint_array& lhs, int lhsSign, uint_array& rhs, int rh
     else
     {
         uint_array bits = BigInteger::Add(lhs, rhs);
+        //for (auto elem : bits)
+        //{
+        //    std::cout << "elem: " << elem << std::endl;
+        //}
         return BigInteger(bits, lhsSign < 0);
     }
 }
@@ -188,10 +578,14 @@ BigInteger BigInteger::Subtract(uint_array& lhs, int lhsSign, uint_array& rhs, i
 {
     bool trivialLeft = lhs.empty();
     bool trivialRight = rhs.empty();
+    //std::cout << "sub now " << std::endl;
+    //std::cout << "lhsSign: " << lhsSign << std::endl;
+    //std::cout << "rhsSign: " << rhsSign << std::endl;
+    //std::cout << "trivial: " << trivialLeft << " " << trivialRight <<  std::endl;
 
     if (trivialLeft && trivialRight)
     {
-        return BigInteger(static_cast<long long>(lhsSign - rhsSign));
+        return BigInteger(static_cast<long long>(lhsSign) - rhsSign);
     }
 
     if (trivialLeft)
@@ -208,7 +602,7 @@ BigInteger BigInteger::Subtract(uint_array& lhs, int lhsSign, uint_array& rhs, i
         return BigInteger(bits, lhsSign < 0);
     }
 
-    assert(!lhs.empty() && rhs.empty());
+    assert(!lhs.empty() && !rhs.empty());
 
     if (BigInteger::Compare(lhs, rhs) < 0)
     {
@@ -222,7 +616,7 @@ BigInteger BigInteger::Subtract(uint_array& lhs, int lhsSign, uint_array& rhs, i
     }
 }
 
-BigInteger& BigInteger::operator -(BigInteger& rhs)
+BigInteger BigInteger::operator -(BigInteger& rhs)
 {
     BigInteger lhs = *this;
     lhs.AssertValid();
@@ -230,29 +624,31 @@ BigInteger& BigInteger::operator -(BigInteger& rhs)
 
     if ((lhs._sign < 0) != (rhs._sign < 0))
     {
-        *this = Subtract(lhs._bits, lhs._sign, rhs._bits, -1 * rhs._sign); 
-        return *this; 
+        //std::cout << "add" << std::endl;
+        return BigInteger::Add(lhs._bits, lhs._sign, rhs._bits, -1 * rhs._sign);
     }
-    *this = Add(lhs._bits, lhs._sign, rhs._bits, rhs._sign); 
-    return *this;
+    //std::cout << "sub" << std::endl;
+    return BigInteger::Subtract(lhs._bits, lhs._sign, rhs._bits, rhs._sign);
 }
 
-BigInteger& BigInteger::operator +(BigInteger& rhs)
+BigInteger BigInteger::operator +(BigInteger& rhs)
 {
     BigInteger lhs = *this;
-    //lhs.AssertValid();
-    //rhs.AssertValid();
+    lhs.AssertValid();
+    rhs.AssertValid();
+    //std::cout << "*operator sign left: " << lhs._sign << " sign right: " << rhs._sign<< std::endl;
+    //std::cout << "*operator left: " << lhs.ToString() << " right: " << rhs.ToString() << std::endl;
 
     if ((lhs._sign < 0) != (rhs._sign < 0))
     {
-        *this = BigInteger::Subtract(lhs._bits, lhs._sign, rhs._bits, -1 * rhs._sign);
-        return *this;
+        //std::cout << "sub::::::" << std::endl;
+        return BigInteger::Subtract(lhs._bits, lhs._sign, rhs._bits, -1 * rhs._sign);
     }
-    *this = Add(lhs._bits, lhs._sign, rhs._bits, rhs._sign); 
-    return *this;
+    //std::cout << "Add::::::" << std::endl;
+    return BigInteger::Add(lhs._bits, lhs._sign, rhs._bits, rhs._sign);
 }
 
-BigInteger& BigInteger::operator *(BigInteger& rhs)
+BigInteger BigInteger::operator *(BigInteger& rhs)
 {
     BigInteger lhs = *this;
     lhs.AssertValid();
@@ -260,27 +656,27 @@ BigInteger& BigInteger::operator *(BigInteger& rhs)
 
     bool trivialLeft = lhs._bits.empty();
     bool trivialRight = rhs._bits.empty();
+    //std::cout << "*operator trivialLeft: " << trivialLeft << " trivialRight: " << trivialRight << std::endl;
+    //std::cout << "*operator sign left: " << lhs._sign << " sign right: " << rhs._sign<< std::endl;
 
     if (trivialLeft && trivialRight)
     {
-        *this = BigInteger(static_cast<long long>(lhs._sign * rhs._sign));
-        return *this;
+        //std::cout << "trivvvv: " << static_cast<long long>(lhs._sign) * rhs._sign << std::endl;
+        return BigInteger(static_cast<long long>(lhs._sign) * rhs._sign);
     }
 
     if (trivialLeft)
     {
         assert(!rhs._bits.empty());
         uint_array bits = BigInteger::Multiply(rhs._bits, abs(lhs._sign));
-        *this = BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0)); 
-        return *this;
+        return BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
     }
 
     if (trivialRight)
     {
         assert(!lhs._bits.empty());
         uint_array bits = BigInteger::Multiply(lhs._bits, abs(rhs._sign));
-        *this = BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
-        return *this;
+        return BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
     }
 
     assert(!lhs._bits.empty() && !rhs._bits.empty());
@@ -288,21 +684,18 @@ BigInteger& BigInteger::operator *(BigInteger& rhs)
     if (lhs._bits == rhs._bits)
     {
         uint_array bits = BigInteger::Square(lhs._bits);
-        *this = BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
-        return *this;
+        return BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
     }
 
     if (lhs._bits.size() < rhs._bits.size())
     {
         uint_array bits = BigInteger::Multiply(rhs._bits, lhs._bits);
-        *this = BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
-        return *this;
+        return BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
     }
     else
     {
         uint_array bits = BigInteger::Multiply(lhs._bits, rhs._bits);
-        *this = BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
-        return *this;
+        return BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
     }
 }
 
@@ -571,7 +964,7 @@ void BigInteger::Square(uint32_t* value, int valueLength, uint32_t* bits, int bi
 
         for (int i = 0; i < valueLength; i++)
         {
-            long long carry = 0UL;
+            uint64_t carry = 0UL;
             for (int j = 0; j < i; j++)
             {
                 uint64_t digit1 = bits[i + j] + carry;
@@ -725,9 +1118,9 @@ uint_array BigInteger::Add(uint_array& lhs, uint32_t rhs)
     // Thus, we've similar code than below, but there is no loop for
     // processing the 32-bit integer, since it's a single element.
 
-    uint_array bits(lhs.size());
+    uint_array bits(lhs.size() + 1);
 
-    long digit = (long)lhs[0] - rhs;
+    long long digit = static_cast<long long>(lhs[0]) + rhs;
     bits[0] = static_cast<uint32_t>(digit);
     long carry = digit >> 32;
 
@@ -750,7 +1143,7 @@ uint_array BigInteger::Add(uint_array& lhs, uint_array& rhs)
 
     uint_array bits(lhs.size() + 1);
 
-    BigInteger::Add(&lhs[0], lhs.size(), &rhs[0], rhs.size(), &bits[0], bits.size());
+    BigInteger::Add(lhs.data(), lhs.size(), rhs.data(), rhs.size(), bits.data(), bits.size());
 
     return bits;
 }
@@ -763,23 +1156,23 @@ void BigInteger::Add(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength,
     assert(bitsLength == lhsLength + 1);
 
     int i = 0;
-    long long carry = 0L;
+    uint64_t carry = 0L;
 
     for (; i < rhsLength; i++)
     {
-        long digit = (lhs[i] + carry) + rhs[i];
+        uint64_t digit = (lhs[i] + carry) + rhs[i];
         bits[i] = static_cast<uint32_t>(digit);
         carry = digit >> 32;
     }
 
     for (; i < lhsLength; i++)
     {
-        long long digit = lhs[i] + carry;
+        uint64_t digit = lhs[i] + carry;
         bits[i] = static_cast<uint32_t>(digit);
         carry = digit >> 32;
     }
 
-    assert(carry == 0);
+    bits[i] = static_cast<uint32_t>(carry);
 }
 
 uint_array BigInteger::Subtract(uint_array& lhs, uint32_t rhs)
@@ -817,7 +1210,7 @@ uint_array BigInteger::Subtract(uint_array& lhs, uint_array& rhs)
 
     uint_array bits(lhs.size());
 
-    BigInteger::Subtract(&lhs[0], lhs.size(), &rhs[0], rhs.size(), &bits[0], bits.size());
+    BigInteger::Subtract(lhs.data(), lhs.size(), rhs.data(), rhs.size(), bits.data(), bits.size());
 
     return bits;
 }
@@ -854,75 +1247,69 @@ void BigInteger::Subtract(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLe
     assert(carry == 0);
 }
 
-BigInteger& BigInteger::operator >=(BigInteger& rhs)
+BigInteger BigInteger::operator >=(BigInteger& rhs)
 {
-    *this = this->CompareTo(rhs);
-    return *this;
+    return this->CompareTo(rhs);
 }
 
-BigInteger& BigInteger::operator >=(long rhs)
+BigInteger BigInteger::operator >=(long rhs)
 {
-    *this = this->CompareTo(rhs);
-    return *this;
+    return this->CompareTo(rhs);
 }
 
-BigInteger& BigInteger::operator %(BigInteger& divisor)
+BigInteger BigInteger::operator %(BigInteger& divisor)
 {
     BigInteger dividend = *this;
     dividend.AssertValid();
     divisor.AssertValid();
-    
+
     bool trivialDividend = dividend._bits.empty();
     bool trivialDivisor = divisor._bits.empty();
-    
+
     if (trivialDividend && trivialDivisor)
     {
-        *this = dividend._sign % divisor._sign;
-        return *this;
+        return dividend._sign % divisor._sign;
     }
-    
+
     if (trivialDividend)
     {
         // The divisor is non-trivial
         // and therefore the bigger one
-        *this = dividend;
-        return *this;
+        return dividend;
     }
-    
+
     if (trivialDivisor)
     {
         assert(!dividend._bits.empty());
         uint32_t remainder = BigInteger::Remainder(dividend._bits, abs(divisor._sign));
-        *this = dividend._sign < 0 ? -1 * remainder : remainder;
-        return *this;
+        return dividend._sign < 0 ? -1 * remainder : remainder;
     }
-    
+
     assert(!dividend._bits.empty() && !divisor._bits.empty());
-    
+
     if (dividend._bits.size() < divisor._bits.size())
     {
-        *this = dividend;
-        return *this;
+        return dividend;
     }
+
     uint_array bits = BigInteger::Remainder(dividend._bits, divisor._bits);
-    *this = BigInteger(bits, dividend._sign < 0);
-    return *this;
+    return BigInteger(bits, dividend._sign < 0);
 }
 
 BigInteger BigInteger::DivRem(BigInteger& dividend, BigInteger& divisor, BigInteger& remainder)
 {
     //dividend.AssertValid();
     //divisor.AssertValid();
-    
+
    bool trivialDividend = dividend.GetBits().empty() ;
    bool trivialDivisor = divisor.GetBits().empty();
-   
+
    if (trivialDividend && trivialDivisor)
    {
        remainder = dividend.GetSign() % divisor.GetSign();
        return dividend.GetSign() / divisor.GetSign();
    }
-   
+
    if (trivialDividend)
    {
        // The divisor is non-trivial
@@ -930,21 +1317,21 @@ BigInteger BigInteger::DivRem(BigInteger& dividend, BigInteger& divisor, BigInte
        remainder = dividend;
        return BigInteger::Zero();
    }
-   
+
    assert(dividend.GetBits().empty());
-   
+
    if (trivialDivisor)
    {
        uint32_t rest;
        uint_array rbits = dividend.GetBits();
        uint_array bits = BigInteger::Divide(rbits, abs(divisor.GetSign()), rest);
-   
+
        remainder = dividend.GetSign() < 0 ? -1 * rest : rest;
        return BigInteger(bits, (dividend.GetSign() < 0) ^ (divisor.GetSign() < 0));
    }
-   
+
    assert(!divisor.GetBits().empty());
-   
+
    if (dividend.GetBits().size() < divisor.GetBits().size())
    {
        remainder = dividend;
@@ -956,22 +1343,20 @@ BigInteger BigInteger::DivRem(BigInteger& dividend, BigInteger& divisor, BigInte
        uint_array lbits = dividend.GetBits();
        uint_array rbits = divisor.GetBits();
        uint_array bits = BigInteger::Divide(lbits, rbits, rest);
-   
+
        remainder = BigInteger(rest, dividend.GetSign() < 0);
        return BigInteger(bits, (dividend.GetSign() < 0) ^ (divisor.GetSign() < 0));
    }
 }
 
-BigInteger& BigInteger::operator -()
+BigInteger BigInteger::operator -()
 {
-    *this = BigInteger(-(*this)._sign, (*this)._bits);
-    return *this;
+    return BigInteger(-(*this)._sign, (*this)._bits);
 }
 
-BigInteger& BigInteger::operator +()
+BigInteger BigInteger::operator +()
 {
-    *this = BigInteger(+(*this)._sign, (*this)._bits);
-    return *this;
+    return BigInteger(+(*this)._sign, (*this)._bits);
 }
 
 BigInteger& BigInteger::operator ++(int value)
@@ -989,47 +1374,58 @@ BigInteger& BigInteger::operator --(int value)
     return *this;
 }
 
-BigInteger& BigInteger::operator +=(int rhs)
+BigInteger BigInteger::operator +=(uint64_t rhs)
 {
+    //std::cout << "uint += operator" << std::endl;
     //value.AssertValid();
     BigInteger value = BigInteger(rhs);
+    //std::cout << "adding: " << value.ToString() << std::endl;
     return *this + value;
 }
 
-BigInteger& BigInteger::operator +=(BigInteger& rhs)
+BigInteger BigInteger::operator +=(BigInteger& rhs)
 {
     //value.AssertValid();
-    return *this + rhs;
+    *this = (*this + rhs);
+    return *this;
 }
 
-BigInteger& BigInteger::operator -=(BigInteger& rhs)
+BigInteger BigInteger::operator -=(BigInteger& rhs)
 {
     //value.AssertValid();
-    return *this - rhs;
+    *this = (*this - rhs);
+    return *this;
 }
 
-BigInteger& BigInteger::operator /=(BigInteger& rhs)
+BigInteger BigInteger::operator /=(BigInteger& rhs)
 {
     //value.AssertValid();
+    *this = (*this / rhs);
     return *this / rhs;
 }
 
-BigInteger& BigInteger::operator *=(BigInteger& rhs)
+BigInteger BigInteger::operator *=(BigInteger& rhs)
 {
-    return *this * rhs;
+    *this = (*this * rhs);
+    return *this;
 }
 
-bool BigInteger::operator ==(BigInteger& rhs)
+bool operator ==(const BigInteger& lhs, const BigInteger& rhs)
+{
+    return lhs.Equals(rhs);
+}
+
+bool BigInteger::operator ==(const BigInteger& rhs)
 {
     return this->Equals(rhs);
 }
 
-bool BigInteger::operator !=(BigInteger& rhs)
+bool BigInteger::operator !=(const BigInteger& rhs)
 {
     return !(this->Equals(rhs));
 }
 
-BigInteger& BigInteger::operator /(BigInteger& divisor)
+BigInteger BigInteger::operator /(BigInteger& divisor)
 {
     BigInteger dividend = *this;
     dividend.AssertValid();
@@ -1040,38 +1436,34 @@ BigInteger& BigInteger::operator /(BigInteger& divisor)
 
     if (trivialDividend && trivialDivisor)
     {
-        *this = dividend._sign / divisor._sign;
-        return *this;
+        //std::cout << dividend._sign << " / " << divisor._sign << std::endl;
+        return static_cast<long long>(dividend._sign / divisor._sign);
     }
 
     if (trivialDividend)
     {
         // The divisor is non-trivial
         // and therefore the bigger one
-        *this = BigInteger::s_bnZeroInt;
-        return *this;
+        return BigInteger::s_bnZeroInt;
     }
 
     if (trivialDivisor)
     {
         assert(!dividend._bits.empty());
         uint_array bits = BigInteger::Divide(dividend._bits, abs(divisor._sign));
-        *this = BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
-        return *this;
+        return BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
     }
 
     assert(!dividend._bits.empty() && !divisor._bits.empty());
 
     if (dividend._bits.size() < divisor._bits.size())
     {
-        *this = BigInteger::s_bnZeroInt;
-        return *this;
+        return BigInteger::s_bnZeroInt;
     }
     else
     {
         uint_array bits = BigInteger::Divide(dividend._bits, divisor._bits);
-        *this = BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
-        return *this;
+        return BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
     }
 }
 
@@ -1529,8 +1921,7 @@ uint_array BigInteger::GetBits()
 //    return Equals(std::any_cast<BigInteger>(obj));
 //}
 
-
-bool BigInteger::Equals(long long rhs) const
+bool BigInteger::Equals(uint64_t rhs) const
 {
     BigInteger other = BigInteger(rhs);
 
@@ -1552,10 +1943,10 @@ bool BigInteger::Equals(long long rhs) const
     return cuDiff == 0;
 }
 
-bool BigInteger::Equals(BigInteger& other) const
+bool BigInteger::Equals(const BigInteger& other) const
 {
-    //AssertValid();
-    //other.AssertValid();
+    AssertValid();
+    other.AssertValid();
 
     if (_sign != other._sign)
         return false;
@@ -1587,6 +1978,497 @@ std::string BigInteger::ToString()
     return BigNumber::FormatBigInteger(*this);
 }
 
+bool BigInteger::GetPartsForBitManipulation(BigInteger& x, uint_array& xd, int& xl)
+{
+    if (x.GetBits().size() == 0)
+    {
+        if (x.GetSign() < 0)
+        {
+            auto temp = uint_array(static_cast<uint32_t>(-x.GetSign()));
+            xd.swap(temp);
+        }
+        else
+        {
+            auto temp = uint_array(static_cast<uint32_t>(x.GetSign()));
+            xd.swap(temp);
+        }
+    }
+    else
+    {
+        xd = x.GetBits();
+    }
+    xl = (x.GetBits().size() == 0 ? 1 : x.GetBits().size());
+    return x.GetSign() < 0;
+}
+
+BigInteger BigInteger::operator <<(int shift)
+{
+    if (shift == 0)
+    {
+        return *this;
+    }
+    else if (shift == std::numeric_limits<int>::min())
+    {
+        return ((*this>> std::numeric_limits<int>::max()) >> 1);
+    }
+    else if (shift < 0)
+    {
+        return *this >> -shift;
+    }
+
+    int digitShift = shift / kcbitUint;
+    int smallShift = shift - (digitShift * kcbitUint);
+
+    uint_array xd; int xl; bool negx;
+    negx = BigInteger::GetPartsForBitManipulation(*this, xd, xl);
+
+    int zl = xl + digitShift + 1;
+    uint_array zd(zl);
+
+    if (smallShift == 0)
+    {
+        for (int i = 0; i < xl; i++)
+        {
+            zd[i + digitShift] = xd[i];
+        }
+    }
+    else
+    {
+        int carryShift = kcbitUint - smallShift;
+        uint32_t carry = 0;
+        int i;
+        for (i = 0; i < xl; i++)
+        {
+            uint rot = xd[i];
+            zd[i + digitShift] = rot << smallShift | carry;
+            carry = rot >> carryShift;
+        }
+        zd[i + digitShift] = carry;
+    }
+    return BigInteger(zd, negx);
+
+}
+
+void BigInteger::DangerousMakeTwosComplement(uint_array& d)
+{
+    //dangerous because mutates d!
+    if (d.size() > 0)
+    {
+        d[0] = ~d[0] + 1;
+
+        size_t i = 1;
+        // first do complement and +1 as long as carry is needed
+        for (; d[i - 1] == 0 && i < d.size(); i++)
+        {
+            d[i] = ~d[i] + 1;
+        }
+        // now ones complement is sufficient
+        for (; i < d.size(); i++)
+        {
+            d[i] = ~d[i];
+        }
+    }
+}
+
+uint_array BigInteger::ToUInt32Array()
+{
+    if (_bits.size() == 0 && _sign == 0)
+        return uint_array();
+
+    uint_array dwords;
+    uint32_t highDWord;
+
+    if (_bits.size() == 0)
+    {
+        dwords = uint_array(static_cast<uint32_t>(_sign));
+        highDWord = (_sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+    }
+    else if (_sign == -1)
+    {
+        dwords = _bits;
+        DangerousMakeTwosComplement(dwords);  // Mutates dwords
+        highDWord = std::numeric_limits<uint32_t>::max();
+    }
+    else
+    {
+        dwords = _bits;
+        highDWord = 0;
+    }
+
+    // Find highest significant byte
+    int msb;
+    for (msb = dwords.size() - 1; msb > 0; msb--)
+    {
+        if (dwords[msb] != highDWord) break;
+    }
+    // Ensure high bit is 0 if positive, 1 if negative
+    bool needExtraByte = (dwords[msb] & 0x80000000) != (highDWord & 0x80000000);
+
+    //uint_array trimmed = new uint[msb + 1 + (needExtraByte ? 1 : 0)];
+    uint_array trimmed;
+    trimmed.swap(dwords);
+
+    if (needExtraByte) trimmed[trimmed.size() - 1] = highDWord;
+    return trimmed;
+}
+
+BigInteger BigInteger::operator ^(BigInteger& rhs)
+{
+    BigInteger lhs = *this;
+    if (lhs._bits.size() == 0 && rhs._bits.size() == 0)
+    {
+        return lhs._sign ^ rhs._sign;
+    }
+
+    uint_array x = lhs.ToUInt32Array();
+    uint_array y = rhs.ToUInt32Array();
+    uint_array z;;
+    uint32_t xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::min() : 0;
+    uint32_t yExtend = (rhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+
+    for (size_t i = 0; i < z.size(); i++)
+    {
+        uint32_t xu = (i < x.size()) ? x[i] : xExtend;
+        uint32_t yu = (i < y.size()) ? y[i] : yExtend;
+        z[i] = xu ^ yu;
+    }
+
+    return BigInteger(z);
+
+}
+
+BigInteger BigInteger::operator >>(int shift)
+{
+    if (shift == 0)
+    {
+        return *this;
+    }
+    else if (shift == std::numeric_limits<int>::min())
+    {
+        return ((*this << std::numeric_limits<int>::max()) << 1);
+    }
+    else if (shift < 0)
+    {
+        return *this << -shift;
+    }
+
+    int digitShift = shift / kcbitUint;
+    int smallShift = shift - (digitShift * kcbitUint);
+
+    uint_array xd; int xl; bool negx;
+    negx = BigInteger::GetPartsForBitManipulation(*this, xd, xl);
+
+    if (negx)
+    {
+        if (shift >= (kcbitUint * xl))
+        {
+            return s_bnMinusOneInt;
+        }
+        uint_array temp = xd;
+        xd = temp;
+        BigInteger::DangerousMakeTwosComplement(xd); // Mutates xd
+    }
+
+    int zl = xl - digitShift;
+    if (zl < 0) zl = 0;
+    uint_array zd(zl);
+
+    if (smallShift == 0)
+    {
+        for (int i = xl - 1; i >= digitShift; i--)
+        {
+            zd[i - digitShift] = xd[i];
+        }
+    }
+    else
+    {
+        int carryShift = kcbitUint - smallShift;
+        uint32_t carry = 0;
+        for (int i = xl - 1; i >= digitShift; i--)
+        {
+            uint32_t rot = xd[i];
+            if (negx && i == xl - 1)
+                // Sign-extend the first shift for negative ints then let the carry propagate
+                zd[i - digitShift] = (rot >> smallShift) | (0xFFFFFFFF << carryShift);
+            else
+                zd[i - digitShift] = (rot >> smallShift) | carry;
+            carry = rot << carryShift;
+        }
+    }
+    if (negx)
+    {
+        BigInteger::DangerousMakeTwosComplement(zd); // Mutates zd
+    }
+    return BigInteger(zd, negx);
+
+}
+
+BigInteger BigInteger::operator &(BigInteger& rhs)
+{
+    BigInteger lhs = *this;
+    if (lhs.IsZero() || rhs.IsZero())
+    {
+        return BigInteger::Zero();
+    }
+
+    if (lhs.GetBits().size() == 0 && rhs.GetBits().size() == 0)
+    {
+        return lhs.GetSign() & rhs.GetSign();
+    }
+
+    uint_array x = lhs.ToUInt32Array();
+    uint_array y = rhs.ToUInt32Array();
+    uint_array z;
+    uint xExtend = (lhs.GetSign() < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+    uint yExtend = (rhs.GetSign() < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+
+    for (size_t i = 0; i < z.size(); i++)
+    {
+        uint xu = (i < x.size()) ? x[i] : xExtend;
+        uint yu = (i < y.size()) ? y[i] : yExtend;
+        z[i] = xu & yu;
+    }
+    return BigInteger(z);
+
+}
+
+BigInteger BigInteger::Negate(BigInteger& value)
+{
+    return -value;
+}
+
+int Compare(BigInteger& lhs, BigInteger& rhs)
+{
+    return lhs.CompareTo(rhs);
+}
+
+static BigInteger& Max(BigInteger& lhs, BigInteger& rhs)
+{
+    if (lhs.CompareTo(rhs) < 0)
+        return rhs;
+    return lhs;
+}
+
+static BigInteger& Min(BigInteger& lhs, BigInteger& rhs)
+{
+    if (lhs.CompareTo(rhs) <= 0)
+        return lhs;
+    return rhs;
+}
+
+BigInteger BigInteger::operator |(BigInteger& rhs)
+{
+    BigInteger lhs = *this;
+    if (lhs.IsZero())
+        return rhs;
+    if (rhs.IsZero())
+        return lhs;
+
+    if (lhs._bits.size() == 0 && rhs._bits.size() == 0)
+    {
+        return lhs._sign | rhs._sign;
+    }
+
+    uint_array x = lhs.ToUInt32Array();
+    uint_array y = rhs.ToUInt32Array();
+    uint_array z(std::max(x.size(), y.size()));
+    uint xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+    uint yExtend = (rhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+
+    for (size_t i = 0; i < z.size(); i++)
+    {
+        uint xu = (i < x.size()) ? x[i] : xExtend;
+        uint yu = (i < y.size()) ? y[i] : yExtend;
+        z[i] = xu | yu;
+    }
+    return BigInteger(z);
+}
+
+int BigInteger::GetByteCount(bool isUnsigned)
+{
+    int bytesWritten = 0;
+    this->ToByteArray(GetBytesMode::Count, false, false, &bytesWritten);
+
+    return bytesWritten;
+}
+
+byte_array BigInteger::ToByteArray(bool isUnsigned, bool isBigEndian)
+{
+    int ignored = 0;
+    return this->ToByteArray(GetBytesMode::AllocateArray, false, false, &ignored);
+}
+
+byte_array BigInteger::ToByteArray(GetBytesMode mode, bool isUnsigned, bool isBigEndian, int* bytesWritten)
+{
+    //int bytesWritten = 0;
+    //assert(mode == GetBytesMode.AllocateArray || mode == GetBytesMode.Count || mode == GetBytesMode.Span, $"Unexpected mode {mode}.");
+    //assert(mode == GetBytesMode.Span || destination.IsEmpty, $"If we're not in span mode, we shouldn't have been passed a destination.");
+
+    int sign = _sign;
+    if (sign == 0)
+    {
+        switch (mode)
+        {
+            case GetBytesMode::Count:
+                *bytesWritten = 1;
+                return byte_array();
+            default:
+                *bytesWritten = 1;
+                return byte_array(1,0);
+        }
+    }
+
+    if (isUnsigned && sign < 0)
+    {
+        throw std::runtime_error("Overflow error can't have unsigned & sing < 0");
+    }
+
+    byte highByte;
+    int nonZeroDwordIndex = 0;
+    uint32_t highDword;
+    uint_array bits = _bits;
+    if (bits.size() == 0)
+    {
+        highByte = static_cast<byte>((sign < 0) ? 0xff : 0x00);
+        highDword = static_cast<uint32_t>(sign);
+    }
+    else if (sign == -1)
+    {
+        highByte = 0xff;
+
+        // If sign is -1, we will need to two's complement bits.
+        // Previously this was accomplished via NumericsHelpers.DangerousMakeTwosComplement()
+        // however, we can do the two's complement on the stack so as to avoid
+        // creating a temporary copy of bits just to hold the two's complement.
+        // One special case in DangerousMakeTwosComplement() is that if the array
+        // is all zeros, then it would allocate a new array with the high-order
+        // uint set to 1 (for the carry). In our usage, we will not hit this case
+        // because a bits array of all zeros would represent 0, and this case
+        // would be encoded as _bits = null and _sign = 0.
+        assert(bits.size() > 0);
+        assert(bits[bits.size() - 1] != 0);
+        while (bits[nonZeroDwordIndex] == 0U)
+        {
+            nonZeroDwordIndex++;
+        }
+
+        highDword = ~bits[bits.size() - 1];
+        if (bits.size() - 1 == nonZeroDwordIndex)
+        {
+            // This will not overflow because highDword is less than or equal to uint.MaxValue - 1.
+            assert(highDword <= std::numeric_limits<uint32_t>::max() - 1);
+            highDword += 1U;
+        }
+    }
+    else
+    {
+        assert(sign == 1);
+        highByte = 0x00;
+        highDword = bits[bits.size() - 1];
+    }
+
+    byte msb;
+    int msbIndex;
+    if ((msb = static_cast<byte>((highDword >> 24))) != highByte)
+    {
+        msbIndex = 3;
+    }
+    else if ((msb = static_cast<byte>((highDword >> 16))) != highByte)
+    {
+        msbIndex = 2;
+    }
+    else if ((msb = static_cast<byte>((highDword >> 8))) != highByte)
+    {
+        msbIndex = 1;
+    }
+    else
+    {
+        msb = static_cast<byte>(highDword);
+        msbIndex = 0;
+    }
+
+    // Ensure high bit is 0 if positive, 1 if negative
+    bool needExtraByte = (msb & 0x80) != (highByte & 0x80) && !isUnsigned;
+    int length = msbIndex + 1 + (needExtraByte ? 1 : 0);
+    if (bits.size() != 0)
+    {
+        length = 4 * (bits.size() - 1) + length;
+    }
+
+    byte_array array;
+    byte_array destination;
+    switch (mode)
+    {
+        case GetBytesMode::Count:
+            *bytesWritten = length;
+            return byte_array();
+        default:
+            destination = array = byte_array(length);
+            break;
+    }
+
+    int curByte = isBigEndian ? length - 1 : 0;
+    int increment = isBigEndian ? -1 : 1;
+
+    if (bits.size() != 0)
+    {
+        for (int i = 0; i < bits.size() - 1; i++)
+        {
+            uint dword = bits[i];
+
+            if (sign == -1)
+            {
+                dword = ~dword;
+                if (i <= nonZeroDwordIndex)
+                {
+                    dword = dword + 1U;
+                }
+
+            }
+
+            destination[curByte] = static_cast<byte>(dword);
+            curByte += increment;
+            destination[curByte] = static_cast<byte>((dword >> 8));
+            curByte += increment;
+            destination[curByte] = static_cast<byte>((dword >> 16));
+            curByte += increment;
+            destination[curByte] = static_cast<byte>((dword >> 24));
+            curByte += increment;
+        }
+    }
+
+    assert(msbIndex >= 0 && msbIndex <= 3);
+    destination[curByte] = static_cast<byte>(highDword);
+    if (msbIndex != 0)
+    {
+        curByte += increment;
+        destination[curByte] = static_cast<byte>((highDword >> 8));
+        if (msbIndex != 1)
+        {
+            curByte += increment;
+            destination[curByte] = static_cast<byte>((highDword >> 16));
+            if (msbIndex != 2)
+            {
+                curByte += increment;
+                destination[curByte] = static_cast<byte>((highDword >> 24));
+            }
+        }
+    }
+
+    // Assert we're big endian, or little endian consistency holds.
+    assert(isBigEndian || (!needExtraByte && curByte == length - 1) || (needExtraByte && curByte == length - 2));
+    // Assert we're little endian, or big endian consistency holds.
+    assert(!isBigEndian || (!needExtraByte && curByte == 0) || (needExtraByte && curByte == 1));
+
+    if (needExtraByte)
+    {
+        curByte += increment;
+        destination[curByte] = highByte;
+    }
+
+    return array;
+}
+
 void BigInteger::AssertValid() const
 {
 
@@ -1595,11 +2477,15 @@ void BigInteger::AssertValid() const
         assert(_sign == 1 || _sign == -1);
         assert(_bits.size() > 0);
         assert(_bits.size() > 1 || _bits[0] >= kuMaskHighBit);
+        //for (auto a : _bits)
+        //{
+        //    std::cout << "bits: " << a << std::endl;
+        //}
         assert(_bits[_bits.size() - 1] != 0);
     }
     else
     {
+        //std::cout << "_sign: " << _sign << " intMin: " << std::numeric_limits<int>::min() << std::endl;
         assert(_sign > std::numeric_limits<int>::min());
     }
 }
-

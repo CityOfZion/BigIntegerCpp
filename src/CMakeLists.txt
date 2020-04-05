@@ -1,5 +1,7 @@
 add_library(BigInteger SHARED)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 target_sources(
     BigInteger
     PRIVATE
