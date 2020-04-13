@@ -1265,6 +1265,8 @@ BigInteger BigInteger::operator %(BigInteger& divisor)
 
     bool trivialDividend = dividend._bits.empty();
     bool trivialDivisor = divisor._bits.empty();
+    //std::cout << "trivialDividend: " << trivialDividend << " trivialDivisor: " << trivialDivisor << std::endl;
+    //std::cout << "dividend: " << dividend.ToString() << " divisor: " << divisor.ToString() << std::endl;
 
     if (trivialDividend && trivialDivisor)
     {
@@ -1281,7 +1283,8 @@ BigInteger BigInteger::operator %(BigInteger& divisor)
     if (trivialDivisor)
     {
         assert(!dividend._bits.empty());
-        uint32_t remainder = BigInteger::Remainder(dividend._bits, abs(divisor._sign));
+        long remainder = BigInteger::Remainder(dividend._bits, abs(divisor._sign));
+        //std::cout << "remainder: " << -1 * remainder << std::endl;
         return dividend._sign < 0 ? -1 * remainder : remainder;
     }
 
@@ -2395,7 +2398,6 @@ byte_array BigInteger::ToByteArray(GetBytesMode mode, bool isUnsigned, bool isBi
         length = 4 * (bits.size() - 1) + length;
     }
 
-    byte_array array;
     byte_array destination;
     switch (mode)
     {
@@ -2403,7 +2405,7 @@ byte_array BigInteger::ToByteArray(GetBytesMode mode, bool isUnsigned, bool isBi
             *bytesWritten = length;
             return byte_array();
         default:
-            destination = array = byte_array(length);
+            destination = byte_array(length);
             break;
     }
 
@@ -2412,7 +2414,7 @@ byte_array BigInteger::ToByteArray(GetBytesMode mode, bool isUnsigned, bool isBi
 
     if (bits.size() != 0)
     {
-        for (int i = 0; i < bits.size() - 1; i++)
+        for (size_t i = 0; i < bits.size() - 1; i++)
         {
             uint dword = bits[i];
 
@@ -2466,7 +2468,7 @@ byte_array BigInteger::ToByteArray(GetBytesMode mode, bool isUnsigned, bool isBi
         destination[curByte] = highByte;
     }
 
-    return array;
+    return destination;
 }
 
 void BigInteger::AssertValid() const

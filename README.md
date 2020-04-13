@@ -4,4 +4,4 @@ C++ port of C# BigInteger
 mkdir build 
 cd build; cmake ..
 cmake --build .
-bin/BigIntegerTests
+bin/unit_tests
