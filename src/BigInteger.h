@@ -4,6 +4,7 @@
 #include <climits>
 #include <vector>
 #include <string>
+#include <iostream>
 
  using uint_array = std::vector<uint32_t>;
  using byte_array = std::vector<unsigned char>;
@@ -25,6 +26,8 @@ class BigInteger {
         static int GetDiffLength(uint_array rgu1, uint_array rgu2, int cu);
         static void DangerousMakeTwosComplement(uint_array& d);
         void AssertValid() const;
+
+
 
     public:
         enum GetBytesMode { AllocateArray, Count }; // currently AllocateArray only
@@ -55,6 +58,14 @@ class BigInteger {
         BigInteger(uint_array value, bool negative);
         BigInteger(const byte_array value, bool isUnsigned = false, bool isBigEndian = false);
 
+        // explicit casts
+        operator int();
+        operator unsigned int();
+        operator long();
+        operator unsigned long();
+        operator double();
+        operator float();
+
         static BigInteger Zero();
         static BigInteger One();
         static BigInteger MinusOne();
@@ -75,16 +86,16 @@ class BigInteger {
 
         static BigInteger Negate(BigInteger& value);
 
-        // Not sure if needed
-        //static double Log(BigInteger value, double baseValue);
-        //static double Log10(BigInteger value);
+        static double Log(BigInteger value);
+        static double Log(BigInteger value, double baseValue);
+        static double Log10(BigInteger value);
 
         static BigInteger& Max(BigInteger& lhs, BigInteger& rhs);
         static BigInteger& Min(BigInteger& lhs, BigInteger& rhs);
 
         // Not sure if needed
         //static BigInteger ModPow(BigInteger value, BigInteger exponent, BigInteger modulus);
-        //static BigInteger Pow(BigInteger left, int exponent);
+        static BigInteger Pow(BigInteger value, int exponent);
 
         //bool Equals(long long other) const;
         //bool Equals(unsigned long other) const;
@@ -169,7 +180,7 @@ class BigInteger {
         BigInteger Subtract(uint_array& lhs, int lhsSign, uint_array& rhs, int rhsSign);
         static uint_array Subtract(uint_array& lhs, uint32_t rhs);
         static uint_array Subtract(uint_array& lhs, uint_array& rhs);
-        static void SubtractSelf(uint_array* lhs, int lhsLength, uint_array* rhs, int rhsLength);
+        static void SubtractSelf(uint32_t * lhs, int lhsLength, uint32_t * rhs, int rhsLength);
         static void Subtract(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength, uint32_t* bits, int bitsLength);
 
         // Compare
@@ -190,5 +201,6 @@ class BigInteger {
         byte_array ToByteArray(bool isUnsigned = false, bool isBigEndian = false);
         byte_array ToByteArray(GetBytesMode mode, bool isUnsigned = false, bool isBigEndian = false, int* bytesWritten = 0);
         int GetByteCount(bool isUnsigned = false);
+
 };
 

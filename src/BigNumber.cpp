@@ -398,7 +398,7 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
     }
 
     //std::cout << "bufSize: " << rgchBufSize << std::endl;
-    char rgch[rgchBufSize] = "";
+    char rgch[rgchBufSize];
 
     int ichDst = cchMax;
 

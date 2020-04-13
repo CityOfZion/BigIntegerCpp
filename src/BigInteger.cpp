@@ -1,11 +1,14 @@
 #include "BigInteger.h"
 #include "BigNumber.h"
+#include "NumericsHelpers.h"
 
 #include <limits>
 #include <cassert>
 #include <cstdlib>
 #include <any>
 #include <iostream>
+#include <cmath>
+#include <BigIntegerCalculator/BigIntegerCalculator.h>
 
 
 //using tcb::span; // currently unused, not sure if we "need" a span
@@ -14,6 +17,10 @@ const BigInteger BigInteger::s_bnMinInt = BigInteger(-1, uint_array {kuMaskHighB
 const BigInteger BigInteger::s_bnOneInt = BigInteger(1);
 const BigInteger BigInteger::s_bnZeroInt = BigInteger(0);
 const BigInteger BigInteger::s_bnMinusOneInt = BigInteger(-1);
+
+const double double_NaN = static_cast<double>(0.0)/static_cast<double>(0.0);
+const double double_PositiveInfinity = static_cast<double>(1.0)/static_cast<double>(0.0);
+const double double_NegativeInfinity = static_cast<double>(-1.0)/static_cast<double>(0.0);
 
 BigInteger::BigInteger()
 {
@@ -1382,8 +1389,9 @@ BigInteger BigInteger::operator +=(uint64_t rhs)
     //std::cout << "uint += operator" << std::endl;
     //value.AssertValid();
     BigInteger value = BigInteger(rhs);
+    *this = (*this + value);
     //std::cout << "adding: " << value.ToString() << std::endl;
-    return *this + value;
+    return *this;
 }
 
 BigInteger BigInteger::operator +=(BigInteger& rhs)
@@ -1684,7 +1692,7 @@ uint32_t BigInteger::AddDivisor(uint32_t* lhs, int lhsLength, uint32_t* rhs, int
 
     for (int i = 0; i < rhsLength; i++)
     {
-        ulong digit = (lhs[i] + carry) + rhs[i];
+        uint64_t digit = (lhs[i] + carry) + rhs[i];
         lhs[i] = static_cast<uint32_t>(digit);
         carry = digit >> 32;
     }
@@ -2491,3 +2499,182 @@ void BigInteger::AssertValid() const
         assert(_sign > std::numeric_limits<int>::min());
     }
 }
+
+BigInteger::operator int() {
+    if (_bits.empty())
+        return _sign;
+
+    if (_bits.size() > 1)
+        throw std::overflow_error("SR.Overflow_Int32");
+
+    if (_sign > 0) {
+        if (_bits[0] > INT32_MAX)
+            throw std::overflow_error("checked() size > INT32_MAX");
+        else
+            return static_cast<int>(_bits[0]);
+    }
+    if (_bits[0] > kuMaskHighBit)
+        throw std::overflow_error("SR.Overflow_Int32");
+
+    return -static_cast<int>(_bits[0]);
+}
+
+BigInteger::operator unsigned int() {
+    if (_bits.empty()) {
+        if (_sign < 0)
+            throw std::overflow_error("checked() UInt32 overflow");
+        else
+            return static_cast<unsigned int>(_sign);
+    } else if (_bits.size() > 1 || _sign < 0) {
+        throw std::overflow_error("SR.Overflow_UInt32");
+    } else {
+        return _bits[0];
+    }
+}
+
+BigInteger::operator long() {
+    if (_bits.empty())
+        return _sign;
+
+    int len = _bits.size();
+    if (len > 2)
+        throw std::overflow_error("SR.Overflow_Int64");
+
+    unsigned long uu;
+    if (len > 1) {
+        uu = (static_cast<unsigned long>(_bits[1]) << kcbitUint) | _bits[0];
+    } else {
+        uu = _bits[0];
+    }
+
+    long ll = _sign > 0 ? static_cast<long>(uu) : -static_cast<long>(uu);
+    if ((ll > 0 && _sign > 0) || (ll < 0 && _sign < 0))
+        return ll;
+    throw std::overflow_error("SR.Overflow_Int64");
+}
+
+BigInteger::operator unsigned long() {
+    if (_bits.empty()) {
+        if (_sign < 0)
+            throw std::overflow_error("checked() UInt32 overflow");
+        else
+            return static_cast<unsigned long>(_sign);
+    }
+
+    int len = _bits.size();
+    if (len > 2 || _sign < 0) {
+        throw std::overflow_error("SR.Overflow_UInt64");
+    }
+
+    if (len > 1) {
+        return (static_cast<unsigned long>(_bits[1]) << kcbitUint) | _bits[0];
+    }
+    return _bits[0];
+}
+
+BigInteger::operator double() {
+    if (_bits.empty())
+        return _sign;
+
+    int length = _bits.size();
+    const int InfinityLength = 1024 / kcbitUint;
+
+    if (length > InfinityLength) {
+        if (_sign == 1)
+            return static_cast<double>(1.0)/static_cast<double>(0.0); // PositiveInfinity
+        else
+            return static_cast<double>(-1.0)/static_cast<double>(0.0); // NegativeInfinity
+    }
+
+    unsigned long h = _bits[length -1];
+    unsigned long m = length > 1 ? _bits[length - 2] : 0;
+    unsigned long l = length > 2 ? _bits[length - 3] : 0;
+
+    int z = NumericsHelpers::CbitHighZero(static_cast<unsigned int>(h));
+
+    int exp = (length - 2) * 32 - z;
+    ulong man = (h << (32 + z)) | (m << z) | (l >> (32 - z));
+
+    return NumericsHelpers::GetDoubleFromParts(_sign, exp, man);
+}
+
+BigInteger::operator float() {
+    return static_cast<float>(static_cast<double>(*this));
+}
+
+double BigInteger::Log(BigInteger value) {
+    return Log(value, 2.7182818284590451);
+}
+
+double BigInteger::Log(BigInteger value, double baseValue) {
+    if (value._sign < 0 || baseValue == 1.0)
+        return double_NaN;
+
+    if (baseValue == double_PositiveInfinity)
+        return value.IsOne() ? 0.0 : double_NaN;
+
+    if (baseValue == 0.0 && !value.IsOne())
+        return double_NaN;
+
+    if (value._bits.empty())
+        return log(value) / log(baseValue);
+
+    uint64_t h = value._bits[value._bits.size() - 1];
+    uint64_t m = value._bits.size() > 1 ? value._bits[value._bits.size() - 2] : 0;
+    uint64_t l = value._bits.size() > 2 ? value._bits[value._bits.size() - 3] : 0;
+
+    int c = NumericsHelpers::CbitHighZero(static_cast<unsigned int>(h));
+    int64_t b = static_cast<int64_t>(value._bits.size() * 32 - c);
+
+    uint64_t x = (h << (32 + c)) | (m << c) | (l >> (32 - c));
+    return (log(x) / log(baseValue)) + (b - 64) / log2(baseValue);
+}
+
+double BigInteger::Log10(BigInteger value) {
+    return Log(value, 10);
+}
+
+BigInteger BigInteger::Pow(BigInteger value, int exponent) {
+    if (exponent < 0)
+        throw std::out_of_range("SR.ArgumentOutOfRange_MustBeNonNeg");
+
+    value.AssertValid();
+
+    if (exponent == 0)
+        return s_bnOneInt;
+    if (exponent == 1)
+        return value;
+
+    bool trivialValue = value._bits.empty();
+
+    if (trivialValue) {
+        if (value._sign == 1)
+            return value;
+        if (value._sign == -1)
+            return (exponent & 1) != 0 ? value : s_bnOneInt;
+        if (value._sign == 0)
+            return value;
+    }
+    uint_array bits = trivialValue
+            ? BigIntegerCalculator::Pow(abs(value._sign), abs(exponent))
+            : BigIntegerCalculator::Pow(value._bits, abs(exponent));
+
+    return BigInteger(bits, value._sign < 0 && (exponent & 1) != 0);
+}
+
+void BigInteger::SubtractSelf(uint32_t *left, int leftLength, uint32_t *right, int rightLength) {
+    int i = 0;
+    long carry = 0;
+
+    for (; i < rightLength; i++) {
+        long digit = (left[i] + carry) - right[i];
+        left[i] = static_cast<uint32_t>(digit); // unchecked()
+        carry = digit >> 32;
+    }
+    for (; carry != 0 && i < leftLength; i++) {
+        long digit = left[i] + carry;
+        left[i] = static_cast<uint32_t>(digit);
+        carry = digit >> 32;
+    }
+}
+
