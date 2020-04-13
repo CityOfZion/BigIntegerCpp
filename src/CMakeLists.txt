@@ -1,4 +1,5 @@
-add_library(BigInteger SHARED BigIntegerCalculator/PowMod.cpp BigIntegerCalculator/BigIntegerCalculator.h BigIntegerCalculator/BitsBuffer.cpp BigIntegerCalculator/BitsBuffer.h BigIntegerCalculator/FastReducer.cpp BigIntegerCalculator/FastReducer.h)
+file(GLOB BigIntegerCalc "BigIntegerCalculator/*.cpp" "BigIntegerCalculator/*.h")
+add_library(BigInteger SHARED ${BigIntegerCalc})
 
 set(CMAKE_BUILD_TYPE Debug)
 
