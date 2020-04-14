@@ -18,9 +18,9 @@ void BitsBuffer::MultiplySelf(BitsBuffer& value, BitsBuffer& temp) {
     unsigned int* t = temp._bits.data();
 
     if (_length < value._length)
-        BigInteger::Multiply(v, value._length, b, _length, t, _length + value._length);
+        BigIntegerCalculator::Multiply(v, value._length, b, _length, t, _length + value._length);
     else
-        BigInteger::Multiply(b, _length, v, value._length, t, _length + value._length);
+        BigIntegerCalculator::Multiply(b, _length, v, value._length, t, _length + value._length);
     Apply(temp, _length + value._length);
 }
 
@@ -28,7 +28,7 @@ void BitsBuffer::SquareSelf(BitsBuffer& temp) {
     unsigned int* b = _bits.data();
     unsigned int* t = temp._bits.data();
 
-    BigInteger::Square(b, _length, t, _length + _length);
+    BigIntegerCalculator::Square(b, _length, t, _length + _length);
     Apply(temp, _length + _length);
 }
 
@@ -40,7 +40,7 @@ void BitsBuffer::Reduce(uint_array modulus) {
     if (_length >= modulus.size()) {
         unsigned int* b = _bits.data();
         unsigned int* m = modulus.data();
-        BigInteger::Divide(b, _length, m, modulus.size(), nullptr, 0);
+        BigIntegerCalculator::Divide(b, _length, m, modulus.size(), nullptr, 0);
         _length = BigIntegerCalculator::ActualLength(_bits, modulus.size());
     }
 }
@@ -49,7 +49,7 @@ void BitsBuffer::Reduce(BitsBuffer& modulus) {
     if (_length >= modulus._length) {
         unsigned int* b = _bits.data();
         unsigned int* m = modulus._bits.data();
-        BigInteger::Divide(b, _length, m, modulus._length, nullptr, 0);
+        BigIntegerCalculator::Divide(b, _length, m, modulus._length, nullptr, 0);
         _length = BigIntegerCalculator::ActualLength(_bits, modulus._length);
     }
 }

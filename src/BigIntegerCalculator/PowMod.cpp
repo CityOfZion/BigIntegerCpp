@@ -75,7 +75,7 @@ uint32_t BigIntegerCalculator::PowCore(uint32_t power, uint32_t modulus, unsigne
 }
 
 uint32_t BigIntegerCalculator::Pow(uint_array& value, uint32_t power, uint32_t modulus) {
-    uint32_t v = BigInteger::Remainder(value, modulus);
+    uint32_t v = Remainder(value, modulus);
     return PowCore(power, modulus, v, 1);
 }
 
@@ -92,7 +92,7 @@ uint32_t BigIntegerCalculator::PowCore(uint_array& power, uint32_t modulus, unsi
 }
 
 uint32_t BigIntegerCalculator::Pow(uint_array& value, uint_array& power, uint32_t modulus) {
-    auto v = BigInteger::Remainder(value, modulus);
+    auto v = Remainder(value, modulus);
     return PowCore(power, modulus, v, 1);
 }
 
@@ -119,7 +119,7 @@ uint_array BigIntegerCalculator::PowCore(uint32_t power, uint_array& modulus, Bi
 
 uint_array BigIntegerCalculator::Pow(uint_array& value, uint32_t power, uint_array& modulus) {
     if (value.size() > modulus.size())
-        value = BigInteger::Remainder(value, modulus);
+        value = Remainder(value, modulus);
 
     int size = modulus.size() + modulus.size();
     BitsBuffer v(size, value);
@@ -165,7 +165,7 @@ uint_array BigIntegerCalculator::Pow(uint32_t value, uint_array& power, uint_arr
 
 uint_array BigIntegerCalculator::Pow(uint_array& value, uint_array& power, uint_array& modulus) {
     if (value.size() > modulus.size())
-        value = BigInteger::Remainder(value, modulus);
+        value = Remainder(value, modulus);
 
     int size = modulus.size() + modulus.size();
     BitsBuffer v(size, value);

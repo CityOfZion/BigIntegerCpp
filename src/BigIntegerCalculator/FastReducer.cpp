@@ -5,7 +5,7 @@ FastReducer::FastReducer(uint_array modulus) {
     uint_array r(modulus.size() * 2 + 1, 0);
     r[r.size() - 1] = 1;
 
-    _mu = BigInteger::Divide(r, modulus);
+    _mu = BigIntegerCalculator::Divide(r, modulus);
     _modulus = modulus;
 
     _q1 = uint_array(modulus.size() * 2 + 2);
@@ -32,9 +32,9 @@ int FastReducer::DivMul(uint_array& left, int leftLength, uint_array& right, int
         unsigned int* r = right.data();
         unsigned int* b = bits.data();
         if (leftLength < rightLength)
-            BigInteger::Multiply(r, rightLength, l + k , leftLength, b, leftLength + rightLength);
+            BigIntegerCalculator::Multiply(r, rightLength, l + k , leftLength, b, leftLength + rightLength);
         else
-            BigInteger::Multiply(l + k, leftLength, r, rightLength, b, leftLength + rightLength);
+            BigIntegerCalculator::Multiply(l + k, leftLength, r, rightLength, b, leftLength + rightLength);
 
         return BigIntegerCalculator::ActualLength(bits, leftLength + rightLength);
     }
@@ -53,11 +53,11 @@ int FastReducer::SubMod(uint_array left, int leftLength, uint_array right, int r
     unsigned int* r = right.data();
     unsigned int* m = modulus.data();
 
-    BigInteger::SubtractSelf(l, leftLength, r, rightLength);
+    BigIntegerCalculator::SubtractSelf(l, leftLength, r, rightLength);
     leftLength = BigIntegerCalculator::ActualLength(left, leftLength);
 
-    while (BigInteger::Compare(l, leftLength, m, modulus.size()) >= 0) {
-        BigInteger::SubtractSelf(l, leftLength, m, modulus.size());
+    while (BigIntegerCalculator::Compare(l, leftLength, m, modulus.size()) >= 0) {
+        BigIntegerCalculator::SubtractSelf(l, leftLength, m, modulus.size());
         leftLength = BigIntegerCalculator::ActualLength(left, leftLength);
     }
 
