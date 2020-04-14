@@ -99,43 +99,40 @@ void BigIntegerCalculator::Square(uint32_t* value, int valueLength, uint32_t* bi
 
         if (coreLength < AllocationThreshold)
         {
-            uint32_t* fold = new uint32_t[foldLength];
-            //new Span<uint>(fold, foldLength).Clear();
-            uint32_t* core = new uint32_t[coreLength];
-            //new Span<uint>(core, coreLength).Clear();
+            uint_array fold(foldLength, 0);
+            uint_array core(coreLength, 0);
 
             // ... compute z_a = a_1 + a_0 (call it fold...)
             Add(valueHigh, valueHighLength,
                             valueLow, valueLowLength,
-                            fold, foldLength);
+                            fold.data(), foldLength);
 
             // ... compute z_1 = z_a * z_a - z_0 - z_2
-            Square(fold, foldLength,
-                               core, coreLength);
+            Square(fold.data(), foldLength,
+                               core.data(), coreLength);
 
             SubtractCore(bitsHigh, bitsHighLength,
                                      bitsLow, bitsLowLength,
-                                     core, coreLength);
+                                     core.data(), coreLength);
 
             // ... and finally merge the result! :-)
             AddSelf(&bits[n], bitsLength - n, &core[0], coreLength);
         }
         else
         {
-            uint32_t* fold = new uint32_t[foldLength];
-            uint32_t* core = new uint32_t[coreLength];
+            uint_array fold(foldLength, 0);
+            uint_array core(coreLength, 0);
             // ... compute z_a = a_1 + a_0 (call it fold...)
             Add(valueHigh, valueHighLength,
                             valueLow, valueLowLength,
-                            fold, foldLength);
+                            fold.data(), foldLength);
 
             // ... compute z_1 = z_a * z_a - z_0 - z_2
-            Square(fold, foldLength,
-                               core, coreLength);
+            Square(fold.data(), foldLength, core.data(), coreLength);
 
             SubtractCore(bitsHigh, bitsHighLength,
                                      bitsLow, bitsLowLength,
-                                     core, coreLength);
+                                     core.data(), coreLength);
 
             // ... and finally merge the result! :-)
             AddSelf(&bits[n], bitsLength - n, &core[0], coreLength);
@@ -272,57 +269,55 @@ void BigIntegerCalculator::Multiply(uint32_t* left, int leftLength, uint32_t* ri
 
         if (coreLength < AllocationThreshold)
         {
-            uint32_t* leftFold = new uint32_t[leftFoldLength];
-            //new Span<uint>(leftFold, leftFoldLength).Clear();
-            uint32_t* rightFold = new uint32_t[rightFoldLength];
-            //new Span<uint>(rightFold, rightFoldLength).Clear();
-            uint32_t* core = new uint32_t[coreLength];
-            //new Span<uint>(core, coreLength).Clear();
+            uint_array leftFold(leftFoldLength, 0);
+            uint_array rightFold(rightFoldLength, 0);
+            uint_array core(coreLength, 0);
 
             // ... compute z_a = a_1 + a_0 (call it fold...)
             BigIntegerCalculator::Add(leftHigh, leftHighLength,
                                       leftLow, leftLowLength,
-                                      leftFold, leftFoldLength);
+                                      leftFold.data(), leftFoldLength);
 
             // ... compute z_b = b_1 + b_0 (call it fold...)
             BigIntegerCalculator::Add(rightHigh, rightHighLength,
                                       rightLow, rightLowLength,
-                                      rightFold, rightFoldLength);
+                                      rightFold.data(), rightFoldLength);
 
             // ... compute z_1 = z_a * z_b - z_0 - z_2
-            Multiply(leftFold, leftFoldLength,
-                                 rightFold, rightFoldLength,
-                                 core, coreLength);
+            Multiply(leftFold.data(), leftFoldLength,
+                                 rightFold.data(), rightFoldLength,
+                                 core.data(), coreLength);
 
             SubtractCore(bitsHigh, bitsHighLength,
                                      bitsLow, bitsLowLength,
-                                     core, coreLength);
+                                     core.data(), coreLength);
 
             // ... and finally merge the result! :-)
             AddSelf(&bits[n], bitsLength - n, &core[0], coreLength);
         }
         else
         {
-            uint32_t* leftFold = new uint32_t[leftFoldLength];
-            uint32_t* rightFold = new uint32_t[rightFoldLength];
-            uint32_t* core = new uint32_t[coreLength];
+            uint_array leftFold(leftFoldLength, 0);
+            uint_array rightFold(rightFoldLength, 0);
+            uint_array core(coreLength, 0);
+
             // ... compute z_a = a_1 + a_0 (call it fold...)
             Add(leftHigh, leftHighLength,
                             leftLow, leftLowLength,
-                            leftFold, leftFoldLength);
+                            leftFold.data(), leftFoldLength);
 
             // ... compute z_b = b_1 + b_0 (call it fold...)
             Add(rightHigh, rightHighLength,
                             rightLow, rightLowLength,
-                            rightFold, rightFoldLength);
+                            rightFold.data(), rightFoldLength);
 
             // ... compute z_1 = z_a * z_b - z_0 - z_2
-            Multiply(leftFold, leftFoldLength,
-                                 rightFold, rightFoldLength,
-                                 core, coreLength);
+            Multiply(leftFold.data(), leftFoldLength,
+                                 rightFold.data(), rightFoldLength,
+                                 core.data(), coreLength);
             SubtractCore(bitsHigh, bitsHighLength,
                                      bitsLow, bitsLowLength,
-                                     core, coreLength);
+                                     core.data(), coreLength);
 
             // ... and finally merge the result! :-)
             AddSelf(&bits[n], bitsLength - n, &core[0], coreLength);
