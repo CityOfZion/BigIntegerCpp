@@ -445,6 +445,5 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
             rgch[--ichDst] = negativeSign[i];
     }
 
-    std::string a = std::string(rgch);
-    return std::string(rgch, cchMax + 1);
+    return std::string(&rgch[ichDst], cchMax - ichDst);
 }
