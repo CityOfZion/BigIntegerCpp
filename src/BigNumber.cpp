@@ -1,5 +1,6 @@
 #include "BigNumber.h"
 #include "BigInteger.h"
+#include "NumericsHelpers.h"
 #include <sstream>
 #include <limits>
 #include <cassert>
@@ -346,7 +347,7 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
         for (int iuDst = 0; iuDst < cuDst; iuDst++)
         {
             assert(rguDst[iuDst] < kuBase);
-            uint64_t uuRes = BigInteger::MakeUlong(rguDst[iuDst], uCarry);
+            uint64_t uuRes = NumericsHelpers::MakeUlong(rguDst[iuDst], uCarry);
             rguDst[iuDst] = static_cast<uint32_t>(uuRes % kuBase);
             uCarry = static_cast<uint32_t>(uuRes / kuBase);
         }

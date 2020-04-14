@@ -1,4 +1,3 @@
-
 #pragma once
 #include <any>
 #include <climits>
@@ -12,13 +11,6 @@
 
 class BigInteger {
     public:
-        enum GetBytesMode { AllocateArray, Count }; // currently AllocateArray only
-        static unsigned long MakeUlong(unsigned int uHi, unsigned int uLo);
-
-        //getter/setter
-        int GetSign() ;
-        uint_array GetBits();
-
         static constexpr unsigned int kuMaskHighBit = static_cast<unsigned int>(INT_MIN);
         static constexpr int kcbitUint = 32;
         static constexpr int kcbitUlong = 64;
@@ -35,6 +27,15 @@ class BigInteger {
         BigInteger(uint_array value, bool negative);
         BigInteger(const byte_array value, bool isUnsigned = false, bool isBigEndian = false);
 
+        friend bool operator<(const BigInteger& lhs, const BigInteger& rhs) { return lhs.CompareTo(rhs) < 0; }
+        friend bool operator>(const BigInteger& lhs, const BigInteger& rhs) { return rhs < lhs; }
+        friend bool operator<=(const BigInteger& lhs, const BigInteger& rhs) { return !(lhs > rhs); }
+        friend bool operator>=(const BigInteger& lhs, const BigInteger& rhs) { return !(lhs < rhs); }
+        friend bool operator==(const BigInteger& lhs, const BigInteger& rhs) { return lhs.Equals(rhs); };
+
+        bool operator ==(const BigInteger& rhs);
+        bool operator !=(const BigInteger& rhs);
+
         // explicit casts
         operator int();
         operator unsigned int();
@@ -43,32 +44,23 @@ class BigInteger {
         operator double();
         operator float();
 
-        static BigInteger Zero();
-        static BigInteger One();
-        static BigInteger MinusOne();
-
         bool IsPowerOfTwo();
         bool IsZero();
         bool IsOne();
         bool IsEven();
 
-        int Sign();
+        static BigInteger Zero();
+        static BigInteger One();
+        static BigInteger MinusOne();
 
         static BigInteger Parse(std::string value);
         static bool TryParse(std::string value, BigInteger& result);
-
-        std::string ToString();
-
-        static int Compare(BigInteger& lhs, BigInteger& rhs);
 
         static BigInteger Negate(BigInteger& value);
 
         static double Log(BigInteger value);
         static double Log(BigInteger value, double baseValue);
         static double Log10(BigInteger value);
-
-        static BigInteger& Max(BigInteger& lhs, BigInteger& rhs);
-        static BigInteger& Min(BigInteger& lhs, BigInteger& rhs);
 
         static BigInteger ModPow(BigInteger value, BigInteger exponent, BigInteger modulus);
         static BigInteger Pow(BigInteger value, int exponent);
@@ -78,29 +70,6 @@ class BigInteger {
         //bool Equals(std::any obj);
         bool Equals(uint64_t other) const;
         bool Equals(const BigInteger& other) const;
-
-
-        //friend BigInteger operator <(const BigInteger& lhs, const BigInteger& rhs);
-        //friend BigInteger operator >(const BigInteger& lhs, const BigInteger& rhs);
-
-        //friend BigInteger operator <=(const BigInteger& lhs, const BigInteger& rhs);
-        //friend BigInteger operator >=(const BigInteger& lhs, const BigInteger& rhs);
-
-        //friend BigInteger operator ==(const BigInteger& lhs, const BigInteger& rhs);
-        //friend BigInteger operator !=(const BigInteger& lhs, const BigInteger& rhs);
-
-        //friend BigInteger operator <(const BigInteger& lhs, long& rhs);
-        //friend BigInteger operator <=(const BigInteger& lhs, long& rhs);
-        //friend BigInteger operator >(const BigInteger& lhs, long& rhs);
-        //friend BigInteger operator >=(const BigInteger& lhs, long& rhs);
-
-        BigInteger operator >=(long rhs);
-        BigInteger operator >=(BigInteger& rhs);
-
-        bool operator ==(const BigInteger& rhs);
-        friend bool operator ==(const BigInteger& lhs, const BigInteger& rhs);
-
-        bool operator !=(const BigInteger& rhs);
 
         // Divide & Modulo
         BigInteger operator %(BigInteger& rhs);
@@ -132,8 +101,8 @@ class BigInteger {
         BigInteger Subtract(uint_array& lhs, int lhsSign, uint_array& rhs, int rhsSign);
 
         // Compare
-        int CompareTo(long other);
-        int CompareTo(BigInteger& other);
+        int CompareTo(long other) const;
+        int CompareTo(const BigInteger& other) const;
 
         BigInteger operator <<(int shift);
         BigInteger operator >>(int shift);
@@ -141,9 +110,13 @@ class BigInteger {
         BigInteger operator &(BigInteger& rhs);
         BigInteger operator |(BigInteger& rhs);
 
-        uint_array ToUInt32Array();
-        static bool GetPartsForBitManipulation(BigInteger& x, uint_array& xd, int& xl);
+        enum GetBytesMode { AllocateArray, Count }; // currently AllocateArray only
+        int Sign();
+        int GetSign() ;
+        uint_array GetBits();
 
+        std::string ToString();
+        uint_array ToUInt32Array();
         byte_array ToByteArray(bool isUnsigned = false, bool isBigEndian = false);
         byte_array ToByteArray(GetBytesMode mode, bool isUnsigned = false, bool isBigEndian = false, int* bytesWritten = 0);
         int GetByteCount(bool isUnsigned = false);
@@ -161,7 +134,7 @@ private:
     BigInteger(uint_array value);
 
     static int GetDiffLength(uint_array rgu1, uint_array rgu2, int cu);
-    static void DangerousMakeTwosComplement(uint_array& d);
+    static bool GetPartsForBitManipulation(BigInteger& x, uint_array& xd, int& xl);
     void AssertValid() const;
 };
 

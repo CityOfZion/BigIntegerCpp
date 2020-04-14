@@ -73,4 +73,29 @@ class NumericsHelpers {
             du.uu |= 0x8000000000000000;
         return du.dbl;
     }
+
+    static void DangerousMakeTwosComplement(uint_array& d)
+    {
+        //dangerous because mutates d!
+        if (d.size() > 0)
+        {
+            d[0] = ~d[0] + 1;
+
+            size_t i = 1;
+            // first do complement and +1 as long as carry is needed
+            for (; d[i - 1] == 0 && i < d.size(); i++)
+            {
+                d[i] = ~d[i] + 1;
+            }
+            // now ones complement is sufficient
+            for (; i < d.size(); i++)
+            {
+                d[i] = ~d[i];
+            }
+        }
+    }
+
+    static uint64_t MakeUlong(unsigned int uHi, unsigned int uLo) {
+            return (static_cast<uint64_t>(uHi) << BigInteger::kcbitUint) | uLo;
+    }
 };

@@ -275,7 +275,7 @@ BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
 
         if (isNegative)
         {
-            BigInteger::DangerousMakeTwosComplement(val); // Mutates val
+            NumericsHelpers::DangerousMakeTwosComplement(val); // Mutates val
 
             // Pack _bits to remove any wasted space after the twos complement
             int len = val.size() - 1;
@@ -386,7 +386,7 @@ BigInteger::BigInteger(uint_array value)
     }
 
     // Finally handle the more complex cases where we must transform the input into sign magnitude
-    BigInteger::DangerousMakeTwosComplement(value); // mutates val
+    NumericsHelpers::DangerousMakeTwosComplement(value); // mutates val
 
     // Pack _bits to remove any wasted space after the twos complement
     int len = value.size();
@@ -662,16 +662,6 @@ BigInteger BigInteger::Multiply(BigInteger& lhs, BigInteger& rhs)
     return lhs * rhs;
 }
 
-BigInteger BigInteger::operator >=(BigInteger& rhs)
-{
-    return this->CompareTo(rhs);
-}
-
-BigInteger BigInteger::operator >=(long rhs)
-{
-    return this->CompareTo(rhs);
-}
-
 BigInteger BigInteger::operator %(BigInteger& divisor)
 {
     BigInteger dividend = *this;
@@ -823,11 +813,6 @@ BigInteger BigInteger::operator *=(BigInteger& rhs)
     return *this;
 }
 
-bool operator ==(const BigInteger& lhs, const BigInteger& rhs)
-{
-    return lhs.Equals(rhs);
-}
-
 bool BigInteger::operator ==(const BigInteger& rhs)
 {
     return this->Equals(rhs);
@@ -882,7 +867,7 @@ BigInteger BigInteger::Divide(BigInteger& dividend, BigInteger& divisor)
     return dividend / divisor;
 }
 
-int BigInteger::CompareTo(long other)
+int BigInteger::CompareTo(const long other) const
 {
     AssertValid();
 
@@ -892,11 +877,11 @@ int BigInteger::CompareTo(long other)
     if ((_sign ^ other) < 0 || (cu = _bits.size()) > 2)
         return _sign;
     uint64_t uu = other < 0 ? static_cast<unsigned long>(-other) : static_cast<unsigned long>(other);
-    uint64_t uuTmp = cu == 2 ? BigInteger::MakeUlong(_bits[1], _bits[0]) : _bits[0];
+    uint64_t uuTmp = cu == 2 ? NumericsHelpers::MakeUlong(_bits[1], _bits[0]) : _bits[0];
     return (_sign * uuTmp) == uu;
 }
 
-int BigInteger::CompareTo(BigInteger& other)
+int BigInteger::CompareTo(const BigInteger& other) const
 {
     AssertValid();
     other.AssertValid();
@@ -934,11 +919,6 @@ int BigInteger::GetDiffLength(uint_array rgu1, uint_array rgu2, int cu)
             return iv + 1;
     }
     return 0;
-}
-
-uint64_t BigInteger::MakeUlong(unsigned int uHi, unsigned int uLo)
-{
-    return (static_cast<uint64_t>(uHi) << BigInteger::kcbitUint) | uLo;
 }
 
 BigInteger BigInteger::Zero()
@@ -1071,7 +1051,7 @@ BigInteger BigInteger::operator <<(int shift)
     int smallShift = shift - (digitShift * kcbitUint);
 
     uint_array xd; int xl; bool negx;
-    negx = BigInteger::GetPartsForBitManipulation(*this, xd, xl);
+    negx = GetPartsForBitManipulation(*this, xd, xl);
 
     int zl = xl + digitShift + 1;
     uint_array zd(zl);
@@ -1100,27 +1080,6 @@ BigInteger BigInteger::operator <<(int shift)
 
 }
 
-void BigInteger::DangerousMakeTwosComplement(uint_array& d)
-{
-    //dangerous because mutates d!
-    if (d.size() > 0)
-    {
-        d[0] = ~d[0] + 1;
-
-        size_t i = 1;
-        // first do complement and +1 as long as carry is needed
-        for (; d[i - 1] == 0 && i < d.size(); i++)
-        {
-            d[i] = ~d[i] + 1;
-        }
-        // now ones complement is sufficient
-        for (; i < d.size(); i++)
-        {
-            d[i] = ~d[i];
-        }
-    }
-}
-
 uint_array BigInteger::ToUInt32Array()
 {
     if (_bits.size() == 0 && _sign == 0)
@@ -1137,7 +1096,7 @@ uint_array BigInteger::ToUInt32Array()
     else if (_sign == -1)
     {
         dwords = _bits;
-        DangerousMakeTwosComplement(dwords);  // Mutates dwords
+        NumericsHelpers::DangerousMakeTwosComplement(dwords);  // Mutates dwords
         highDWord = std::numeric_limits<uint32_t>::max();
     }
     else
@@ -1207,7 +1166,7 @@ BigInteger BigInteger::operator >>(int shift)
     int smallShift = shift - (digitShift * kcbitUint);
 
     uint_array xd; int xl; bool negx;
-    negx = BigInteger::GetPartsForBitManipulation(*this, xd, xl);
+    negx = GetPartsForBitManipulation(*this, xd, xl);
 
     if (negx)
     {
@@ -1217,7 +1176,7 @@ BigInteger BigInteger::operator >>(int shift)
         }
         uint_array temp = xd;
         xd = temp;
-        BigInteger::DangerousMakeTwosComplement(xd); // Mutates xd
+        NumericsHelpers::DangerousMakeTwosComplement(xd); // Mutates xd
     }
 
     int zl = xl - digitShift;
@@ -1248,7 +1207,7 @@ BigInteger BigInteger::operator >>(int shift)
     }
     if (negx)
     {
-        BigInteger::DangerousMakeTwosComplement(zd); // Mutates zd
+        NumericsHelpers::DangerousMakeTwosComplement(zd); // Mutates zd
     }
     return BigInteger(zd, negx);
 
