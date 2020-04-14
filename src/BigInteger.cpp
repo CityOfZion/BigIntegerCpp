@@ -1015,13 +1015,11 @@ bool BigInteger::GetPartsForBitManipulation(BigInteger& x, uint_array& xd, int& 
     {
         if (x.GetSign() < 0)
         {
-            auto temp = uint_array(static_cast<uint32_t>(-x.GetSign()));
-            xd.swap(temp);
+            xd.push_back(static_cast<uint32_t>(-x.GetSign()));
         }
         else
         {
-            auto temp = uint_array(static_cast<uint32_t>(x.GetSign()));
-            xd.swap(temp);
+            xd.push_back(static_cast<uint32_t>(x.GetSign()));
         }
     }
     else
@@ -1054,7 +1052,7 @@ BigInteger BigInteger::operator <<(int shift)
     negx = GetPartsForBitManipulation(*this, xd, xl);
 
     int zl = xl + digitShift + 1;
-    uint_array zd(zl);
+    uint_array zd(zl, 0);
 
     if (smallShift == 0)
     {
@@ -1070,14 +1068,13 @@ BigInteger BigInteger::operator <<(int shift)
         int i;
         for (i = 0; i < xl; i++)
         {
-            uint rot = xd[i];
+            unsigned int rot = xd[i];
             zd[i + digitShift] = rot << smallShift | carry;
             carry = rot >> carryShift;
         }
         zd[i + digitShift] = carry;
     }
     return BigInteger(zd, negx);
-
 }
 
 uint_array BigInteger::ToUInt32Array()
