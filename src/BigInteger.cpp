@@ -10,9 +10,6 @@
 #include <cmath>
 #include <BigIntegerCalculator/BigIntegerCalculator.h>
 
-
-//using tcb::span; // currently unused, not sure if we "need" a span
-
 const BigInteger BigInteger::s_bnMinInt = BigInteger(-1, uint_array {kuMaskHighBit});
 const BigInteger BigInteger::s_bnOneInt = BigInteger(1);
 const BigInteger BigInteger::s_bnZeroInt = BigInteger(0);
@@ -30,8 +27,6 @@ BigInteger::BigInteger()
 
 BigInteger::BigInteger(int value)
 {
-
-    //std::cout << "int constructor value: " << value << " minint: " << std::numeric_limits<int>::min() << std::endl;
 	if (value == std::numeric_limits<int>::min())
 	{
 		*this = s_bnMinInt;
@@ -39,18 +34,16 @@ BigInteger::BigInteger(int value)
 	else
 	{
 		_sign = value;
-		_bits = uint_array();
+		_bits.clear();
 	}
 	AssertValid();
 }
 
 BigInteger::BigInteger(uint32_t value) {
-    //std::cout << "uint32_t constructor: " << value << std::endl;
-    //std::cout << "uint32_t limit: " << std::numeric_limits<uint32_t>::min() << std::endl;
     if (value <= static_cast<uint32_t>(std::numeric_limits<int>::max()))
     {
         _sign = value;
-        //_bits = uint_array();
+        _bits.clear();
     }
     else
     {
@@ -67,15 +60,9 @@ BigInteger::BigInteger(long value)
 
 BigInteger::BigInteger(long long value)
 {
-    //std::cout << "long long constructor: " << value << std::endl;
-    //std::cout << "int min: " << std::numeric_limits<int>::min() << std::endl;
-    //std::cout << "int min: " << std::numeric_limits<int>::max() << std::endl;
-    if (std::numeric_limits<int>::min() < value
-            && value <= std::numeric_limits<int>::max())
+    if (std::numeric_limits<int>::min() < value && value <= std::numeric_limits<int>::max())
     {
-        //std::cout << "if " << std::endl;
         _sign = static_cast<int>(value);
-        //_bits = ;
     }
     else if (value == std::numeric_limits<int>::min())
     {
@@ -83,7 +70,6 @@ BigInteger::BigInteger(long long value)
     }
     else
     {
-        //std::cout << "else " << value << std::endl;
         uint64_t x = 0;
         if (value < 0)
         {
@@ -102,8 +88,6 @@ BigInteger::BigInteger(long long value)
         }
         else
         {
-            //std::cout << "uint cast: " << static_cast<uint32_t>(x) << std::endl;
-            //std::cout << "uint cast2: " << static_cast<uint32_t>(x >> kcbitUint) << std::endl;
             _bits.push_back(static_cast<uint32_t>(x));
             _bits.push_back(static_cast<uint32_t>(x >> kcbitUint));
         }
@@ -114,7 +98,6 @@ BigInteger::BigInteger(long long value)
 
 BigInteger::BigInteger(uint64_t value)
 {
-    //std::cout << "uint64_t constructor" << std::endl;
     if (value <= static_cast<uint64_t>(std::numeric_limits<int>::max()))
     {
         _sign = static_cast<int>(value);
@@ -183,7 +166,6 @@ BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
 
     if (byteCount == 0)
     {
-        // BigInteger.Zero
         _sign = 0;
         _bits = uint_array();
         AssertValid();
@@ -533,12 +515,8 @@ BigInteger BigInteger::Subtract(BigInteger& lhs, BigInteger& rhs)
 
 BigInteger BigInteger::Add(uint_array& lhs, int lhsSign, uint_array& rhs, int rhsSign)
 {
-    //std::cout << "add now " << std::endl;
-    //std::cout << "lhsSign: " << lhsSign << std::endl;
-    //std::cout << "rhsSign: " << rhsSign << std::endl;
     bool trivialLeft = lhs.empty();
     bool trivialRight = rhs.empty();
-    //std::cout << "trivial: " << trivialLeft << " " << trivialRight <<  std::endl;
 
     if (trivialLeft && trivialRight)
     {
@@ -556,10 +534,6 @@ BigInteger BigInteger::Add(uint_array& lhs, int lhsSign, uint_array& rhs, int rh
     {
         assert(!lhs.empty());
         uint_array bits = BigIntegerCalculator::Add(lhs, abs(rhsSign));
-        //for (auto a : bits)
-        //{
-        //    std::cout << "auto: " << a << std::endl;
-        //}
         return BigInteger(bits, lhsSign < 0);
     }
 
@@ -573,10 +547,6 @@ BigInteger BigInteger::Add(uint_array& lhs, int lhsSign, uint_array& rhs, int rh
     else
     {
         uint_array bits = BigIntegerCalculator::Add(lhs, rhs);
-        //for (auto elem : bits)
-        //{
-        //    std::cout << "elem: " << elem << std::endl;
-        //}
         return BigInteger(bits, lhsSign < 0);
     }
 }
@@ -585,10 +555,6 @@ BigInteger BigInteger::Subtract(uint_array& lhs, int lhsSign, uint_array& rhs, i
 {
     bool trivialLeft = lhs.empty();
     bool trivialRight = rhs.empty();
-    //std::cout << "sub now " << std::endl;
-    //std::cout << "lhsSign: " << lhsSign << std::endl;
-    //std::cout << "rhsSign: " << rhsSign << std::endl;
-    //std::cout << "trivial: " << trivialLeft << " " << trivialRight <<  std::endl;
 
     if (trivialLeft && trivialRight)
     {
@@ -630,11 +596,7 @@ BigInteger BigInteger::operator -(BigInteger& rhs)
     rhs.AssertValid();
 
     if ((lhs._sign < 0) != (rhs._sign < 0))
-    {
-        //std::cout << "add" << std::endl;
         return BigInteger::Add(lhs._bits, lhs._sign, rhs._bits, -1 * rhs._sign);
-    }
-    //std::cout << "sub" << std::endl;
     return BigInteger::Subtract(lhs._bits, lhs._sign, rhs._bits, rhs._sign);
 }
 
@@ -643,15 +605,9 @@ BigInteger BigInteger::operator +(BigInteger& rhs)
     BigInteger lhs = *this;
     lhs.AssertValid();
     rhs.AssertValid();
-    //std::cout << "*operator sign left: " << lhs._sign << " sign right: " << rhs._sign<< std::endl;
-    //std::cout << "*operator left: " << lhs.ToString() << " right: " << rhs.ToString() << std::endl;
 
     if ((lhs._sign < 0) != (rhs._sign < 0))
-    {
-        //std::cout << "sub::::::" << std::endl;
         return BigInteger::Subtract(lhs._bits, lhs._sign, rhs._bits, -1 * rhs._sign);
-    }
-    //std::cout << "Add::::::" << std::endl;
     return BigInteger::Add(lhs._bits, lhs._sign, rhs._bits, rhs._sign);
 }
 
@@ -663,14 +619,9 @@ BigInteger BigInteger::operator *(BigInteger& rhs)
 
     bool trivialLeft = lhs._bits.empty();
     bool trivialRight = rhs._bits.empty();
-    //std::cout << "*operator trivialLeft: " << trivialLeft << " trivialRight: " << trivialRight << std::endl;
-    //std::cout << "*operator sign left: " << lhs._sign << " sign right: " << rhs._sign<< std::endl;
 
     if (trivialLeft && trivialRight)
-    {
-        //std::cout << "trivvvv: " << static_cast<long long>(lhs._sign) * rhs._sign << std::endl;
         return BigInteger(static_cast<long long>(lhs._sign) * rhs._sign);
-    }
 
     if (trivialLeft)
     {
@@ -706,34 +657,10 @@ BigInteger BigInteger::operator *(BigInteger& rhs)
     }
 }
 
-
-
-
-
-
-//void BigInteger::SubtractSelf(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength)
-//{
-//
-//}
-
-
-
-
 BigInteger BigInteger::Multiply(BigInteger& lhs, BigInteger& rhs)
 {
     return lhs * rhs;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 BigInteger BigInteger::operator >=(BigInteger& rhs)
 {
@@ -753,8 +680,6 @@ BigInteger BigInteger::operator %(BigInteger& divisor)
 
     bool trivialDividend = dividend._bits.empty();
     bool trivialDivisor = divisor._bits.empty();
-    //std::cout << "trivialDividend: " << trivialDividend << " trivialDivisor: " << trivialDivisor << std::endl;
-    //std::cout << "dividend: " << dividend.ToString() << " divisor: " << divisor.ToString() << std::endl;
 
     if (trivialDividend && trivialDivisor)
     {
@@ -772,7 +697,6 @@ BigInteger BigInteger::operator %(BigInteger& divisor)
     {
         assert(!dividend._bits.empty());
         long remainder = BigIntegerCalculator::Remainder(dividend._bits, abs(divisor._sign));
-        //std::cout << "remainder: " << -1 * remainder << std::endl;
         return dividend._sign < 0 ? -1 * remainder : remainder;
     }
 
@@ -789,8 +713,8 @@ BigInteger BigInteger::operator %(BigInteger& divisor)
 
 BigInteger BigInteger::DivRem(BigInteger& dividend, BigInteger& divisor, BigInteger& remainder)
 {
-    //dividend.AssertValid();
-    //divisor.AssertValid();
+    dividend.AssertValid();
+    divisor.AssertValid();
 
    bool trivialDividend = dividend.GetBits().empty() ;
    bool trivialDivisor = divisor.GetBits().empty();
@@ -867,31 +791,28 @@ BigInteger& BigInteger::operator --(int value)
 
 BigInteger BigInteger::operator +=(uint64_t rhs)
 {
-    //std::cout << "uint += operator" << std::endl;
-    //value.AssertValid();
     BigInteger value = BigInteger(rhs);
     *this = (*this + value);
-    //std::cout << "adding: " << value.ToString() << std::endl;
     return *this;
 }
 
 BigInteger BigInteger::operator +=(BigInteger& rhs)
 {
-    //value.AssertValid();
+    rhs.AssertValid();
     *this = (*this + rhs);
     return *this;
 }
 
 BigInteger BigInteger::operator -=(BigInteger& rhs)
 {
-    //value.AssertValid();
+    rhs.AssertValid();
     *this = (*this - rhs);
     return *this;
 }
 
 BigInteger BigInteger::operator /=(BigInteger& rhs)
 {
-    //value.AssertValid();
+    rhs.AssertValid();
     *this = (*this / rhs);
     return *this / rhs;
 }
@@ -927,10 +848,7 @@ BigInteger BigInteger::operator /(BigInteger& divisor)
     bool trivialDivisor = divisor._bits.empty();
 
     if (trivialDividend && trivialDivisor)
-    {
-        //std::cout << dividend._sign << " / " << divisor._sign << std::endl;
         return static_cast<long long>(dividend._sign / divisor._sign);
-    }
 
     if (trivialDividend)
     {
@@ -958,18 +876,6 @@ BigInteger BigInteger::operator /(BigInteger& divisor)
         return BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 BigInteger BigInteger::Divide(BigInteger& dividend, BigInteger& divisor)
 {
@@ -1030,9 +936,6 @@ int BigInteger::GetDiffLength(uint_array rgu1, uint_array rgu2, int cu)
     return 0;
 }
 
-
-
-
 uint64_t BigInteger::MakeUlong(unsigned int uHi, unsigned int uLo)
 {
     return (static_cast<uint64_t>(uHi) << BigInteger::kcbitUint) | uLo;
@@ -1068,15 +971,6 @@ uint_array BigInteger::GetBits()
 {
     return _bits;
 }
-
-//bool Equals(std::any obj)
-//{
-//    //AssertValid();
-//
-//    //if (!(obj is BigInteger))
-//    //    return false;
-//    return Equals(std::any_cast<BigInteger>(obj));
-//}
 
 bool BigInteger::Equals(uint64_t rhs) const
 {
@@ -1633,15 +1527,10 @@ void BigInteger::AssertValid() const
         assert(_sign == 1 || _sign == -1);
         assert(_bits.size() > 0);
         assert(_bits.size() > 1 || _bits[0] >= kuMaskHighBit);
-        //for (auto a : _bits)
-        //{
-        //    std::cout << "bits: " << a << std::endl;
-        //}
         assert(_bits[_bits.size() - 1] != 0);
     }
     else
     {
-        //std::cout << "_sign: " << _sign << " intMin: " << std::numeric_limits<int>::min() << std::endl;
         assert(_sign > std::numeric_limits<int>::min());
     }
 }
@@ -1727,9 +1616,9 @@ BigInteger::operator double() {
 
     if (length > InfinityLength) {
         if (_sign == 1)
-            return static_cast<double>(1.0)/static_cast<double>(0.0); // PositiveInfinity
+            return double_PositiveInfinity;
         else
-            return static_cast<double>(-1.0)/static_cast<double>(0.0); // NegativeInfinity
+            return double_NegativeInfinity;
     }
 
     unsigned long h = _bits[length -1];
@@ -1853,4 +1742,3 @@ BigInteger BigInteger::ModPow(BigInteger value, BigInteger exponent, BigInteger 
         return BigInteger(bits, value._sign < 0 && !exponent.IsEven());
     }
 }
-

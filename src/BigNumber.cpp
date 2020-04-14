@@ -122,7 +122,6 @@ static bool ParseNumber(char* str, char* strEnd, Number::NumberBuffer& number, s
     int digEnd = 0;
     while (true)
     {
-        //std::cout << "char: " << ch << std::endl;
         if ((ch >= '0' && ch <= '9') || (AllowHexSpecifier && ((ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'))))
         {
             state |= StateDigits;
@@ -221,7 +220,6 @@ static bool TryStringToNumber(std::string value, Number::NumberBuffer& buffer, s
     {
         return false;
     }
-    //std::cout << "after ParseNumber: " << receiver.str() << std::endl;
     return true;
 }
 
@@ -243,7 +241,6 @@ static bool TryStringToBigInteger(std::string value, std::stringstream& receiver
         precision = numberBuffer.precision;
         scale = numberBuffer.scale;
         sign = numberBuffer.sign;
-        //std::cout << "scale: " << scale << std::endl;
 
         return true;
     }
@@ -254,28 +251,18 @@ bool BigNumber::NumberToBigInteger(BigNumber::BigNumberBuffer& number, BigIntege
     int i = number.scale;
     int cur = 0;
 
-    //BigInteger ten = BigInteger(10);
     BigInteger ten = 10;
-    //std::cout << "ten: sign: " << ten.GetSign() << "bits size: " << ten.GetBits().size() << std::endl;
     value = 0;
-    //std::cout << "value: sign: " << value.GetSign() << "bits size: " << value.GetBits().size() << std::endl;
 
-    //std::cout << "========================================NumberToBigInteger start" << std::endl;
     while (--i >= 0)
     {
-        //std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ while start value:" << value.ToString() << std::endl;
         value *= ten;
-        //std::cout << "value*ten: " << value.ToString()  << std::endl;
         if (number.digits.str()[cur] != '\0')
         {
-            //std::cout << "number: " << number.digits.str()[cur] - '0' << std::endl;
             BigInteger temp = BigInteger(static_cast<int>(number.digits.str()[cur++] - '0'));
-            //std::cout << "sign: " << temp.GetSign() << " bits size: " << temp.GetBits().size() << std::endl;
             value += temp;
         }
-        //std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ while end" << std::endl;
     }
-    //std::cout << "========================================NumberToBigInteger mid" << std::endl;
 
     while (number.digits.str()[cur] != '\0')
     {
@@ -286,8 +273,6 @@ bool BigNumber::NumberToBigInteger(BigNumber::BigNumberBuffer& number, BigIntege
     {
         value = -value;
     }
-
-    //std::cout << "========================================NumberToBigInteger end" << std::endl;
     return true;
 }
 
@@ -341,7 +326,6 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
     const int kcchBase = 9;
 
     int cuSrc = value.GetBits().size();
-    //std::cout << "bits len: " << value.GetBits().size() << std::endl;
     int cuTemp;
     int cuMax;
     if (((cuTemp = cuSrc * 10) < cuSrc))
@@ -359,23 +343,18 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
     for (int iuSrc = cuSrc; --iuSrc >= 0;)
     {
         uint32_t uCarry = value.GetBits()[iuSrc];
-        //std::cout << "uCarry: " << uCarry << std::endl;
         for (int iuDst = 0; iuDst < cuDst; iuDst++)
         {
             assert(rguDst[iuDst] < kuBase);
             uint64_t uuRes = BigInteger::MakeUlong(rguDst[iuDst], uCarry);
-            //std::cout << "uuRes: " << uCarry << std::endl;
             rguDst[iuDst] = static_cast<uint32_t>(uuRes % kuBase);
             uCarry = static_cast<uint32_t>(uuRes / kuBase);
         }
 
         if (uCarry != 0)
         {
-            //std::cout << "cuDst: " << cuDst << std::endl;
             rguDst[cuDst++] = uCarry % kuBase;
-            //std::cout << "2cuDst: " << cuDst << std::endl;
             uCarry /= kuBase;
-            //std::cout << "ucarry" << uCarry<< std::endl;
             if (uCarry != 0)
                 rguDst[cuDst++] = uCarry;
         }
@@ -397,7 +376,6 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
         throw std::overflow_error("Overflow during string conversion [rgchBufSize]");
     }
 
-    //std::cout << "bufSize: " << rgchBufSize << std::endl;
     char rgch[rgchBufSize];
 
     int ichDst = cchMax;
@@ -405,13 +383,11 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
     for (int iuDst = 0; iuDst < cuDst - 1; iuDst++)
     {
         uint32_t uDig = rguDst[iuDst];
-        //std::cout << "uDig: " << uDig << std::endl;
         assert(uDig < kuBase);
         for (int cch = kcchBase; --cch >= 0;)
         {
             rgch[--ichDst] = static_cast<char>('0' + (uDig % 10));
             uDig /= 10;
-            //std::cout << "uDig/10: " << uDig << std::endl;
         }
     }
 
@@ -467,16 +443,7 @@ std::string BigNumber::FormatBigInteger(BigInteger& value)
         for (int i = negativeSign.size() - 1; i > -1; i--)
             rgch[--ichDst] = negativeSign[i];
     }
-    for (auto a : rgch)
-    {
-        //std::cout << "rgch: " << a << std::endl;
-    }
 
-    //19 
-    //9
-    //18
-    //std::cout << cchMax << " " << ichDst << std::endl;
     std::string a = std::string(rgch);
-    //std::cout << "string: " << a.size() << std::endl;
     return std::string(rgch, cchMax + 1);
 }
