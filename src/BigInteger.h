@@ -93,8 +93,7 @@ class BigInteger {
         static BigInteger& Max(BigInteger& lhs, BigInteger& rhs);
         static BigInteger& Min(BigInteger& lhs, BigInteger& rhs);
 
-        // Not sure if needed
-        //static BigInteger ModPow(BigInteger value, BigInteger exponent, BigInteger modulus);
+        static BigInteger ModPow(BigInteger value, BigInteger exponent, BigInteger modulus);
         static BigInteger Pow(BigInteger value, int exponent);
 
         //bool Equals(long long other) const;

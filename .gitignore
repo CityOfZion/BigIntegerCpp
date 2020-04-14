@@ -37,3 +37,5 @@ CMakeFiles/
 Makefile
 cmake_install.cmake
 build
+.idea
+.DS_Store

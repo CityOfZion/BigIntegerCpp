@@ -2678,3 +2678,47 @@ void BigInteger::SubtractSelf(uint32_t *left, int leftLength, uint32_t *right, i
     }
 }
 
+BigInteger BigInteger::ModPow(BigInteger value, BigInteger exponent, BigInteger modulus) {
+    if (exponent._sign < 0)
+        throw std::out_of_range("SR.ArgumentOutOfRange_MustBeNonNeg");
+
+    value.AssertValid();
+    exponent.AssertValid();
+    modulus.AssertValid();
+
+    bool trivialValue = value._bits.empty();
+    bool trivialExponent = exponent._bits.empty();
+    bool trivialModulus = modulus._bits.empty();
+
+    if (trivialModulus) {
+        uint32_t bits;
+        if (trivialValue) {
+            if (trivialExponent)
+                bits = BigIntegerCalculator::Pow(abs(value._sign), abs(exponent._sign), abs(modulus._sign));
+            else
+                bits = BigIntegerCalculator::Pow(abs(value._sign), exponent._bits, abs(modulus._sign));
+        } else {
+            if (trivialExponent)
+                bits = BigIntegerCalculator::Pow(value._bits, abs(exponent._sign), abs(modulus._sign));
+            else
+                bits = BigIntegerCalculator::Pow(value._bits, exponent._bits, abs(modulus._sign));
+        }
+        return value._sign < 0 && !exponent.IsEven() ? -1 * bits : bits;
+    } else {
+        uint_array bits;
+        if (trivialValue) {
+            if (trivialExponent)
+                bits = BigIntegerCalculator::Pow(abs(value._sign), abs(exponent._sign), modulus._bits);
+            else
+                bits = BigIntegerCalculator::Pow(abs(value._sign), exponent._bits, modulus._bits);
+        } else {
+            if (trivialExponent)
+                bits = BigIntegerCalculator::Pow(value._bits, abs(exponent._sign), modulus._bits);
+            else
+                bits = BigIntegerCalculator::Pow(value._bits, exponent._bits, modulus._bits);
+        }
+
+        return BigInteger(bits, value._sign < 0 && !exponent.IsEven());
+    }
+}
+
