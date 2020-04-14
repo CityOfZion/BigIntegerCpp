@@ -4,7 +4,12 @@ add_executable(
     bigint_test_add.cpp
     bigint_test_sub.cpp
     bigint_test_byte_array.cpp
-        scratch_test.cpp)
+    op_leftshift.cpp
+    MyBigInt.cpp
+    MyBigInt.h
+    Random.cpp
+    Random.h
+    scratch_test.cpp)
 
 target_link_libraries(
     unit_tests

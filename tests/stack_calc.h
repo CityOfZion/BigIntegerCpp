@@ -8,10 +8,11 @@
 #include <list>
 
 #include "../src/BigInteger.h"
+#include "MyBigInt.h"
 
 using string_array = std::vector<std::string>;
 
-class StackCal
+class StackCalc
 {
     public:
         string_array input;
@@ -19,7 +20,7 @@ class StackCal
         std::stack<BigInteger> snCalc;
         std::queue<std::string> operators;
 
-        StackCal(std::string _input)
+        StackCalc(std::string _input)
         {
             std::istringstream iss (_input);
             input = string_array( std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>() );
@@ -57,23 +58,24 @@ class StackCal
                 snCalc.push(DoUnaryOperatorSN(snnum1, op));
 
                 mynum1 = myCalc.top();
-                myCalc.push(MyBigIntImp.DoUnaryOperatorMine(mynum1, op));
+                myCalc.push(MyBigIntImp::DoUnaryOperatorMine(mynum1, op));
 
                 ret = true;
             }
             else if (op.rfind("b") == 0)
             {
                 checkValues = true;
-
-                snnum1 = snCalc.top();
-                snnum2 = snCalc.top();
-                snCalc.push(DoBinaryOperatorSN(snnum1, snnum2, op, out _snOut));
-
-                mynum1 = myCalc.top();
-                mynum2 = myCalc.top();
-                myCalc.push(MyBigIntImp.DoBinaryOperatorMine(mynum1, mynum2, op, out _myOut));
-
-                ret = true;
+// TODO
+                //
+//                snnum1 = snCalc.top();
+//                snnum2 = snCalc.top();
+//                snCalc.push(DoBinaryOperatorSN(snnum1, snnum2, op, out _snOut));
+//
+//                mynum1 = myCalc.top();
+//                mynum2 = myCalc.top();
+//                myCalc.push(MyBigIntImp::DoBinaryOperatorMine(mynum1, mynum2, op, out _myOut));
+//
+//                ret = true;
             }
             else if (op.rfind("t") == 0)
             {
@@ -81,13 +83,13 @@ class StackCal
                 snnum1 = snCalc.top();
                 snnum2 = snCalc.top();
                 snnum3 = snCalc.top();
-
-                snCalc.push(DoTertanaryOperatorSN(snnum1, snnum2, snnum3, op));
+// TODO
+//                snCalc.push(DoTertanaryOperatorSN(snnum1, snnum2, snnum3, op));
 
                 mynum1 = myCalc.top();
                 mynum2 = myCalc.top();
                 mynum3 = myCalc.top();
-                myCalc.push(MyBigIntImp.DoTertanaryOperatorMine(mynum1, mynum2, mynum3, op));
+                myCalc.push(MyBigIntImp::DoTertanaryOperatorMine(mynum1, mynum2, mynum3, op));
 
                 ret = true;
             }
@@ -104,11 +106,12 @@ class StackCal
                     snCalc.push(-33);
                     myCalc.push(-555);
                 }
-                else if (BigInteger::TryParse(op, out snnum1))
-                {
-                    snCalc.push(snnum1);
-                    myCalc.push(snnum1);
-                }
+                //TODO
+//                else if (BigInteger::TryParse(op, out snnum1))
+//                {
+//                    snCalc.push(snnum1);
+//                    myCalc.push(snnum1);
+//                }
                 else
                 {
                     std::cout << "Failed to parse string " <<  op << std::endl;
@@ -151,35 +154,34 @@ class StackCal
 
         BigInteger DoUnaryOperatorSN(BigInteger num1, std::string op)
         {
-            switch (op)
-            {
-                case "uSign":
-                    return BigInteger(num1.Sign());
-                case "u~":
-                    return (~(num1));
-                case "uLog10":
-                    return MyBigIntImp.ApproximateBigInteger(BigInteger.Log10(num1));
-                case "uLog":
-                    return MyBigIntImp.ApproximateBigInteger(BigInteger.Log(num1));
-                case "uAbs":
-                    return BigInteger::Abs(num1);
-                case "uNegate":
-                    return BigInteger::Negate(num1);
-                case "u--":
-                    return (--(num1));
-                case "u++":
-                    return (++(num1));
-                case "u-":
-                    return (-(num1));
-                case "u+":
-                    return (+(num1));
-                case "uMultiply":
-                    return BigInteger::Multiply(num1, num1);
-                case "u*":
-                    return num1 * num1;
-                default:
-                    throw new ArgumentException(string.Format("Invalid operation found: {0}", op));
-            }
+//            switch (op)
+//            {
+//                case "uSign":
+//                    return BigInteger(num1.Sign());
+//                case "u~":
+//                    return (~(num1));
+//                case "uLog10":
+//                    return MyBigIntImp::ApproximateBigInteger(BigInteger::Log10(num1));
+//                case "uLog":
+//                    return MyBigIntImp::ApproximateBigInteger(BigInteger::Log(num1));
+//                case "uAbs":
+//                    return BigInteger::Abs(num1);
+//                case "uNegate":
+//                    return BigInteger::Negate(num1);
+//                case "u--":
+//                    return (--(num1));
+//                case "u++":
+//                    return (++(num1));
+//                case "u-":
+//                    return (-(num1));
+//                case "u+":
+//                    return (+(num1));
+//                case "uMultiply":
+//                    return BigInteger::Multiply(num1, num1);
+//                case "u*":
+//                    return num1 * num1;
+//                default:
+                    throw new std::exception(); //string.Format("Invalid operation found: {0}", op));
+//            }
         }
-
 };
