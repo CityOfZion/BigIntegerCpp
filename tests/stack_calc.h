@@ -140,6 +140,7 @@ class StackCalc
             std::vector<unsigned char> bytes;
             BigInteger ret = BigInteger(0);
             std::string op = operators.front();
+            operators.pop();
 
             //todo check, not sure if that works
             while (op.compare("endmake") != 0)
@@ -147,6 +148,7 @@ class StackCalc
                 unsigned char chr = (unsigned char)op[0];
                 bytes.emplace_back(chr);
                 op = operators.front();
+                operators.pop();
             }
 
             return BigInteger(bytes);

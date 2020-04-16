@@ -9,6 +9,8 @@ add_executable(
     MyBigInt.h
     Random.cpp
     Random.h
+    BitArray.cpp
+    BitArray.h
     scratch_test.cpp)
 
 target_link_libraries(

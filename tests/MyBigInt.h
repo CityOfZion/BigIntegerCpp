@@ -1,6 +1,7 @@
 #pragma once
 #include "BigInteger.h"
 #include "Random.h"
+#include "BitArray.h"
 #include <string>
 #include <vector>
 
@@ -8,7 +9,7 @@ class MyBigIntImp {
 public:
     static BigInteger DoUnaryOperatorMine(BigInteger num1, std::string op);
     static BigInteger DoBinaryOperatorMine(BigInteger num1, BigInteger num2, std::string op);
-    static BigInteger DoBinaryOperatorMine(BigInteger num1, BigInteger num2, std::string op, BigInteger& num3);
+    static BigInteger DoBinaryOperatorMine(BigInteger num1, BigInteger num2, std::string op, BigInteger* num3);
     static BigInteger DoTertanaryOperatorMine(BigInteger num1, BigInteger num2, BigInteger num3, std::string op);
     static byte_array Add(byte_array bytes1, byte_array bytes2);
     static byte_array Negate(byte_array bytes);
@@ -31,7 +32,7 @@ public:
     static byte_array Copy(byte_array bytes);
     static void NormalizeLengths(byte_array bytes1, byte_array bytes2);
     static void Trim(byte_array bytes);
-//    static byte_array GetBytes(BitArray ba);
+    static byte_array GetBytes(BitArray ba);
     static std::string Print(byte_array bytes);
     static std::string PrintFormatX(byte_array bytes);
     static std::string PrintFormatX2(byte_array bytes);
