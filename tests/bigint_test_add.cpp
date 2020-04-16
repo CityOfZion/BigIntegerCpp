@@ -111,7 +111,8 @@ TEST(binary, binary_plus)
 
     bigint1  = llongMaxValue;
     bigint2  = BigInteger(1);
-    expected = BigInteger((unsigned long)llongMaxValue + 1);
+
+    expected = BigInteger((uint64_t)llongMaxValue + 1);
     ASSERT_EQ( expected, bigint1 + bigint2);
     ASSERT_EQ( expected, bigint2 + bigint1);
     ASSERT_EQ( expected, BigInteger::Add(bigint1, bigint2));

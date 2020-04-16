@@ -1584,7 +1584,7 @@ BigInteger::operator double() {
     int z = NumericsHelpers::CbitHighZero(static_cast<unsigned int>(h));
 
     int exp = (length - 2) * 32 - z;
-    ulong man = (h << (32 + z)) | (m << z) | (l >> (32 - z));
+    unsigned long man = (h << (32 + z)) | (m << z) | (l >> (32 - z));
 
     return NumericsHelpers::GetDoubleFromParts(_sign, exp, man);
 }
@@ -1608,7 +1608,7 @@ double BigInteger::Log(BigInteger value, double baseValue) {
         return double_NaN;
 
     if (value._bits.empty())
-        return log(value) / log(baseValue);
+        return log(value._sign) / log(baseValue);
 
     uint64_t h = value._bits[value._bits.size() - 1];
     uint64_t m = value._bits.size() > 1 ? value._bits[value._bits.size() - 2] : 0;

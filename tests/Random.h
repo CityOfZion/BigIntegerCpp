@@ -3,8 +3,8 @@
 
 class Random {
 public:
-    Random() =default;
-    Random(int seed) : engine{seed} {};
+    Random() : engine(MSEED) {};
+    Random(int seed) : engine(seed) {};
     int Next() { return engine(); };
     int Next(int min, int max);
 
@@ -12,5 +12,5 @@ public:
 
 private:
     const unsigned long MSEED = 161803398;
-    std::mt19937 engine{MSEED};
+    std::mt19937 engine;
 };
