@@ -58,6 +58,27 @@ BigInteger::BigInteger(long value)
     *this = BigInteger(static_cast<long long>(value));
 }
 
+BigInteger::BigInteger(unsigned long value) {
+    if (value <= static_cast<unsigned long>(std::numeric_limits<int>::max()))
+    {
+        _sign = static_cast<int>(value);
+        _bits.clear();
+    }
+    else if (value <= static_cast<unsigned long>(std::numeric_limits<unsigned int>::max()))
+    {
+        _sign = +1;
+        _bits.push_back(static_cast<unsigned int>(value));
+    }
+    else
+    {
+        _sign = +1;
+        _bits.push_back(static_cast<unsigned int>(value));
+        _bits.push_back(static_cast<unsigned int>(value >> kcbitUint));
+    }
+
+    AssertValid();
+}
+
 BigInteger::BigInteger(long long value)
 {
     if (std::numeric_limits<int>::min() < value && value <= std::numeric_limits<int>::max())
@@ -1698,3 +1719,82 @@ BigInteger BigInteger::ModPow(BigInteger value, BigInteger exponent, BigInteger 
         return BigInteger(bits, value._sign < 0 && !exponent.IsEven());
     }
 }
+
+BigInteger BigInteger::Remainder(BigInteger& dividend, BigInteger& divisor)
+{
+    return dividend % divisor;
+}
+
+BigInteger BigInteger::GreatestCommonDivisor(BigInteger &left, BigInteger &right) {
+    left.AssertValid();
+    right.AssertValid();
+
+    bool trivialLeft = left._bits.empty();
+    bool trivialRight = right._bits.empty();
+
+    if (trivialLeft && trivialRight)
+    {
+        return BigIntegerCalculator::Gcd((uint32_t)abs(left._sign), abs(right._sign));
+    }
+
+    if (trivialLeft)
+    {
+        assert(!right._bits.empty());
+        if (left._sign != 0) {
+            auto result = BigIntegerCalculator::Gcd(right._bits, abs(left._sign));
+            return BigInteger{result};
+        } else {
+            return BigInteger(right._bits, false);
+        }
+    }
+
+    if (trivialRight)
+    {
+        assert(!left._bits.empty());
+        if (left._sign != 0) {
+            auto result = BigIntegerCalculator::Gcd(left._bits, abs(right._sign));
+            return BigInteger{result};
+        } else {
+            return BigInteger(left._bits, false);
+        }
+    }
+
+    assert(!left._bits.empty() && !right._bits.empty());
+
+    if (BigIntegerCalculator::Compare(left._bits, right._bits) < 0)
+    {
+        return GreatestCommonDivisor(right._bits, left._bits);
+    }
+    else
+    {
+        return GreatestCommonDivisor(left._bits, right._bits);
+    }
+}
+
+BigInteger BigInteger::GreatestCommonDivisor(uint_array leftBits, uint_array rightBits)
+{
+    assert(BigIntegerCalculator::Compare(leftBits, rightBits) >= 0);
+
+    // Short circuits to spare some allocations...
+    if (rightBits.size() == 1)
+    {
+        uint temp = BigIntegerCalculator::Remainder(leftBits, rightBits[0]);
+        return BigIntegerCalculator::Gcd(rightBits[0], temp);
+    }
+
+    if (rightBits.size() == 2)
+    {
+        auto tempBits = BigIntegerCalculator::Remainder(leftBits, rightBits);
+
+        unsigned long left = (static_cast<unsigned long>(rightBits[1]) << 32) | rightBits[0];
+        unsigned long right = (static_cast<unsigned long>(tempBits[1]) << 32) | tempBits[0];
+
+        unsigned long res = BigIntegerCalculator::Gcd(left, right);
+        return BigInteger{res};
+    }
+
+    auto bits = BigIntegerCalculator::Gcd(leftBits, rightBits);
+    return BigInteger(bits, false);
+}
+
+

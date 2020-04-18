@@ -9,7 +9,7 @@ byte_array MyBigIntImp::GetRandomByteArray(Random random, int size) {
 }
 
 std::string MyBigIntImp::Print(byte_array bytes) {
-    std::string ret("make");
+    std::string ret("make ");
     for (auto& b : bytes)
         ret += static_cast<char>(b) + std::string(" ");
     ret += "endmake ";
@@ -486,4 +486,48 @@ void MyBigIntImp::NormalizeLengths(byte_array bytes1, byte_array bytes2) {
             bytes2.push_back(extender);
         }
     }
+}
+
+BigInteger MyBigIntImp::ApproximateBigInteger(double value) {
+    //TODO implement
+    //Special case values;
+//    if (double.IsNaN(value))
+//    {
+//        return BigInteger(-101);
+//    }
+//    if (double.IsNegativeInfinity(value))
+//    {
+//        return new BigInteger(-102);
+//    }
+//    if (double.IsPositiveInfinity(value))
+//    {
+//        return new BigInteger(-103);
+//    }
+//
+//    BigInteger result = new BigInteger(Math.Round(value, 0));
+//
+//    if (result != 0)
+//    {
+//        bool pos = (value > 0);
+//        if (!pos)
+//        {
+//            value = -value;
+//        }
+//
+//        int size = (int)Math.Floor(Math.Log10(value));
+//
+//        //keep only the first 17 significant digits;
+//        if (size > 17)
+//        {
+//            result = result - (result % BigInteger.Pow(10, size - 17));
+//        }
+//
+//        if (!pos)
+//        {
+//            value = -value;
+//        }
+//    }
+//
+//    return result;
+return BigInteger::Zero(); // remove this, just for compilation
 }

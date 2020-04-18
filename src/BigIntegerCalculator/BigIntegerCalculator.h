@@ -58,6 +58,12 @@ public:
     static int Compare(uint_array lhs, uint_array rhs);
     static int Compare(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength);
 
+    static uint32_t Gcd(uint32_t left, uint32_t right);
+    static unsigned long Gcd(unsigned long left, unsigned long right);
+    static uint32_t Gcd(uint_array left, uint32_t right);
+    static uint_array Gcd(uint_array left, uint_array right);
+    static void Gcd(BitsBuffer& left, BitsBuffer& right);
+
 private:
     static constexpr int AllocationThreshold = 256;
     static constexpr int ReducerThreshold = 32;
@@ -70,6 +76,10 @@ private:
     static void SubtractCore(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength, uint32_t* core, int coreLength);
     static bool DivideGuessTooBig(uint64_t q, uint64_t valHi, uint32_t valLo, uint32_t divHi, uint32_t divLo);
     static int LeadingZeros(uint32_t value);
+
+    static void ExtractDigits(BitsBuffer& xBuffer, BitsBuffer& yBuffer,unsigned long& x, unsigned long& y);
+    static void LehmerCore(BitsBuffer& xBuffer, BitsBuffer& yBuffer, long a, long b, long c, long d);
+
 
 };
 

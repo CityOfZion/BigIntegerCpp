@@ -7,7 +7,6 @@
 #include "MyBigInt.h"
 
 
-
 static void VerifyLeftShiftString(std::string opstring)
 {
     StackCalc sc(opstring);
@@ -71,7 +70,7 @@ TEST(shift_tests, simple_add)
 
     for (int i = 0; i < s_samples; i++) {
         tempByteArray1 = GetRandomByteArray(s_random);
-        tempByteArray2 = GetRandomByteArray(s_random, 2);
+        tempByteArray2 = GetRandomPosByteArray(s_random, 2);
         VerifyLeftShiftString(Print(tempByteArray2) + Print(tempByteArray1) + "b<<");
     }
 

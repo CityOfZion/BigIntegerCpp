@@ -21,6 +21,7 @@ class BigInteger {
         BigInteger(int value);
         BigInteger(uint32_t value);
         BigInteger(long value);
+        BigInteger(unsigned long);
         BigInteger(long long value);
         BigInteger(uint64_t value);
         BigInteger(int n, uint_array value);
@@ -65,6 +66,9 @@ class BigInteger {
         static BigInteger ModPow(BigInteger value, BigInteger exponent, BigInteger modulus);
         static BigInteger Pow(BigInteger value, int exponent);
 
+        static BigInteger GreatestCommonDivisor(BigInteger& left, BigInteger& right);
+        static BigInteger GreatestCommonDivisor(uint_array leftBits, uint_array rightBits);
+
         //bool Equals(long long other) const;
         //bool Equals(unsigned long other) const;
         //bool Equals(std::any obj);
@@ -77,6 +81,7 @@ class BigInteger {
         BigInteger operator /=(BigInteger& divisor);
         static BigInteger Divide(BigInteger& dividend, BigInteger& divisor);
         static BigInteger DivRem(BigInteger& dividend, BigInteger& divisor, BigInteger& remainder);
+        static BigInteger Remainder(BigInteger& dividend, BigInteger& divisor);
 
         // Multiply & Square
         BigInteger operator *(BigInteger& rhs);
