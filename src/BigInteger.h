@@ -24,9 +24,10 @@ class BigInteger {
         BigInteger(unsigned long);
         BigInteger(long long value);
         BigInteger(uint64_t value);
+        BigInteger(double value);
         BigInteger(int n, uint_array value);
         BigInteger(uint_array value, bool negative);
-        BigInteger(const byte_array value, bool isUnsigned = false, bool isBigEndian = false);
+        BigInteger(byte_array value, bool isUnsigned = false, bool isBigEndian = false);
 
         friend bool operator<(const BigInteger& lhs, const BigInteger& rhs) { return lhs.CompareTo(rhs) < 0; }
         friend bool operator>(const BigInteger& lhs, const BigInteger& rhs) { return rhs < lhs; }
@@ -58,6 +59,7 @@ class BigInteger {
         static bool TryParse(std::string value, BigInteger& result);
 
         static BigInteger Negate(BigInteger& value);
+        static BigInteger Abs(BigInteger& value);
 
         static double Log(BigInteger value);
         static double Log(BigInteger value, double baseValue);
@@ -76,32 +78,32 @@ class BigInteger {
         bool Equals(const BigInteger& other) const;
 
         // Divide & Modulo
-        BigInteger operator %(BigInteger& rhs);
-        BigInteger operator /(BigInteger& divisor);
-        BigInteger operator /=(BigInteger& divisor);
+        BigInteger operator%(const BigInteger& rhs);
+        BigInteger operator/(const BigInteger& divisor);
+        BigInteger operator/=(const BigInteger& divisor);
         static BigInteger Divide(BigInteger& dividend, BigInteger& divisor);
         static BigInteger DivRem(BigInteger& dividend, BigInteger& divisor, BigInteger& remainder);
         static BigInteger Remainder(BigInteger& dividend, BigInteger& divisor);
 
         // Multiply & Square
-        BigInteger operator *(BigInteger& rhs);
-        BigInteger operator *=(BigInteger& rhs);
+        BigInteger operator*(const BigInteger& rhs);
+        BigInteger operator*=(const BigInteger& rhs);
         static BigInteger Multiply(BigInteger& lhs, BigInteger& rhs);
 
         // Add
-        BigInteger operator +();
-        BigInteger operator +(BigInteger& rhs);
-        BigInteger operator +=(BigInteger& rhs);
-        BigInteger operator +=(uint64_t rhs);
-        BigInteger& operator ++(int value);
+        BigInteger operator+();
+        BigInteger operator+(const BigInteger& rhs);
+        BigInteger operator+=(const BigInteger& rhs);
+        BigInteger operator+=(uint64_t rhs);
+        BigInteger& operator ++();
         static BigInteger Add(BigInteger& lhs, BigInteger& rhs);
         BigInteger Add(uint_array& lhs, int lhsSign, uint_array& rhs, int rhsSign);
 
         // Subtract
         BigInteger operator -();
-        BigInteger operator -(BigInteger& rhs);
-        BigInteger operator -=(BigInteger& rhs);
-        BigInteger& operator --(int value);
+        BigInteger operator -(const BigInteger& rhs);
+        BigInteger operator -=(const BigInteger& rhs);
+        BigInteger& operator --();
         static BigInteger Subtract(BigInteger& lhs, BigInteger& rhs);
         BigInteger Subtract(uint_array& lhs, int lhsSign, uint_array& rhs, int rhsSign);
 
@@ -114,6 +116,7 @@ class BigInteger {
         BigInteger operator ^(BigInteger& rhs);
         BigInteger operator &(BigInteger& rhs);
         BigInteger operator |(BigInteger& rhs);
+        BigInteger operator ~();
 
         enum GetBytesMode { AllocateArray, Count }; // currently AllocateArray only
         int Sign();
@@ -125,6 +128,11 @@ class BigInteger {
         byte_array ToByteArray(bool isUnsigned = false, bool isBigEndian = false);
         byte_array ToByteArray(GetBytesMode mode, bool isUnsigned = false, bool isBigEndian = false, int* bytesWritten = 0);
         int GetByteCount(bool isUnsigned = false);
+
+        static bool double_IsFinite(double value);
+        static bool double_IsInfinity(double value);
+        static bool double_IsNaN(double value);
+
 
 private:
 

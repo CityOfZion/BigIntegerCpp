@@ -98,4 +98,33 @@ class NumericsHelpers {
     static uint64_t MakeUlong(unsigned int uHi, unsigned int uLo) {
             return (static_cast<uint64_t>(uHi) << BigInteger::kcbitUint) | uLo;
     }
+
+    static void GetDoubleParts(double dbl, int& sign, int& exp, unsigned long& man, bool& fFinite) {
+        DoubleULong du;
+        du.uu = 0;
+        du.dbl = dbl;
+
+        sign = 1 - ((int)(du.uu >> 62) & 2);
+        man = du.uu & 0x000FFFFFFFFFFFFF;
+        exp = (int)(du.uu >> 52) & 0x7FF;
+        if (exp == 0)
+        {
+            // Denormalized number.
+            fFinite = true;
+            if (man != 0)
+                exp = -1074;
+        }
+        else if (exp == 0x7FF)
+        {
+            // NaN or Infinite.
+            fFinite = false;
+            exp = std::numeric_limits<uint32_t>::max();
+        }
+        else
+        {
+            fFinite = true;
+            man |= 0x0010000000000000;
+            exp -= 1075;
+        }
+    }
 };

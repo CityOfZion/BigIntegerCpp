@@ -16,8 +16,7 @@ const BigInteger BigInteger::s_bnZeroInt = BigInteger(0);
 const BigInteger BigInteger::s_bnMinusOneInt = BigInteger(-1);
 
 const double double_NaN = static_cast<double>(0.0)/static_cast<double>(0.0);
-const double double_PositiveInfinity = static_cast<double>(1.0)/static_cast<double>(0.0);
-const double double_NegativeInfinity = static_cast<double>(-1.0)/static_cast<double>(0.0);
+
 
 BigInteger::BigInteger()
 {
@@ -610,8 +609,9 @@ BigInteger BigInteger::Subtract(uint_array& lhs, int lhsSign, uint_array& rhs, i
     }
 }
 
-BigInteger BigInteger::operator -(BigInteger& rhs)
+BigInteger BigInteger::operator -(const BigInteger& right)
 {
+    BigInteger& rhs = const_cast<BigInteger &>(right);
     BigInteger lhs = *this;
     lhs.AssertValid();
     rhs.AssertValid();
@@ -621,8 +621,9 @@ BigInteger BigInteger::operator -(BigInteger& rhs)
     return BigInteger::Subtract(lhs._bits, lhs._sign, rhs._bits, rhs._sign);
 }
 
-BigInteger BigInteger::operator +(BigInteger& rhs)
+BigInteger BigInteger::operator+(const BigInteger& right)
 {
+    BigInteger& rhs = const_cast<BigInteger &>(right);
     BigInteger lhs = *this;
     lhs.AssertValid();
     rhs.AssertValid();
@@ -632,7 +633,7 @@ BigInteger BigInteger::operator +(BigInteger& rhs)
     return BigInteger::Add(lhs._bits, lhs._sign, rhs._bits, rhs._sign);
 }
 
-BigInteger BigInteger::operator *(BigInteger& rhs)
+BigInteger BigInteger::operator*(const BigInteger& rhs)
 {
     BigInteger lhs = *this;
     lhs.AssertValid();
@@ -683,8 +684,9 @@ BigInteger BigInteger::Multiply(BigInteger& lhs, BigInteger& rhs)
     return lhs * rhs;
 }
 
-BigInteger BigInteger::operator %(BigInteger& divisor)
+BigInteger BigInteger::operator%(const BigInteger& div)
 {
+    BigInteger divisor = div;
     BigInteger dividend = *this;
     dividend.AssertValid();
     divisor.AssertValid();
@@ -780,19 +782,19 @@ BigInteger BigInteger::operator -()
     return BigInteger(-(*this)._sign, (*this)._bits);
 }
 
-BigInteger BigInteger::operator +()
+BigInteger BigInteger::operator+()
 {
     return BigInteger(+(*this)._sign, (*this)._bits);
 }
 
-BigInteger& BigInteger::operator ++(int value)
+BigInteger& BigInteger::operator++()
 {
     BigInteger&& one = BigInteger::One();
     *this = *this + one;
     return *this;
 }
 
-BigInteger& BigInteger::operator --(int value)
+BigInteger& BigInteger::operator--()
 {
     //value.AssertValid();
     BigInteger&& one = BigInteger::One();
@@ -800,35 +802,35 @@ BigInteger& BigInteger::operator --(int value)
     return *this;
 }
 
-BigInteger BigInteger::operator +=(uint64_t rhs)
+BigInteger BigInteger::operator+=(const uint64_t rhs)
 {
     BigInteger value = BigInteger(rhs);
     *this = (*this + value);
     return *this;
 }
 
-BigInteger BigInteger::operator +=(BigInteger& rhs)
+BigInteger BigInteger::operator+=(const BigInteger& rhs)
 {
     rhs.AssertValid();
     *this = (*this + rhs);
     return *this;
 }
 
-BigInteger BigInteger::operator -=(BigInteger& rhs)
+BigInteger BigInteger::operator-=(const BigInteger& rhs)
 {
     rhs.AssertValid();
     *this = (*this - rhs);
     return *this;
 }
 
-BigInteger BigInteger::operator /=(BigInteger& rhs)
+BigInteger BigInteger::operator /=(const BigInteger& rhs)
 {
     rhs.AssertValid();
     *this = (*this / rhs);
     return *this / rhs;
 }
 
-BigInteger BigInteger::operator *=(BigInteger& rhs)
+BigInteger BigInteger::operator *=(const BigInteger& rhs)
 {
     *this = (*this * rhs);
     return *this;
@@ -844,8 +846,9 @@ bool BigInteger::operator !=(const BigInteger& rhs)
     return !(this->Equals(rhs));
 }
 
-BigInteger BigInteger::operator /(BigInteger& divisor)
+BigInteger BigInteger::operator/(const BigInteger& div)
 {
+    BigInteger& divisor = const_cast<BigInteger &>(div);
     BigInteger dividend = *this;
     dividend.AssertValid();
     divisor.AssertValid();
@@ -1593,9 +1596,9 @@ BigInteger::operator double() {
 
     if (length > InfinityLength) {
         if (_sign == 1)
-            return double_PositiveInfinity;
+            return std::numeric_limits<double>::infinity();
         else
-            return double_NegativeInfinity;
+            return -std::numeric_limits<double>::infinity();
     }
 
     unsigned long h = _bits[length -1];
@@ -1622,7 +1625,7 @@ double BigInteger::Log(BigInteger value, double baseValue) {
     if (value._sign < 0 || baseValue == 1.0)
         return double_NaN;
 
-    if (baseValue == double_PositiveInfinity)
+    if (baseValue == std::numeric_limits<double>::infinity())
         return value.IsOne() ? 0.0 : double_NaN;
 
     if (baseValue == 0.0 && !value.IsOne())
@@ -1795,6 +1798,104 @@ BigInteger BigInteger::GreatestCommonDivisor(uint_array leftBits, uint_array rig
 
     auto bits = BigIntegerCalculator::Gcd(leftBits, rightBits);
     return BigInteger(bits, false);
+}
+
+BigInteger BigInteger::operator~() {
+    auto res = this + One();
+    return -(*res);
+}
+
+BigInteger BigInteger::Abs(BigInteger &value) {
+    return (value >= Zero()) ? value : -value;
+}
+
+BigInteger::BigInteger(double value) {
+    if (!double_IsFinite(value))
+    {
+        if (double_IsInfinity(value))
+        {
+            throw std::overflow_error("SR.Overflow_BigIntInfinity");
+        }
+        else // NaN
+        {
+            throw std::overflow_error("SR.Overflow_NotANumber");
+        }
+    }
+
+    _sign = 0;
+    _bits.clear();
+
+    int sign, exp;
+    unsigned long man;
+    bool fFinite;
+    NumericsHelpers::GetDoubleParts(value, sign, exp, man, fFinite);
+    assert(sign == +1 || sign == -1);
+
+    if (man == 0)
+    {
+        *this = Zero();
+        return;
+    }
+
+    assert(man < (1UL << 53));
+    assert(exp <= 0 || man >= (1UL << 52));
+
+    if (exp <= 0)
+    {
+        if (exp <= -kcbitUlong)
+        {
+            *this = Zero();
+            return;
+        }
+        *this = man >> -exp;
+        if (sign < 0)
+            _sign = -_sign;
+    }
+    else if (exp <= 11)
+    {
+        *this = man << exp;
+        if (sign < 0)
+            _sign = -_sign;
+    }
+    else
+    {
+        // Overflow into at least 3 uints.
+        // Move the leading 1 to the high bit.
+        man <<= 11;
+        exp -= 11;
+
+        // Compute cu and cbit so that exp == 32 * cu - cbit and 0 <= cbit < 32.
+        int cu = (exp - 1) / kcbitUint + 1;
+        int cbit = cu * kcbitUint - exp;
+        assert(0 <= cbit && cbit < kcbitUint);
+        assert(cu >= 1);
+
+        // Populate the uints.
+        _bits = uint_array(cu+2, 0);
+        _bits[cu + 1] = (uint)(man >> (cbit + kcbitUint));
+        _bits[cu] = static_cast<unsigned int>((man >> cbit));
+        if (cbit > 0)
+            _bits[cu - 1] = static_cast<unsigned int>(man) << (kcbitUint - cbit);
+        _sign = sign;
+    }
+
+    AssertValid();
+
+}
+
+bool BigInteger::double_IsFinite(double value) {
+    auto bits = *((long*)&value);
+    return (bits & 0x7FFFFFFFFFFFFFFF) < 0x7FF0000000000000;
+}
+
+bool BigInteger::double_IsNaN(double value) {
+    auto bits = *((long*)&value);
+    return (bits & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000;
+}
+
+bool BigInteger::double_IsInfinity(double value) {
+    auto bits = *((long*)&value);
+    return (bits & 0x7FFFFFFFFFFFFFFF) == 0x7FF0000000000000;
 }
 
 

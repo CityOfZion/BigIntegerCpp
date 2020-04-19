@@ -225,8 +225,8 @@ void BigIntegerCalculator::ExtractDigits(BitsBuffer &xBuffer, BitsBuffer &yBuffe
     // Use all the bits but one, see [hac] 14.58 (ii)
     int z = LeadingZeros((uint)xh);
 
-    x = ((xh << 32 + z) | (xm << z) | (xl >> 32 - z)) >> 1;
-    y = ((yh << 32 + z) | (ym << z) | (yl >> 32 - z)) >> 1;
+    x = ((xh << (32 + z)) | (xm << z) | (xl >> (32 - z))) >> 1;
+    y = ((yh << (32 + z)) | (ym << z) | (yl >> (32 - z))) >> 1;
 
     assert(x >= y);
 }

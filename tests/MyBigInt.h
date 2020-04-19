@@ -36,7 +36,7 @@ public:
     static std::string Print(byte_array bytes);
     static std::string PrintFormatX(byte_array bytes);
     static std::string PrintFormatX2(byte_array bytes);
-    static bool IsZero(byte_array list);
+    static bool IsZero(byte_array& list);
     static byte_array GetNonZeroRandomByteArray(Random random, int size);
     static byte_array GetRandomByteArray(Random random, int size);
     static BigInteger ApproximateBigInteger(double value);
