@@ -13,7 +13,7 @@ add_executable(
     BitArray.h
     scratch_test.cpp
     stack_calc.cpp
-    utils.h)
+    utils.h op_rightshift.cpp op_rightshift.h)
 
 target_link_libraries(
     unit_tests

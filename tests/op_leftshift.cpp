@@ -60,7 +60,7 @@ static std::string Print(byte_array bytes)
 
 
 // Tests for simple arithmetic
-TEST(shift_tests, simple_add)
+TEST(shift_tests, shift_left)
 {
     int s_samples = 10;
     Random s_random(100);
