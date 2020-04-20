@@ -1243,7 +1243,7 @@ BigInteger BigInteger::operator &(BigInteger& rhs)
 
     uint_array x = lhs.ToUInt32Array();
     uint_array y = rhs.ToUInt32Array();
-    uint_array z;
+    uint_array z(std::max(x.size(), y.size()), 0);
     uint xExtend = (lhs.GetSign() < 0) ? std::numeric_limits<uint32_t>::max() : 0;
     uint yExtend = (rhs.GetSign() < 0) ? std::numeric_limits<uint32_t>::max() : 0;
 

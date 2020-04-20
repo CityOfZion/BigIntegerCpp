@@ -17,7 +17,8 @@ add_executable(
     op_rightshift.cpp
     op_xor.cpp
     op_or.cpp
-    op_not.cpp)
+    op_not.cpp
+    op_and.cpp)
 
 target_link_libraries(
     unit_tests
