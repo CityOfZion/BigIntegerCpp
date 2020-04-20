@@ -58,26 +58,26 @@ BigInteger::BigInteger(long value)
     *this = BigInteger(static_cast<long long>(value));
 }
 
-BigInteger::BigInteger(unsigned long value) {
-    if (value <= static_cast<unsigned long>(std::numeric_limits<int>::max()))
-    {
-        _sign = static_cast<int>(value);
-        _bits.clear();
-    }
-    else if (value <= static_cast<unsigned long>(std::numeric_limits<unsigned int>::max()))
-    {
-        _sign = +1;
-        _bits.push_back(static_cast<unsigned int>(value));
-    }
-    else
-    {
-        _sign = +1;
-        _bits.push_back(static_cast<unsigned int>(value));
-        _bits.push_back(static_cast<unsigned int>(value >> kcbitUint));
-    }
-
-    AssertValid();
-}
+//BigInteger::BigInteger(unsigned long value) {
+//    if (value <= static_cast<unsigned long>(std::numeric_limits<int>::max()))
+//    {
+//        _sign = static_cast<int>(value);
+//        _bits.clear();
+//    }
+//    else if (value <= static_cast<unsigned long>(std::numeric_limits<unsigned int>::max()))
+//    {
+//        _sign = +1;
+//        _bits.push_back(static_cast<unsigned int>(value));
+//    }
+//    else
+//    {
+//        _sign = +1;
+//        _bits.push_back(static_cast<unsigned int>(value));
+//        _bits.push_back(static_cast<unsigned int>(value >> kcbitUint));
+//    }
+//
+//    AssertValid();
+//}
 
 BigInteger::BigInteger(long long value)
 {

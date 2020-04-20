@@ -18,6 +18,7 @@ add_executable(
     op_xor.cpp
     op_or.cpp
     op_not.cpp
+    op_modulus.cpp
     op_and.cpp
     op_decrement.cpp
     op_increment.cpp

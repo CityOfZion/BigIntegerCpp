@@ -1,4 +1,5 @@
 #include "BigIntegerCalculator.h"
+#include <cassert>
 
 uint32_t BigIntegerCalculator::Gcd(uint32_t left, uint32_t right) {
     // Executes the classic Euclidean algorithm.
