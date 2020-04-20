@@ -1,5 +1,6 @@
 #include "BigIntegerCalculator.h"
 #include <cassert>
+#include <exceptions.h>
 
 uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint32_t rhs, uint32_t& remainder)
 {
@@ -17,6 +18,8 @@ uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint32_t rhs, uint32_t&
     for (int i = lhs.size() - 1; i >= 0; i--)
     {
         uint64_t value = (carry << 32) | lhs[i];
+        if (rhs == 0)
+            throw DivideByZero();
         uint64_t digit = value / rhs;
         quotient[i] = static_cast<uint32_t>(digit);
         carry = value - digit * rhs;
@@ -39,6 +42,8 @@ uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint32_t rhs)
     for (int i = lhs.size() - 1; i >= 0; i--)
     {
         uint64_t value = (carry << 32) | lhs[i];
+        if (rhs == 0)
+            throw DivideByZero();
         uint64_t digit = value / rhs;
         quotient[i] = static_cast<uint32_t>(digit);
         carry = value - digit * rhs;
@@ -171,6 +176,8 @@ void BigIntegerCalculator::Divide(uint32_t* lhs, int lhsLength, uint32_t* rhs, i
 
         // First guess for the current digit of the quotient,
         // which naturally must have only 32 bits...
+        if (divHi == 0)
+            throw DivideByZero();
         uint64_t digit = valHi / divHi;
         if (digit > 0xFFFFFFFF)
             digit = 0xFFFFFFFF;

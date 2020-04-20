@@ -1,6 +1,7 @@
 #include "BigInteger.h"
 #include "BigNumber.h"
 #include "NumericsHelpers.h"
+#include "exceptions.h"
 
 #include <limits>
 #include <cassert>
@@ -850,8 +851,11 @@ BigInteger BigInteger::operator/(const BigInteger& div)
     bool trivialDividend = dividend._bits.empty();
     bool trivialDivisor = divisor._bits.empty();
 
-    if (trivialDividend && trivialDivisor)
+    if (trivialDividend && trivialDivisor) {
+        if (divisor._sign == 0)
+            throw DivideByZero();
         return static_cast<long long>(dividend._sign / divisor._sign);
+    }
 
     if (trivialDividend)
     {
