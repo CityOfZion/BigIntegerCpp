@@ -772,6 +772,7 @@ BigInteger BigInteger::DivRem(BigInteger& dividend, BigInteger& divisor, BigInte
 
 BigInteger BigInteger::operator -()
 {
+//    n new BigInteger(-value._sign, value._bits);
     return BigInteger(-(*this)._sign, (*this)._bits);
 }
 
@@ -1794,8 +1795,8 @@ BigInteger BigInteger::GreatestCommonDivisor(uint_array leftBits, uint_array rig
 }
 
 BigInteger BigInteger::operator~() {
-    auto res = this + One();
-    return -(*res);
+    auto res = *this + One();
+    return -(res);
 }
 
 BigInteger BigInteger::Abs(BigInteger &value) {
