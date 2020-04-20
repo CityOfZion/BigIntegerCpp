@@ -141,16 +141,16 @@ BigInteger MyBigIntImp::DoBinaryOperatorMine(BigInteger num1, BigInteger num2, s
         bytes2 = num2.ToByteArray();
         *num3 = BigInteger(Remainder(bytes1, bytes2));
         return ret;
-    } else if (op == "bRemainder" || "b%") {
+    } else if (op == "bRemainder" || op == "b%") {
         return BigInteger(Remainder(bytes1, bytes2));
-    } else if (op == "bDivide" || "b/") {
+    } else if (op == "bDivide" || op == "b/") {
         return BigInteger(Divide(bytes1, bytes2));
-    } else if (op == "bMultiply" || "b*") {
+    } else if (op == "bMultiply" || op == "b*") {
         return BigInteger(Multiply(bytes1, bytes2));
-    } else if (op == "bSubtract" || "b-") {
+    } else if (op == "bSubtract" || op == "b-") {
         bytes2 = Negate(bytes2);
         return BigInteger(Add(bytes1, bytes2));
-    } else if (op == "bAdd" || "b+") {
+    } else if (op == "bAdd" || op == "b+") {
         return BigInteger(Add(bytes1, bytes2));
     } else {
         throw std::invalid_argument("Invalid operation found");
