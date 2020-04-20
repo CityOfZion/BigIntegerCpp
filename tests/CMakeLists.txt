@@ -11,7 +11,9 @@ add_executable(
     Random.h
     BitArray.cpp
     BitArray.h
-    scratch_test.cpp stack_calc.cpp)
+    scratch_test.cpp
+    stack_calc.cpp
+    utils.h)
 
 target_link_libraries(
     unit_tests

@@ -9,7 +9,11 @@ BitArray::BitArray(std::vector<unsigned char> bytes) {
 
 BitArray::BitArray(int size, bool default_value) {
     _size = size;
-    bs.push_back(std::bitset<8>(default_value));
+    int count = (size / 8) + 1;
+    while (count > 0) {
+        bs.push_back(std::bitset<8>(default_value));
+        count--;
+    }
 }
 
 bool BitArray::operator[](int idx) {
@@ -25,5 +29,5 @@ void BitArray::set(int idx, bool value) {
         throw std::out_of_range("");
     int v_idx = idx/8;
     int bs_idx = idx % 8;
-    bs[v_idx] = value;
+    bs[v_idx][bs_idx] = value;
 }

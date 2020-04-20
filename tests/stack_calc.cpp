@@ -75,11 +75,11 @@ bool StackCalc::DoNextOperation() {
 
         ret = true;
     } else {
-        if (op.compare("make")) {
+        if (op == "make") {
             snnum1 = DoConstruction();
             snCalc.push(snnum1);
             myCalc.push(snnum1);
-        } else if (op.compare("Corruption")) {
+        } else if (op == "Corruption") {
             snCalc.push(-33);
             myCalc.push(-555);
         } else if (BigInteger::TryParse(op, snnum1)) {

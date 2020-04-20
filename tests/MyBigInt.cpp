@@ -94,7 +94,13 @@ BigInteger MyBigIntImp::DoUnaryOperatorMine(BigInteger num1, std::string op) {
 }
 
 BigInteger MyBigIntImp::DoTertanaryOperatorMine(BigInteger num1, BigInteger num2, BigInteger num3, std::string op) {
-    return BigInteger();
+    auto bytes1 = num1.ToByteArray();
+    auto bytes2 = num2.ToByteArray();
+    auto bytes3 = num3.ToByteArray();
+    if (op == "tModPow")
+        return BigInteger(ModPow(bytes1, bytes2, bytes3));
+    else
+        throw std::invalid_argument("Invalid operation found");
 }
 
 BigInteger MyBigIntImp::DoBinaryOperatorMine(BigInteger num1, BigInteger num2, std::string op) {
@@ -151,7 +157,7 @@ BigInteger MyBigIntImp::DoBinaryOperatorMine(BigInteger num1, BigInteger num2, s
     }
 }
 
-byte_array MyBigIntImp::ShiftLeft(byte_array bytes1, byte_array bytes2) {
+byte_array MyBigIntImp::ShiftLeft(byte_array& bytes1, const byte_array& bytes2) {
     byte_array tmp1{8};
 
     int byteShift = (int)BigInteger{Divide(Copy(bytes2), tmp1)};
@@ -173,7 +179,7 @@ byte_array MyBigIntImp::ShiftLeft(byte_array bytes1, byte_array bytes2) {
                 bytes1 = byte_array{0x0};
         } else {
             byte_array temp;
-            for (int i = byteShift; i < bytes1.max_size(); i++) {
+            for (int i = byteShift; i < bytes1.size(); i++) {
                 temp.push_back(bytes1[i]);
             }
             bytes1 = temp;
@@ -200,7 +206,7 @@ byte_array MyBigIntImp::ShiftRight(byte_array bytes) {
             newbyte += 128;
         bresult.push_back(newbyte);
     }
-    return byte_array();
+    return bresult;
 }
 
 byte_array MyBigIntImp::ShiftLeftGrow(byte_array bytes) {
@@ -209,7 +215,7 @@ byte_array MyBigIntImp::ShiftLeftGrow(byte_array bytes) {
         auto newbyte = bytes[i];
         if (newbyte > 127)
             newbyte -= 128;
-        newbyte = (byte)(newbyte * 2);
+        newbyte = static_cast<byte>((newbyte * 2));
         if ((i != 0) && (bytes[i-1] >= 128))
             newbyte++;
         bresult.push_back(newbyte);
@@ -226,7 +232,7 @@ byte_array MyBigIntImp::ShiftLeftGrow(byte_array bytes) {
 }
 
 byte_array MyBigIntImp::Copy(byte_array bytes) {
-    byte_array ret;
+    byte_array ret(bytes.size());
     std::copy(bytes.begin(), bytes.end(), ret.begin());
     return ret;
 }
@@ -455,7 +461,7 @@ byte_array MyBigIntImp::Negate(byte_array bytes) {
     return bnew;
 }
 
-void MyBigIntImp::Trim(byte_array bytes) {
+void MyBigIntImp::Trim(byte_array& bytes) {
     while (bytes.size() > 1)
     {
         if ((bytes[bytes.size() - 1] & 0x80) == 0)
@@ -528,7 +534,7 @@ byte_array MyBigIntImp::Add(byte_array bytes1, byte_array bytes2) {
     return bnew;
 }
 
-void MyBigIntImp::NormalizeLengths(byte_array bytes1, byte_array bytes2) {
+void MyBigIntImp::NormalizeLengths(byte_array& bytes1, byte_array& bytes2) {
     bool num1neg = (bytes1[bytes1.size() - 1] & 0x80) != 0;
     bool num2neg = (bytes2[bytes2.size() - 1] & 0x80) != 0;
     byte extender = 0;
@@ -611,7 +617,7 @@ bool MyBigIntImp::IsZero(byte_array& list) {
     return true;
 }
 
-byte_array MyBigIntImp::Max(byte_array bytes1, byte_array bytes2) {
+byte_array MyBigIntImp::Max(const byte_array& bytes1, const byte_array& bytes2) {
     bool b1Pos = ((bytes1[bytes1.size() - 1] & 0x80) == 0);
     bool b2Pos = ((bytes2[bytes2.size() - 1] & 0x80) == 0);
 
@@ -637,7 +643,7 @@ byte_array MyBigIntImp::Max(byte_array bytes1, byte_array bytes2) {
     return bytes1;
 }
 
-byte_array MyBigIntImp::Not(byte_array bytes) {
+byte_array MyBigIntImp::Not(const byte_array& bytes) {
     byte_array bnew;
 
     for (auto& b : bytes)
@@ -781,7 +787,7 @@ byte_array MyBigIntImp::Multiply(byte_array bytes1, byte_array bytes2) {
     return bresult;
 }
 
-byte_array MyBigIntImp::ShiftLeftDrop(byte_array bytes) {
+byte_array MyBigIntImp::ShiftLeftDrop(const byte_array& bytes) {
     byte_array bresult;
 
     for (int i = 0; i < bytes.size(); i++)
@@ -792,7 +798,7 @@ byte_array MyBigIntImp::ShiftLeftDrop(byte_array bytes) {
         {
             newbyte -= 128;
         }
-        newbyte = (byte)(newbyte * 2);
+        newbyte = static_cast<byte>((newbyte * 2));
         if ((i != 0) && (bytes[i - 1] >= 128))
         {
             newbyte++;
@@ -804,7 +810,7 @@ byte_array MyBigIntImp::ShiftLeftDrop(byte_array bytes) {
     return bresult;
 }
 
-byte_array MyBigIntImp::SetLength(byte_array bytes, int size) {
+byte_array MyBigIntImp::SetLength(const byte_array& bytes, int size) {
     byte_array bresult;
 
     for (int i = 0; i < size; i++)
@@ -813,4 +819,50 @@ byte_array MyBigIntImp::SetLength(byte_array bytes, int size) {
     }
 
     return bresult;
+}
+
+byte_array MyBigIntImp::ModPow(byte_array bytes1, byte_array bytes2, byte_array bytes3) {
+    if (IsZero(bytes2))
+    {
+        return Remainder(byte_array{ 1 }, bytes3);
+    }
+
+    BitArray ba2(bytes2);
+    int last1 = 0;
+    byte_array result;
+
+    for (int i = ba2.size() - 1; i >= 0; i--)
+    {
+        if (ba2[i])
+        {
+            last1 = i;
+            break;
+        }
+    }
+
+    bytes1 = Remainder(bytes1, Copy(bytes3));
+    for (int i = 0; i <= last1; i++)
+    {
+        if (ba2[i])
+        {
+            if (result.empty())
+            {
+                result = bytes1;
+            }
+            else
+            {
+                result = Multiply(result, bytes1);
+                result = Remainder(result, Copy(bytes3));
+            }
+            Trim(bytes1);
+            Trim(result);
+        }
+        if (i != last1)
+        {
+            bytes1 = Multiply(bytes1, bytes1);
+            bytes1 = Remainder(bytes1, Copy(bytes3));
+            Trim(bytes1);
+        }
+    }
+    return (result.empty()) ? Remainder(byte_array { 1 }, bytes3) : result;
 }

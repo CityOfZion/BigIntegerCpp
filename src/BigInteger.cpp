@@ -449,9 +449,6 @@ BigInteger::BigInteger(uint_array value)
 
 BigInteger::BigInteger(uint_array value, bool negative)
 {
-    if (value.size() == 0)
-        throw std::runtime_error("value is empty");
-
     int len;
 
     // Try to conserve space as much as possible by checking for wasted leading uint[] entries
@@ -1202,7 +1199,7 @@ BigInteger BigInteger::operator >>(int shift)
 
     int zl = xl - digitShift;
     if (zl < 0) zl = 0;
-    uint_array zd(zl);
+    uint_array zd(zl, 0);
 
     if (smallShift == 0)
     {
