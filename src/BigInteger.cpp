@@ -350,10 +350,6 @@ BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
 
 BigInteger::BigInteger(uint_array value)
 {
-    // TODO
-    if (value.size() == 0)
-        throw std::runtime_error("value cannot be null");
-
     int dwordCount = value.size();
     bool isNegative = dwordCount > 0 && ((value[dwordCount - 1] & 0x80000000) == 0x80000000);
 
@@ -1108,7 +1104,7 @@ uint_array BigInteger::ToUInt32Array()
 
     if (_bits.size() == 0)
     {
-        dwords = uint_array(static_cast<uint32_t>(_sign));
+        dwords = uint_array{static_cast<uint32_t>(_sign)};
         highDWord = (_sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
     }
     else if (_sign == -1)
@@ -1133,8 +1129,8 @@ uint_array BigInteger::ToUInt32Array()
     bool needExtraByte = (dwords[msb] & 0x80000000) != (highDWord & 0x80000000);
 
     //uint_array trimmed = new uint[msb + 1 + (needExtraByte ? 1 : 0)];
-    uint_array trimmed;
-    trimmed.swap(dwords);
+    uint_array trimmed(msb + 1 + (needExtraByte ? 1 : 0), 0);
+    std::copy(dwords.begin(), dwords.begin()+(msb+1), trimmed.begin());
 
     if (needExtraByte) trimmed[trimmed.size() - 1] = highDWord;
     return trimmed;
@@ -1150,8 +1146,8 @@ BigInteger BigInteger::operator ^(BigInteger& rhs)
 
     uint_array x = lhs.ToUInt32Array();
     uint_array y = rhs.ToUInt32Array();
-    uint_array z;;
-    uint32_t xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::min() : 0;
+    uint_array z(std::max(x.size(), y.size()), 0);
+    uint32_t xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
     uint32_t yExtend = (rhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
 
     for (size_t i = 0; i < z.size(); i++)

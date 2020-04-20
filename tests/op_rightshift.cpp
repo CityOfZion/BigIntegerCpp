@@ -55,7 +55,7 @@ static std::string Print(byte_array bytes)
     return MyBigIntImp::Print(bytes);
 }
 
-TEST(shift_tests, shift_right) {
+TEST(operator_tests, shift_right) {
     int s_samples = 10;
     Random s_random(100);
 
