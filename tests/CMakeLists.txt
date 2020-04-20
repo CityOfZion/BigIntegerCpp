@@ -15,7 +15,7 @@ add_executable(
     stack_calc.cpp
     utils.h
     op_rightshift.cpp
-    op_xor.cpp)
+    op_xor.cpp op_or.cpp)
 
 target_link_libraries(
     unit_tests
