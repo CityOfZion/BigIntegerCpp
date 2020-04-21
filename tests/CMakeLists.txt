@@ -22,7 +22,8 @@ add_executable(
     op_and.cpp
     op_decrement.cpp
     op_increment.cpp
-    op_divide.cpp)
+    op_divide.cpp
+    op_multiply.cpp)
 
 target_link_libraries(
     unit_tests
