@@ -10,6 +10,10 @@ TEST(scratch1, scratch_tests)
     auto exp = BigInteger(3);
     auto x = (long)BigInteger::Pow(val, 3);
 
+    int long_size = sizeof(unsigned long);
+    int ll_size = sizeof(unsigned long long);
     int i = 0;
+
+
 
 }

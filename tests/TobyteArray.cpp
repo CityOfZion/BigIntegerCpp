@@ -1,12 +1,8 @@
-#include <iostream>
-#include <stdio.h>
 #include <variant>
 #include <vector>
 #include <math.h>
 #include "../src/BigInteger.h"
 #include "gtest/gtest.h"
-
-// BigInteger.AddTests.cs 
 
 TEST(byte_array, int_byte_array)
 {
@@ -44,13 +40,6 @@ TEST(byte_array, int_byte_array)
     {
         BigInteger bi = BigInteger(std::get<0>(elem));
         byte_array bytes = bi.ToByteArray();
-        //std::cout << "bi: " << bi.ToString() << std::endl;
-        //std::cout << "bytes: " << bytes.size() << std::endl;
-        //for (auto el : bytes)
-        //{
-        //    printf("%#02x ", el);
-        //}
-        //std::cout << std::endl;
         ASSERT_EQ( bytes, std::get<1>(elem) );
 
         BigInteger bi2 = BigInteger(bytes);
@@ -98,13 +87,6 @@ TEST(byte_array, long_byte_array)
     {
         BigInteger bi = BigInteger(std::get<0>(elem));
         byte_array bytes = bi.ToByteArray();
-        //std::cout << "bi: " << bi.ToString() << std::endl;
-        //std::cout << "bytes: " << bytes.size() << std::endl;
-        //for (auto el : bytes)
-        //{
-        //    printf("%#02x ", el);
-        //}
-        //std::cout << std::endl;
         ASSERT_EQ( bytes, std::get<1>(elem) );
 
         BigInteger bi2 = BigInteger(bytes);
@@ -133,25 +115,10 @@ TEST(byte_array, string_byte_array)
         BigInteger bi = BigInteger::Parse(std::get<0>(elem));
         byte_array bytes = bi.ToByteArray();
         std::reverse(bytes.begin(), bytes.end());
-        //std::cout << "bi: " << bi.ToString() << std::endl;
-        //std::cout << "bytes: " << bytes.size() << std::endl;
-        //for (auto el : bytes)
-        //{
-        //    printf("%#02x ", el);
-        //}
-        //std::cout << std::endl;
         ASSERT_EQ( bytes, std::get<1>(elem) );
 
         std::reverse(bytes.begin(), bytes.end());
-        //for (auto el : bytes)
-        //{
-        //    printf("%#02x ", el);
-        //}
-        //std::cout << std::endl;
-
         BigInteger bi2 = BigInteger(bytes);
-        //std::cout << "bi2: " << bi2.ToString()<< std::endl;
-        //std::cout << "bi: " << bi2.ToString()<< std::endl;
         ASSERT_EQ( bi, bi2 );
     }
 }

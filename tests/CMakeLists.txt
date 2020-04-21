@@ -1,9 +1,9 @@
 add_executable(
     unit_tests
     bigint_test_sa.cpp
-    bigint_test_add.cpp
-    bigint_test_sub.cpp
-    bigint_test_byte_array.cpp
+    BigInteger_AddTests.cpp
+    BigInteger_SubtractTests.cpp
+    TobyteArray.cpp
     MyBigInt.cpp
     MyBigInt.h
     Random.cpp
