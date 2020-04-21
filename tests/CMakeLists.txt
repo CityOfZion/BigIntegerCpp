@@ -25,7 +25,10 @@ add_executable(
     op_increment.cpp
     op_divide.cpp
     op_multiply.cpp
-    IsEven.cpp)
+    IsEven.cpp
+    IsOne.cpp
+    IsZero.cpp
+    IsPowerOfTwo.cpp)
 
 target_link_libraries(
     unit_tests
