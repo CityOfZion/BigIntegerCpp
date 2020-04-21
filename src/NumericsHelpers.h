@@ -36,10 +36,10 @@ class NumericsHelpers {
 
     struct DoubleULong {
         double dbl;
-        unsigned long uu;
+        uint64_t uu;
     };
 
-    static double GetDoubleFromParts(int sign, int exp, unsigned long man) {
+    static double GetDoubleFromParts(int sign, int exp, uint64_t man) {
         DoubleULong du;
         du.dbl = 0;
 
@@ -66,7 +66,7 @@ class NumericsHelpers {
                     du.uu = man >> -exp;
             }
             else
-                du.uu = (man & 0x000FFFFFFFFFFFFF) | (static_cast<unsigned long>(exp) << 52);
+                du.uu = (man & 0x000FFFFFFFFFFFFF) | (static_cast<uint64_t>(exp) << 52);
         }
 
         if (sign < 0)
@@ -99,7 +99,7 @@ class NumericsHelpers {
             return (static_cast<uint64_t>(uHi) << BigInteger::kcbitUint) | uLo;
     }
 
-    static void GetDoubleParts(double dbl, int& sign, int& exp, unsigned long& man, bool& fFinite) {
+    static void GetDoubleParts(double dbl, int& sign, int& exp, uint64_t& man, bool& fFinite) {
         DoubleULong du;
         du.uu = 0;
         du.dbl = dbl;

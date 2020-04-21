@@ -16,13 +16,13 @@ uint32_t BigIntegerCalculator::Gcd(uint32_t left, uint32_t right) {
     return left;
 }
 
-unsigned long BigIntegerCalculator::Gcd(unsigned long left, unsigned long right)
+uint64_t BigIntegerCalculator::Gcd(uint64_t left, uint64_t right)
 {
     // Same as above, but for 64-bit values.
 
     while (right > 0xFFFFFFFF)
     {
-        unsigned long temp = left % right;
+        uint64_t temp = left % right;
         left = right;
         right = temp;
     }
@@ -74,7 +74,7 @@ void BigIntegerCalculator::Gcd(BitsBuffer& left, BitsBuffer& right) {
 
     while (right.GetLength() > 2)
     {
-        unsigned long x, y;
+        uint64_t x, y;
 
         ExtractDigits(left, right, x, y);
 
@@ -86,7 +86,7 @@ void BigIntegerCalculator::Gcd(BitsBuffer& left, BitsBuffer& right) {
         // Lehmer's guessing
         while (y != 0)
         {
-            unsigned long q, r, s, t;
+            uint64_t q, r, s, t;
 
             // Odd iteration
             q = x / y;
@@ -167,15 +167,15 @@ void BigIntegerCalculator::Gcd(BitsBuffer& left, BitsBuffer& right) {
         uint_array xBits = right.GetBits();
         uint_array yBits = left.GetBits();
 
-        unsigned long x = (static_cast<unsigned long>(xBits[1]) << 32) | xBits[0];
-        unsigned long y = (static_cast<unsigned long>(yBits[1]) << 32) | yBits[0];
+        uint64_t x = (static_cast<uint64_t>(xBits[1]) << 32) | xBits[0];
+        uint64_t y = (static_cast<uint64_t>(yBits[1]) << 32) | yBits[0];
 
         left.Overwrite(Gcd(x, y));
-        right.Overwrite(0UL);
+        right.Overwrite(static_cast<uint64_t>(0));
     }
 }
 
-void BigIntegerCalculator::ExtractDigits(BitsBuffer &xBuffer, BitsBuffer &yBuffer, unsigned long& x, unsigned long& y) {
+void BigIntegerCalculator::ExtractDigits(BitsBuffer &xBuffer, BitsBuffer &yBuffer, uint64_t& x, uint64_t& y) {
     assert(xBuffer.GetLength() >= 3);
     assert(yBuffer.GetLength() >= 3);
     assert(xBuffer.GetLength() >= yBuffer.GetLength());
@@ -189,11 +189,11 @@ void BigIntegerCalculator::ExtractDigits(BitsBuffer &xBuffer, BitsBuffer &yBuffe
     uint_array yBits = yBuffer.GetBits();
     int yLength = yBuffer.GetLength();
 
-    unsigned long xh = xBits[xLength - 1];
-    unsigned long xm = xBits[xLength - 2];
-    unsigned long xl = xBits[xLength - 3];
+    uint64_t xh = xBits[xLength - 1];
+    uint64_t xm = xBits[xLength - 2];
+    uint64_t xl = xBits[xLength - 3];
 
-    unsigned long yh, ym, yl;
+    uint64_t yh, ym, yl;
 
     // arrange the bits
     switch (xLength - yLength)

@@ -58,27 +58,6 @@ BigInteger::BigInteger(long value)
     *this = BigInteger(static_cast<long long>(value));
 }
 
-BigInteger::BigInteger(unsigned long value) {
-    if (value <= static_cast<unsigned long>(std::numeric_limits<int>::max()))
-    {
-        _sign = static_cast<int>(value);
-        _bits.clear();
-    }
-    else if (value <= static_cast<unsigned long>(std::numeric_limits<unsigned int>::max()))
-    {
-        _sign = +1;
-        _bits.push_back(static_cast<unsigned int>(value));
-    }
-    else
-    {
-        _sign = +1;
-        _bits.push_back(static_cast<unsigned int>(value));
-        _bits.push_back(static_cast<unsigned int>(value >> kcbitUint));
-    }
-
-    AssertValid();
-}
-
 BigInteger::BigInteger(long long value)
 {
     if (std::numeric_limits<int>::min() < value && value <= std::numeric_limits<int>::max())
@@ -1791,10 +1770,10 @@ BigInteger BigInteger::GreatestCommonDivisor(uint_array leftBits, uint_array rig
     {
         auto tempBits = BigIntegerCalculator::Remainder(leftBits, rightBits);
 
-        unsigned long left = (static_cast<unsigned long>(rightBits[1]) << 32) | rightBits[0];
-        unsigned long right = (static_cast<unsigned long>(tempBits[1]) << 32) | tempBits[0];
+        uint64_t left = (static_cast<uint64_t>(rightBits[1]) << 32) | rightBits[0];
+        uint64_t right = (static_cast<uint64_t>(tempBits[1]) << 32) | tempBits[0];
 
-        unsigned long res = BigIntegerCalculator::Gcd(left, right);
+        uint64_t res = BigIntegerCalculator::Gcd(left, right);
         return BigInteger{res};
     }
 
@@ -1828,7 +1807,7 @@ BigInteger::BigInteger(double value) {
     _bits.clear();
 
     int sign, exp;
-    unsigned long man;
+    uint64_t man;
     bool fFinite;
     NumericsHelpers::GetDoubleParts(value, sign, exp, man, fFinite);
     assert(sign == +1 || sign == -1);

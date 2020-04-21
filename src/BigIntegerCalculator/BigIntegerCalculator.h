@@ -23,8 +23,8 @@ public:
     static int ActualLength(uint_array& value) { return ActualLength(value, value.size()); };
     static int ActualLength(uint_array& value, int length);
 
-    static uint32_t PowCore(uint_array& power, uint32_t modulus, unsigned long value, unsigned long result);
-    static uint32_t PowCore(uint32_t power, uint32_t modulus, unsigned long value, unsigned long result);
+    static uint32_t PowCore(uint_array& power, uint32_t modulus, uint64_t value, uint64_t result);
+    static uint32_t PowCore(uint32_t power, uint32_t modulus, uint64_t value, uint64_t result);
 
     static uint_array PowCore(uint32_t power, BitsBuffer& value);
     static uint_array PowCore(uint_array& power, uint_array& modulus, BitsBuffer& value);
@@ -59,7 +59,7 @@ public:
     static int Compare(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength);
 
     static uint32_t Gcd(uint32_t left, uint32_t right);
-    static unsigned long Gcd(unsigned long left, unsigned long right);
+    static uint64_t Gcd(uint64_t left, uint64_t right);
     static uint32_t Gcd(uint_array left, uint32_t right);
     static uint_array Gcd(uint_array left, uint_array right);
     static void Gcd(BitsBuffer& left, BitsBuffer& right);
@@ -77,7 +77,7 @@ private:
     static bool DivideGuessTooBig(uint64_t q, uint64_t valHi, uint32_t valLo, uint32_t divHi, uint32_t divLo);
     static int LeadingZeros(uint32_t value);
 
-    static void ExtractDigits(BitsBuffer& xBuffer, BitsBuffer& yBuffer,unsigned long& x, unsigned long& y);
+    static void ExtractDigits(BitsBuffer& xBuffer, BitsBuffer& yBuffer,uint64_t& x, uint64_t& y);
     static void LehmerCore(BitsBuffer& xBuffer, BitsBuffer& yBuffer, long a, long b, long c, long d);
 
 

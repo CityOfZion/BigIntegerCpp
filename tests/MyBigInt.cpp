@@ -493,6 +493,7 @@ void MyBigIntImp::Trim(byte_array& bytes) {
 
 byte_array MyBigIntImp::Add(byte_array bytes1, byte_array bytes2) {
     byte_array bnew;
+    bnew.reserve(bytes1.size() + 1);
     bool num1neg = (bytes1[bytes1.size() - 1] & 0x80) != 0;
     bool num2neg = (bytes2[bytes2.size() - 1] & 0x80) != 0;
     byte extender = 0;
@@ -789,6 +790,7 @@ byte_array MyBigIntImp::Multiply(byte_array bytes1, byte_array bytes2) {
 
 byte_array MyBigIntImp::ShiftLeftDrop(const byte_array& bytes) {
     byte_array bresult;
+    bresult.reserve(bytes.size());
 
     for (int i = 0; i < bytes.size(); i++)
     {

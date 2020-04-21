@@ -14,7 +14,7 @@ public:
     void Reduce(FastReducer& reducer);
     void Reduce(uint_array modulus);
     void Reduce(BitsBuffer& modulus);
-    void Overwrite(unsigned long value);
+    void Overwrite(uint64_t value);
     void Overwrite(uint32_t value);
     uint_array GetBits() { return _bits; }
     int GetSize() { return _bits.size(); }

@@ -21,7 +21,6 @@ class BigInteger {
         BigInteger(int value);
         BigInteger(uint32_t value);
         BigInteger(long value);
-        BigInteger(unsigned long value);
         BigInteger(long long value);
         BigInteger(uint64_t value);
         BigInteger(double value);

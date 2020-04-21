@@ -54,7 +54,7 @@ void BitsBuffer::Reduce(BitsBuffer& modulus) {
     }
 }
 
-void BitsBuffer::Overwrite(unsigned long value) {
+void BitsBuffer::Overwrite(uint64_t value) {
     if (_length > 2)
         std::fill(_bits.begin(), _bits.begin() + (_length - 2), 2);
     uint32_t lo = static_cast<uint32_t>(value); // unchecked()

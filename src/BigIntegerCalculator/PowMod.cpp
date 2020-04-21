@@ -63,7 +63,7 @@ int BigIntegerCalculator::ActualLength(uint_array& value, int length) {
     return length;
 }
 
-uint32_t BigIntegerCalculator::PowCore(uint32_t power, uint32_t modulus, unsigned long value, unsigned long result) {
+uint32_t BigIntegerCalculator::PowCore(uint32_t power, uint32_t modulus, uint64_t value, uint64_t result) {
     while (power != 0) {
         if ((power & 1) == 1)
             result = (result * value) % modulus;
@@ -79,7 +79,7 @@ uint32_t BigIntegerCalculator::Pow(uint_array& value, uint32_t power, uint32_t m
     return PowCore(power, modulus, v, 1);
 }
 
-uint32_t BigIntegerCalculator::PowCore(uint_array& power, uint32_t modulus, unsigned long value, unsigned long result) {
+uint32_t BigIntegerCalculator::PowCore(uint_array& power, uint32_t modulus, uint64_t value, uint64_t result) {
     for (auto& p : power) {
         for (int j = 0; j < 32; j++) {
             if ((p & 1) == 1)
