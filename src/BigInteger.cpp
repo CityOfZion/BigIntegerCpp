@@ -58,26 +58,26 @@ BigInteger::BigInteger(long value)
     *this = BigInteger(static_cast<long long>(value));
 }
 
-//BigInteger::BigInteger(unsigned long value) {
-//    if (value <= static_cast<unsigned long>(std::numeric_limits<int>::max()))
-//    {
-//        _sign = static_cast<int>(value);
-//        _bits.clear();
-//    }
-//    else if (value <= static_cast<unsigned long>(std::numeric_limits<unsigned int>::max()))
-//    {
-//        _sign = +1;
-//        _bits.push_back(static_cast<unsigned int>(value));
-//    }
-//    else
-//    {
-//        _sign = +1;
-//        _bits.push_back(static_cast<unsigned int>(value));
-//        _bits.push_back(static_cast<unsigned int>(value >> kcbitUint));
-//    }
-//
-//    AssertValid();
-//}
+BigInteger::BigInteger(unsigned long value) {
+    if (value <= static_cast<unsigned long>(std::numeric_limits<int>::max()))
+    {
+        _sign = static_cast<int>(value);
+        _bits.clear();
+    }
+    else if (value <= static_cast<unsigned long>(std::numeric_limits<unsigned int>::max()))
+    {
+        _sign = +1;
+        _bits.push_back(static_cast<unsigned int>(value));
+    }
+    else
+    {
+        _sign = +1;
+        _bits.push_back(static_cast<unsigned int>(value));
+        _bits.push_back(static_cast<unsigned int>(value >> kcbitUint));
+    }
+
+    AssertValid();
+}
 
 BigInteger::BigInteger(long long value)
 {
@@ -690,6 +690,8 @@ BigInteger BigInteger::operator%(const BigInteger& div)
 
     if (trivialDividend && trivialDivisor)
     {
+        if (divisor._sign == 0)
+            throw DivideByZero();
         return dividend._sign % divisor._sign;
     }
 
@@ -729,6 +731,8 @@ BigInteger BigInteger::DivRem(BigInteger& dividend, BigInteger& divisor, BigInte
    if (trivialDividend && trivialDivisor)
    {
        remainder = dividend.GetSign() % divisor.GetSign();
+       if (divisor.GetSign() == 0)
+           throw DivideByZero();
        return dividend.GetSign() / divisor.GetSign();
    }
 

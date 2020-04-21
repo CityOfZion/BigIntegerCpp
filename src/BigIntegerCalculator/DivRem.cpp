@@ -63,6 +63,8 @@ uint32_t BigIntegerCalculator::Remainder(uint_array& lhs, uint rhs)
     for (int i = lhs.size() - 1; i >= 0; i--)
     {
         uint64_t value = (carry << 32) | lhs[i];
+        if (rhs == 0)
+            throw DivideByZero();
         carry = value % rhs;
     }
 
