@@ -99,18 +99,6 @@ TEST(operator_tests, op_multiply_RunMultiplyPositive) {
     }
 }
 
-TEST(operator_tests, op_multiply_test_performance) {
-    int s_samples = 10;
-    Random s_random(100);
-
-    byte_array tempByteArray1;
-    byte_array tempByteArray2;
-
-    tempByteArray1 = GetRandomByteArray(s_random);
-    tempByteArray2 = byte_array{ 0 };
-    VerifyMultiplyString(Print(tempByteArray1) + Print(tempByteArray2) + "b*");
-}
-
 TEST(operator_tests, op_multiply_RunMultiplyPositiveWith0) {
     int s_samples = 10;
     Random s_random(100);
@@ -130,17 +118,17 @@ TEST(operator_tests, op_multiply_RunMultiplyPositiveWith0) {
         VerifyMultiplyString(Print(tempByteArray1) + Print(tempByteArray2) + "b*");
     }
 
-//    // Multiply Method - One small BigIntegers and zero
-//    for (int i = 0; i < s_samples; i++)
-//    {
-//        tempByteArray1 = GetRandomByteArray(s_random, 2);
-//        tempByteArray2 = byte_array{ 0 };
-//        VerifyMultiplyString(Print(tempByteArray1) + Print(tempByteArray2) + "b*");
-//
-//        tempByteArray1 = byte_array{ 0 };
-//        tempByteArray2 = GetRandomByteArray(s_random, 2);
-//        VerifyMultiplyString(Print(tempByteArray1) + Print(tempByteArray2) + "b*");
-//    }
+    // Multiply Method - One small BigIntegers and zero
+    for (int i = 0; i < s_samples; i++)
+    {
+        tempByteArray1 = GetRandomByteArray(s_random, 2);
+        tempByteArray2 = byte_array{ 0 };
+        VerifyMultiplyString(Print(tempByteArray1) + Print(tempByteArray2) + "b*");
+
+        tempByteArray1 = byte_array{ 0 };
+        tempByteArray2 = GetRandomByteArray(s_random, 2);
+        VerifyMultiplyString(Print(tempByteArray1) + Print(tempByteArray2) + "b*");
+    }
 }
 
 TEST(operator_tests, op_multiply_RunMultiplyAxiomXmult1) {
