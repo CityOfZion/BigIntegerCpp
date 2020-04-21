@@ -13,6 +13,7 @@ add_executable(
     scratch_test.cpp
     stack_calc.cpp
     utils.h
+    utils.cpp
     op_leftshift.cpp
     op_rightshift.cpp
     op_xor.cpp
@@ -23,7 +24,8 @@ add_executable(
     op_decrement.cpp
     op_increment.cpp
     op_divide.cpp
-    op_multiply.cpp)
+    op_multiply.cpp
+    IsEven.cpp)
 
 target_link_libraries(
     unit_tests

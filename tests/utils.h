@@ -1,5 +1,7 @@
 #include <vector>
 
+std::string BuildRandomNumber(int maxdigits, int seed);
+
 template<typename T>
 std::vector<unsigned char> to_byte_array(T value) {
     std::vector<unsigned char> v;
