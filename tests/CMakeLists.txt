@@ -31,7 +31,8 @@ add_executable(
     IsPowerOfTwo.cpp
     max.cpp
     min.cpp
-    sign.cpp)
+    sign.cpp
+    remainder.cpp)
 
 target_link_libraries(
     unit_tests
