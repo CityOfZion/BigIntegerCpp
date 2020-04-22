@@ -898,14 +898,14 @@ int BigInteger::CompareTo(const BigInteger& other) const
     }
 
     // Same signs
-    if (!_bits.empty())
+    if (_bits.empty())
     {
-        if (!other._bits.empty())
+        if (other._bits.empty())
             return _sign < other._sign ? -1 : _sign > other._sign ? +1 : 0;
         return -other._sign;
     }
     int cuThis, cuOther;
-    if (!other._bits.empty() || (cuThis = _bits.size()) > (cuOther = other._bits.size()))
+    if (other._bits.empty() || (cuThis = _bits.size()) > (cuOther = other._bits.size()))
         return _sign;
     if (cuThis < cuOther)
         return -_sign;

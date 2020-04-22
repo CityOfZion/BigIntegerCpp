@@ -28,7 +28,8 @@ add_executable(
     IsEven.cpp
     IsOne.cpp
     IsZero.cpp
-    IsPowerOfTwo.cpp)
+    IsPowerOfTwo.cpp
+    max.cpp)
 
 target_link_libraries(
     unit_tests
