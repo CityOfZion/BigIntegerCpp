@@ -39,7 +39,7 @@ static byte_array GetRandomByteArray(Random random, int size)
 
 static byte_array GetRandomByteArray(Random random)
 {
-    return GetRandomByteArray(random, random.Next(0, 1024));
+    return GetRandomByteArray(random, random.Next(0, 100));
 }
 
 static std::string Print(byte_array bytes)
