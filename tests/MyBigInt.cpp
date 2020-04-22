@@ -26,7 +26,7 @@ BigInteger MyBigIntImp::DoUnaryOperatorMine(BigInteger num1, std::string op) {
         {
             return BigInteger(0);
         }
-        auto tmp = Max(bytes1, byte_array(0));
+        auto tmp = Max(bytes1, byte_array{0});
         if (IsZero(tmp))
         {
             return BigInteger(-1);
