@@ -4,14 +4,9 @@
 
 TEST(scratch1, scratch_tests)
 {
-    std::mt19937 bla(123);
-    auto val = BigInteger(123);
-    auto n = ~val;
-    auto exp = BigInteger(3);
-    auto x = (long)BigInteger::Pow(val, 3);
-
-    int long_size = sizeof(unsigned long);
-    int ll_size = sizeof(unsigned long long);
+    auto b1 = BigInteger(byte_array{8, 24, 67, 103, 87});
+    auto b2 = BigInteger(byte_array{8, 24});
+    auto r = std::max(b1, b2);
     int i = 0;
 
 
