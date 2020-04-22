@@ -11,3 +11,12 @@ std::vector<unsigned char> to_byte_array(T value) {
     }
     return v;
 }
+
+#define EXPECT_THROW_WITH_MESSAGE(stmt, etype, whatstring) EXPECT_THROW( \
+        try { \
+            stmt; \
+        } catch (const etype& ex) { \
+            EXPECT_EQ(std::string(ex.what()), whatstring); \
+            throw; \
+        } \
+    , etype)

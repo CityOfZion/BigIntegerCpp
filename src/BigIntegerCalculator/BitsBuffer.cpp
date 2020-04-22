@@ -3,12 +3,13 @@
 
 BitsBuffer::BitsBuffer(int size, uint32_t value) {
     _length = value != 0 ? 1 : 0;
-    _bits.push_back(value);
+    _bits = uint_array(size, 0);
+    _bits[0] = value;
 }
 
 BitsBuffer::BitsBuffer(int size, uint_array value) {
     _length = BigIntegerCalculator::ActualLength(value);
-    _bits = std::vector<uint32_t>(_length, 0);
+    _bits = std::vector<uint32_t>(size, 0);
     std::copy(value.begin(), value.begin()+_length, _bits.begin());
 }
 

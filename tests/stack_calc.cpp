@@ -1,12 +1,16 @@
 #include "stack_calc.h"
 
 StackCalc::StackCalc(const std::string& _input) {
-    std::istringstream iss(_input);
-    input = string_array(std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>());
-
-    for (auto& elem : input) {
-        operators.push(elem);
+    std::string delimiter = " ";
+    size_t start = 0;
+    size_t end = 0;
+    std::string token;
+    while ((start = _input.find(delimiter, end)) != std::string::npos) {
+        token = _input.substr(end, start - end);
+        operators.push(token);
+        end = start + delimiter.length();
     }
+    operators.push(_input.substr(end, _input.size()));
 }
 
 bool StackCalc::DoNextOperation() {

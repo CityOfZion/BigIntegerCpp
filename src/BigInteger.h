@@ -133,10 +133,10 @@ class BigInteger {
         static bool double_IsNaN(double value);
 
 
-private:
-
     int _sign;
     uint_array _bits;
+private:
+
 
     static const BigInteger s_bnMinInt;
     static const BigInteger s_bnOneInt;

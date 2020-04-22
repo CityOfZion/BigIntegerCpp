@@ -32,7 +32,8 @@ add_executable(
     max.cpp
     min.cpp
     sign.cpp
-    remainder.cpp)
+    remainder.cpp
+    pow.cpp)
 
 target_link_libraries(
     unit_tests

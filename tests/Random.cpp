@@ -10,6 +10,8 @@ int Random::Next(int min, int max) {
 }
 
 void Random::NextBytes(byte_array& buffer) {
+    // From the C# source
+    // Fills the byte array with random bytes [0..0x7f].  The entire array is filled.
     for (auto& element : buffer)
-        element = (byte)Next();
+        element = static_cast<byte>(Next(0, 0x7f));
 }
