@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include "BigIntegerCalculator.h"
 #include "BitsBuffer.h"
+#include "exceptions.h"
 
 uint_array BigIntegerCalculator::Pow(uint32_t value, uint32_t power) {
     int size = PowBound(power, 1, 1);
@@ -65,12 +66,20 @@ int BigIntegerCalculator::ActualLength(uint_array& value, int length) {
 
 uint32_t BigIntegerCalculator::PowCore(uint32_t power, uint32_t modulus, uint64_t value, uint64_t result) {
     while (power != 0) {
-        if ((power & 1) == 1)
+        if ((power & 1) == 1) {
+            if (modulus == 0)
+                throw DivideByZero();
             result = (result * value) % modulus;
-        if (power != 1)
+        }
+        if (power != 1) {
+            if (modulus == 0)
+                throw DivideByZero();
             value = (value * value) % modulus;
+        }
         power = power >> 1;
     }
+    if (modulus == 0)
+        throw DivideByZero();
     return static_cast<uint32_t>(result % modulus);
 }
 
@@ -128,7 +137,9 @@ uint_array BigIntegerCalculator::Pow(uint_array& value, uint32_t power, uint_arr
 
 void BigIntegerCalculator::PowCore(uint_array& power, uint_array& modulus, BitsBuffer& value, BitsBuffer& result,
                                    BitsBuffer& temp) {
-    for(auto& p : power) {
+//    for(auto& b : power) {
+    for (int i = 0; i < power.size() - 1; i++) {
+        unsigned int p = power[i];
         for (int j = 0; j < 32; j++) {
             if ((p & 1) == 1) {
                 result.MultiplySelf(value, temp);

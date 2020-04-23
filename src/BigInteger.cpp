@@ -1688,18 +1688,18 @@ BigInteger BigInteger::ModPow(BigInteger value, BigInteger exponent, BigInteger 
         return value._sign < 0 && !exponent.IsEven() ? -1 * bits : bits;
     } else {
         uint_array bits;
-        if (trivialValue) {
-            if (trivialExponent)
+        if (trivialValue && trivialExponent) {
                 bits = BigIntegerCalculator::Pow(abs(value._sign), abs(exponent._sign), modulus._bits);
-            else
-                bits = BigIntegerCalculator::Pow(abs(value._sign), exponent._bits, modulus._bits);
         } else {
-            if (trivialExponent)
-                bits = BigIntegerCalculator::Pow(value._bits, abs(exponent._sign), modulus._bits);
-            else
-                bits = BigIntegerCalculator::Pow(value._bits, exponent._bits, modulus._bits);
+            if (trivialValue)
+                bits = BigIntegerCalculator::Pow(abs(value._sign), exponent._bits, modulus._bits);
+            else {
+                if (trivialExponent)
+                    bits = BigIntegerCalculator::Pow(value._bits, abs(exponent._sign), modulus._bits);
+                else
+                    bits = BigIntegerCalculator::Pow(value._bits, exponent._bits, modulus._bits);
+            }
         }
-
         return BigInteger(bits, value._sign < 0 && !exponent.IsEven());
     }
 }

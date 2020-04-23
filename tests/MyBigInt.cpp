@@ -868,3 +868,11 @@ byte_array MyBigIntImp::ModPow(byte_array bytes1, byte_array bytes2, byte_array 
     }
     return (result.empty()) ? Remainder(byte_array { 1 }, bytes3) : result;
 }
+
+byte_array MyBigIntImp::GetNonZeroRandomByteArray(Random random, int size) {
+    byte_array value(size, 0);
+    while (IsZero(value)) {
+        random.NextBytes(value);
+    }
+    return value;
+}
