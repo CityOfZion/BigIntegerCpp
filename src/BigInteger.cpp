@@ -1299,7 +1299,7 @@ BigInteger BigInteger::operator |(BigInteger& rhs)
 int BigInteger::GetByteCount(bool isUnsigned)
 {
     int bytesWritten = 0;
-    this->ToByteArray(GetBytesMode::Count, false, false, &bytesWritten);
+    this->ToByteArray(GetBytesMode::Count, isUnsigned, false, &bytesWritten);
 
     return bytesWritten;
 }
@@ -1307,7 +1307,7 @@ int BigInteger::GetByteCount(bool isUnsigned)
 byte_array BigInteger::ToByteArray(bool isUnsigned, bool isBigEndian)
 {
     int ignored = 0;
-    return this->ToByteArray(GetBytesMode::AllocateArray, false, false, &ignored);
+    return this->ToByteArray(GetBytesMode::AllocateArray, isUnsigned, isBigEndian, &ignored);
 }
 
 byte_array BigInteger::ToByteArray(GetBytesMode mode, bool isUnsigned, bool isBigEndian, int* bytesWritten)
