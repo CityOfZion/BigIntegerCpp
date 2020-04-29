@@ -127,4 +127,13 @@ class NumericsHelpers {
             exp -= 1075;
         }
     }
+
+    static uint CombineHash(uint u1, uint u2)
+    {
+        return ((u1 << 7) | (u1 >> 25)) ^ u2;
+    }
+
+    static int CombineHash(int n1, int n2) {
+        return static_cast<int>(CombineHash(static_cast<uint>(n1), static_cast<uint>(n2)));
+    }
 };

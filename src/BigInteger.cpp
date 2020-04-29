@@ -756,7 +756,6 @@ BigInteger BigInteger::DivRem(BigInteger& dividend, BigInteger& divisor, BigInte
 
 BigInteger BigInteger::operator -()
 {
-//    n new BigInteger(-value._sign, value._bits);
     return BigInteger(-(*this)._sign, (*this)._bits);
 }
 
@@ -1877,6 +1876,15 @@ bool BigInteger::double_IsNaN(double value) {
 bool BigInteger::double_IsInfinity(double value) {
     auto bits = *((long*)&value);
     return (bits & 0x7FFFFFFFFFFFFFFF) == 0x7FF0000000000000;
+}
+
+int BigInteger::GetHashCode() {
+    if (_bits.empty())
+        return _sign;
+    int hash = _sign;
+    for (int iv = _bits.size(); --iv >= 0;)
+        hash = NumericsHelpers::CombineHash(hash, static_cast<int>(_bits[iv]));
+    return hash;
 }
 
 

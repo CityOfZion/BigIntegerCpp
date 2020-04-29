@@ -121,6 +121,7 @@ class BigInteger {
         int Sign();
         int GetSign() ;
         uint_array GetBits();
+        int GetHashCode();
 
         std::string ToString();
         uint_array ToUInt32Array();

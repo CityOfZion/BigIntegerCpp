@@ -260,8 +260,7 @@ bool BigNumber::NumberToBigInteger(BigNumber::BigNumberBuffer& number, BigIntege
         value *= ten;
         if (number.digits.str()[cur] != '\0')
         {
-            BigInteger temp = BigInteger(static_cast<int>(number.digits.str()[cur++] - '0'));
-            value += temp;
+            value += static_cast<int>(number.digits.str()[cur++] - '0');
         }
     }
 
