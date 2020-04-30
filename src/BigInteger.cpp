@@ -25,9 +25,9 @@ BigInteger::BigInteger()
     _bits = uint_array();
 }
 
-BigInteger::BigInteger(int value)
+BigInteger::BigInteger(int32_t value)
 {
-	if (value == std::numeric_limits<int>::min())
+	if (value == std::numeric_limits<int32_t>::min())
 	{
 		*this = s_bnMinInt;
 	}
@@ -40,9 +40,9 @@ BigInteger::BigInteger(int value)
 }
 
 BigInteger::BigInteger(uint32_t value) {
-    if (value <= static_cast<uint32_t>(std::numeric_limits<int>::max()))
+    if (value <= static_cast<uint32_t>(std::numeric_limits<int32_t>::max()))
     {
-        _sign = value;
+        _sign = static_cast<int32_t>(value);
         _bits.clear();
     }
     else
@@ -53,18 +53,13 @@ BigInteger::BigInteger(uint32_t value) {
     AssertValid();
 }
 
-BigInteger::BigInteger(long value)
+BigInteger::BigInteger(int64_t value)
 {
-    *this = BigInteger(static_cast<long long>(value));
-}
-
-BigInteger::BigInteger(long long value)
-{
-    if (std::numeric_limits<int>::min() < value && value <= std::numeric_limits<int>::max())
+    if (std::numeric_limits<int32_t>::min() < value && value <= std::numeric_limits<int32_t>::max())
     {
-        _sign = static_cast<int>(value);
+        _sign = static_cast<int32_t>(value);
     }
-    else if (value == std::numeric_limits<int>::min())
+    else if (value == std::numeric_limits<int32_t>::min())
     {
         *this = s_bnMinInt;
     }
@@ -98,9 +93,9 @@ BigInteger::BigInteger(long long value)
 
 BigInteger::BigInteger(uint64_t value)
 {
-    if (value <= static_cast<uint64_t>(std::numeric_limits<int>::max()))
+    if (value <= static_cast<uint64_t>(std::numeric_limits<int32_t>::max()))
     {
-        _sign = static_cast<int>(value);
+        _sign = static_cast<int32_t>(value);
     }
     else if (value <= std::numeric_limits<uint32_t>::max())
     {
@@ -513,7 +508,7 @@ BigInteger BigInteger::Add(uint_array& lhs, int lhsSign, uint_array& rhs, int rh
 
     if (trivialLeft && trivialRight)
     {
-        return BigInteger(static_cast<long long>(lhsSign) + rhsSign);
+        return BigInteger(static_cast<int64_t>(lhsSign) + rhsSign);
     }
 
     if (trivialLeft)
@@ -551,7 +546,7 @@ BigInteger BigInteger::Subtract(uint_array& lhs, int lhsSign, uint_array& rhs, i
 
     if (trivialLeft && trivialRight)
     {
-        return BigInteger(static_cast<long long>(lhsSign) - rhsSign);
+        return BigInteger(static_cast<int64_t>(lhsSign) - rhsSign);
     }
 
     if (trivialLeft)
@@ -616,7 +611,7 @@ BigInteger BigInteger::operator*(const BigInteger& rhs)
     bool trivialRight = rhs._bits.empty();
 
     if (trivialLeft && trivialRight)
-        return BigInteger(static_cast<long long>(lhs._sign) * rhs._sign);
+        return BigInteger(static_cast<int64_t>(lhs._sign) * rhs._sign);
 
     if (trivialLeft)
     {
@@ -684,7 +679,7 @@ BigInteger BigInteger::operator%(const BigInteger& div)
     if (trivialDivisor)
     {
         assert(!dividend._bits.empty());
-        long remainder = BigIntegerCalculator::Remainder(dividend._bits, abs(divisor._sign));
+        int64_t remainder = BigIntegerCalculator::Remainder(dividend._bits, abs(divisor._sign));
         return dividend._sign < 0 ? -1 * remainder : remainder;
     }
 

@@ -44,15 +44,15 @@ TEST(binary, binary_minus)
     typedef std::vector<BigIntTup> BigIntVec;
     BigIntVec data;
 
-    int intMinValue = std::numeric_limits<int>::min();
-    int intMaxValue = std::numeric_limits<int>::max();
-    long long llongMinValue = std::numeric_limits<long long>::min();
-    long long llongMaxValue = std::numeric_limits<long long>::max();
+    auto intMinValue = std::numeric_limits<int32_t>::min();
+    auto intMaxValue = std::numeric_limits<int32_t>::max();
+    auto llongMinValue = std::numeric_limits<int64_t>::min();
+    auto llongMaxValue = std::numeric_limits<int64_t>::max();
 
     data.push_back(BigIntTup(BigInteger(intMinValue), BigInteger(-1), BigInteger(intMinValue + 1) ));
-    data.push_back(BigIntTup(BigInteger(intMinValue), BigInteger(1), BigInteger((long long)intMinValue - 1)));
-    data.push_back(BigIntTup(BigInteger(intMaxValue), BigInteger(-1), BigInteger((long long)intMaxValue + 1)));
-    data.push_back(BigIntTup(BigInteger(intMaxValue), BigInteger(1), BigInteger(intMaxValue - 1)));     
+    data.push_back(BigIntTup(BigInteger(intMinValue), BigInteger(1), BigInteger((int64_t)intMinValue - 1)));
+    data.push_back(BigIntTup(BigInteger(intMaxValue), BigInteger(-1), BigInteger((int64_t)intMaxValue + 1)));
+    data.push_back(BigIntTup(BigInteger(intMaxValue), BigInteger(1), BigInteger(intMaxValue - 1)));
 
     data.push_back(BigIntTup(BigInteger(llongMinValue), BigInteger(-1), BigInteger(llongMinValue + 1)));
     byte_array arr = { 255, 255, 255, 255, 255, 255, 255, 127, 255 };

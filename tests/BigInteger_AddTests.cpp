@@ -30,27 +30,23 @@ TEST(unary, unary_plus)
     ASSERT_EQ( +a, a);
     a = BigInteger(std::numeric_limits<int>::max());
     ASSERT_EQ( +a, a);
-    a = BigInteger(std::numeric_limits<long>::min());
+    a = BigInteger(std::numeric_limits<int64_t>::min());
     ASSERT_EQ( +a, a);
-    a = BigInteger(std::numeric_limits<long>::max());
-    ASSERT_EQ( +a, a);
-    a = BigInteger(std::numeric_limits<long long>::min());
-    ASSERT_EQ( +a, a);
-    a = BigInteger(std::numeric_limits<long long>::max());
+    a = BigInteger(std::numeric_limits<int64_t>::max());
     ASSERT_EQ( +a, a);
 }
 
 TEST(binary, binary_plus)
 {
-    int intMinValue = std::numeric_limits<int>::min();
-    int intMaxValue = std::numeric_limits<int>::max();
-    long long llongMinValue = std::numeric_limits<long long>::min();
-    long long llongMaxValue = std::numeric_limits<long long>::max();
+    auto intMinValue = std::numeric_limits<int32_t>::min();
+    auto intMaxValue = std::numeric_limits<int32_t>::max();
+    auto llongMinValue = std::numeric_limits<int64_t>::min();
+    auto llongMaxValue = std::numeric_limits<int64_t>::max();
     BigInteger bigint1, bigint2, expected;
 
     bigint1  = intMinValue;
     bigint2  = BigInteger(-1);
-    expected = BigInteger((long)intMinValue - 1);
+    expected = BigInteger((int64_t)intMinValue - 1);
     ASSERT_EQ( expected, bigint1 + bigint2);
     ASSERT_EQ( expected, bigint2 + bigint1);
     ASSERT_EQ( expected, BigInteger::Add(bigint1, bigint2));
@@ -74,7 +70,7 @@ TEST(binary, binary_plus)
 
     bigint1  = intMaxValue;
     bigint2  = BigInteger(1);
-    expected = BigInteger((long)intMaxValue + 1);
+    expected = BigInteger((int64_t)intMaxValue + 1);
     ASSERT_EQ( expected, bigint1 + bigint2);
     ASSERT_EQ( expected, bigint2 + bigint1);
     ASSERT_EQ( expected, BigInteger::Add(bigint1, bigint2));
@@ -177,7 +173,7 @@ TEST(binary, binary_plus)
     long long a = pow(2,31) + pow(2,30);
     data.push_back(BigIntTup(BigInteger(a)
                             ,BigInteger(a)
-                            ,BigInteger(6442450944)
+                            ,BigInteger(6442450944LL)
                             ));
 
     a = pow(2,32);

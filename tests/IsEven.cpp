@@ -19,7 +19,7 @@ TEST(is_even, RunIsEvenTests) {
 
     // Just basic tests
     // Large Even Number
-    auto long_max_val = std::numeric_limits<long>::max();
+    auto long_max_val = std::numeric_limits<int64_t>::max();
     VerifyIsEven(static_cast<BigInteger>(long_max_val) + BigInteger(1), true);
 
     // Large Odd Number
@@ -48,10 +48,10 @@ TEST(is_even, RunIsEvenTests) {
 
     //Negative tests
     // Large Negative Even Number
-    VerifyIsEven((static_cast<BigInteger>(std::numeric_limits<long>::max()) + BigInteger::One()) * BigInteger(-1), true);
+    VerifyIsEven((static_cast<BigInteger>(std::numeric_limits<int64_t>::max()) + BigInteger::One()) * BigInteger(-1), true);
 
     // Large Negative Odd Number
-    VerifyIsEven((static_cast<BigInteger>(std::numeric_limits<long>::max()) + BigInteger(2)) * BigInteger(-1), false);
+    VerifyIsEven((static_cast<BigInteger>(std::numeric_limits<int64_t>::max()) + BigInteger(2)) * BigInteger(-1), false);
 
 
     // Large Negative Random Even Number

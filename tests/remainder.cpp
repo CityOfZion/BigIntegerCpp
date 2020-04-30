@@ -159,7 +159,7 @@ TEST(remainder_tests, RunRemainderAxioms) {
 
     // Axiom: X%(X + Y) = X where Y is 1 if x>=0 and -1 if x<0
     VerifyIdentityString((BigInteger(std::numeric_limits<int>::max()) + BigInteger(1)).ToString() + " " + int_max_value + " bRemainder", int_max_value);
-    VerifyIdentityString((BigInteger(std::numeric_limits<long>::max()) + BigInteger(1)).ToString() + " " + long_max_value + " bRemainder", long_max_value);
+    VerifyIdentityString((BigInteger(std::numeric_limits<int64_t>::max()) + BigInteger(1)).ToString() + " " + long_max_value + " bRemainder", long_max_value);
 
     for (int i = 0; i < s_samples; i++)
     {

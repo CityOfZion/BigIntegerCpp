@@ -98,9 +98,9 @@ BigInteger to_biginteger(py::int_& value) {
 PYBIND11_MODULE(pybiginteger, m) {
     m.doc() = "A C++ port of the C# BigInteger class";
     py::class_<BigInteger>(m, "BigInteger")
-            .def(py::init<int>())
+            .def(py::init<int32_t>())
             .def(py::init<uint32_t>())
-            .def(py::init<long>())
+            .def(py::init<int64_t>())
             .def(py::init<uint64_t>())
             .def(py::init([](py::int_& i) {
                 return to_biginteger(i);

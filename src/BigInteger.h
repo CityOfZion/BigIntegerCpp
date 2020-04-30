@@ -18,10 +18,9 @@ class BigInteger {
         static constexpr int DecimalSignMask = static_cast<int>(0x80000000);
 
         BigInteger();
-        BigInteger(int value);
+        BigInteger(int32_t value);
         BigInteger(uint32_t value);
-        BigInteger(long value);
-        BigInteger(long long value);
+        BigInteger(int64_t value);
         BigInteger(uint64_t value);
         BigInteger(double value);
         BigInteger(int n, uint_array value);
