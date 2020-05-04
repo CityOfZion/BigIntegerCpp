@@ -6,7 +6,7 @@
 
 static void VerifyIsOne(BigInteger bigInt, bool expectedAnswer)
 {
-    ASSERT_EQ(expectedAnswer, bigInt.IsOne());
+    ASSERT_EQ(expectedAnswer, bigInt.is_one());
 }
 
 TEST(is_one, IsOneTest) {
@@ -14,14 +14,14 @@ TEST(is_one, IsOneTest) {
     Random random(s_seed);
 
     //Just basic tests
-    // Zero
-    VerifyIsOne(BigInteger::Zero(), false);
+    // zero
+    VerifyIsOne(BigInteger::zero(), false);
 
-    // Negative One
-    VerifyIsOne(BigInteger::MinusOne(), false);
+    // Negative one
+    VerifyIsOne(BigInteger::minus_one(), false);
 
-    // One
-    VerifyIsOne(BigInteger::One(), true);
+    // one
+    VerifyIsOne(BigInteger::one(), true);
 
     // -Int32.MaxValue
     auto int_max = std::numeric_limits<int>::max();

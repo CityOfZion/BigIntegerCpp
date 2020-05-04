@@ -6,7 +6,7 @@
 
 static void VerifyIsEven(BigInteger bigInt, bool expectedAnswer)
 {
-    ASSERT_EQ(expectedAnswer, bigInt.IsEven());
+    ASSERT_EQ(expectedAnswer, bigInt.is_even());
 }
 
 TEST(is_even, RunIsEvenTests) {
@@ -29,18 +29,18 @@ TEST(is_even, RunIsEvenTests) {
 
     for (int i = 0; i < Reps; i++) {
         auto bigInt1 = BuildRandomNumber(random.Next() % MaxDigits + 1, random.Next());
-        VerifyIsEven(BigInteger::Parse(bigInt1) * BigInteger(2), true);
+        VerifyIsEven(BigInteger::parse(bigInt1) * BigInteger(2), true);
     }
 
     // Large Random Odd Number
 
     for (int i = 0; i < Reps; i++) {
         auto bigInt1 = BuildRandomNumber(random.Next() % MaxDigits + 1, random.Next());
-        VerifyIsEven((BigInteger::Parse(bigInt1) * BigInteger(2)) - BigInteger::One(), false);
+        VerifyIsEven((BigInteger::parse(bigInt1) * BigInteger(2)) - BigInteger::one(), false);
     }
 
     // Small Even Number
-    VerifyIsEven(static_cast<BigInteger>(std::numeric_limits<short>::max()) - BigInteger::One(), true);
+    VerifyIsEven(static_cast<BigInteger>(std::numeric_limits<short>::max()) - BigInteger::one(), true);
 
     // Small Odd Number
     VerifyIsEven(static_cast<BigInteger>(std::numeric_limits<short>::max()) - BigInteger(2), false);
@@ -48,7 +48,7 @@ TEST(is_even, RunIsEvenTests) {
 
     //Negative tests
     // Large Negative Even Number
-    VerifyIsEven((static_cast<BigInteger>(std::numeric_limits<int64_t>::max()) + BigInteger::One()) * BigInteger(-1), true);
+    VerifyIsEven((static_cast<BigInteger>(std::numeric_limits<int64_t>::max()) + BigInteger::one()) * BigInteger(-1), true);
 
     // Large Negative Odd Number
     VerifyIsEven((static_cast<BigInteger>(std::numeric_limits<int64_t>::max()) + BigInteger(2)) * BigInteger(-1), false);
@@ -57,23 +57,23 @@ TEST(is_even, RunIsEvenTests) {
     // Large Negative Random Even Number
     for (int i = 0; i < Reps; i++) {
         auto bigInt2 = BuildRandomNumber(random.Next() % MaxDigits + 1, random.Next());
-        VerifyIsEven(BigInteger::Parse(bigInt2) * BigInteger(-2), true);
+        VerifyIsEven(BigInteger::parse(bigInt2) * BigInteger(-2), true);
     }
 
     // Small Negative Even Number
-    VerifyIsEven((static_cast<BigInteger>(std::numeric_limits<short>::max()) - BigInteger::One()) * BigInteger(-1), true);
+    VerifyIsEven((static_cast<BigInteger>(std::numeric_limits<short>::max()) - BigInteger::one()) * BigInteger(-1), true);
 
     // Small Negative Odd Number
     VerifyIsEven((static_cast<BigInteger>(std::numeric_limits<short>::max()) - BigInteger(2)) * BigInteger(-1), false);
 
 
-    //Zero Case, 1, -1
-    // Zero
-    VerifyIsEven(BigInteger::Zero(), true);
+    //zero Case, 1, -1
+    // zero
+    VerifyIsEven(BigInteger::zero(), true);
 
-    // One
-    VerifyIsEven(BigInteger::One(), false);
+    // one
+    VerifyIsEven(BigInteger::one(), false);
 
-    // Negative One
-    VerifyIsEven(BigInteger::MinusOne(), false);
+    // Negative one
+    VerifyIsEven(BigInteger::minus_one(), false);
 }

@@ -8,7 +8,7 @@ static int s_seed = 0;
 static int onePosition = 0;
 
 static void VerifyIsPowerOfTwo(BigInteger bigInt, bool expectedAnswer) {
-    ASSERT_EQ(expectedAnswer, bigInt.IsPowerOfTwo());
+    ASSERT_EQ(expectedAnswer, bigInt.is_power_of_two());
 }
 
 static bool CheckExpected(byte_array value) {
@@ -98,15 +98,15 @@ TEST(is_poweroftwo, RunIsPowerOfTwoTests) {
     // Small Non Power Of Two
     VerifyIsPowerOfTwo(static_cast<BigInteger>(int_max) - BigInteger(2), false);
 
-    // Zero Case, 1, -1
-    // Zero
-    VerifyIsPowerOfTwo(BigInteger::Zero(), false);
+    // zero Case, 1, -1
+    // zero
+    VerifyIsPowerOfTwo(BigInteger::zero(), false);
 
-    // One
-    VerifyIsPowerOfTwo(BigInteger::One(), true);
+    // one
+    VerifyIsPowerOfTwo(BigInteger::one(), true);
 
-    // Negative One
-    VerifyIsPowerOfTwo(BigInteger::MinusOne(), false);
+    // Negative one
+    VerifyIsPowerOfTwo(BigInteger::minus_one(), false);
 
     // Random Small BigInteger
     VerifyIsPowerOfTwo(bigIntegerSmall, CheckExpected(byteArray1));

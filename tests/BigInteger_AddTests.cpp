@@ -8,9 +8,11 @@ TEST(unary, unary_plus)
 {
     BigInteger a;
 
-    a = BigInteger::Parse("-123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
+    a = BigInteger::parse(
+            "-123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
     ASSERT_EQ( +a, a);
-    a = BigInteger::Parse("123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
+    a = BigInteger::parse(
+            "123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
     ASSERT_EQ( +a, a);
     a = BigInteger(123);
     ASSERT_EQ( +a, a);
@@ -49,32 +51,32 @@ TEST(binary, binary_plus)
     expected = BigInteger((int64_t)intMinValue - 1);
     ASSERT_EQ( expected, bigint1 + bigint2);
     ASSERT_EQ( expected, bigint2 + bigint1);
-    ASSERT_EQ( expected, BigInteger::Add(bigint1, bigint2));
-    ASSERT_EQ( expected, BigInteger::Add(bigint2, bigint1));
+    ASSERT_EQ( expected, BigInteger::add(bigint1, bigint2));
+    ASSERT_EQ( expected, BigInteger::add(bigint2, bigint1));
 
     bigint1  = intMinValue;
     bigint2  = BigInteger(1);
     expected = BigInteger(intMinValue + 1);
     ASSERT_EQ( expected, bigint1 + bigint2);
     ASSERT_EQ( expected, bigint2 + bigint1);
-    ASSERT_EQ( expected, BigInteger::Add(bigint1, bigint2));
-    ASSERT_EQ( expected, BigInteger::Add(bigint2, bigint1));
+    ASSERT_EQ( expected, BigInteger::add(bigint1, bigint2));
+    ASSERT_EQ( expected, BigInteger::add(bigint2, bigint1));
 
     bigint1  = intMaxValue;
     bigint2  = BigInteger(-1);
     expected = BigInteger(intMaxValue - 1);
     ASSERT_EQ( expected, bigint1 + bigint2);
     ASSERT_EQ( expected, bigint2 + bigint1);
-    ASSERT_EQ( expected, BigInteger::Add(bigint1, bigint2));
-    ASSERT_EQ( expected, BigInteger::Add(bigint2, bigint1));
+    ASSERT_EQ( expected, BigInteger::add(bigint1, bigint2));
+    ASSERT_EQ( expected, BigInteger::add(bigint2, bigint1));
 
     bigint1  = intMaxValue;
     bigint2  = BigInteger(1);
     expected = BigInteger((int64_t)intMaxValue + 1);
     ASSERT_EQ( expected, bigint1 + bigint2);
     ASSERT_EQ( expected, bigint2 + bigint1);
-    ASSERT_EQ( expected, BigInteger::Add(bigint1, bigint2));
-    ASSERT_EQ( expected, BigInteger::Add(bigint2, bigint1));
+    ASSERT_EQ( expected, BigInteger::add(bigint1, bigint2));
+    ASSERT_EQ( expected, BigInteger::add(bigint2, bigint1));
 
     bigint1  = llongMinValue;
     bigint2  = BigInteger(-1);
@@ -82,24 +84,24 @@ TEST(binary, binary_plus)
     expected = BigInteger(byte_array(arr, arr + sizeof(arr) / sizeof(arr[0])));
     ASSERT_EQ( expected, bigint1 + bigint2);
     ASSERT_EQ( expected, bigint2 + bigint1);
-    ASSERT_EQ( expected, BigInteger::Add(bigint1, bigint2));
-    ASSERT_EQ( expected, BigInteger::Add(bigint2, bigint1));
+    ASSERT_EQ( expected, BigInteger::add(bigint1, bigint2));
+    ASSERT_EQ( expected, BigInteger::add(bigint2, bigint1));
 
     bigint1  = llongMinValue;
     bigint2  = BigInteger(1);
     expected = BigInteger(llongMinValue + 1);
     ASSERT_EQ( expected, bigint1 + bigint2);
     ASSERT_EQ( expected, bigint2 + bigint1);
-    ASSERT_EQ( expected, BigInteger::Add(bigint1, bigint2));
-    ASSERT_EQ( expected, BigInteger::Add(bigint2, bigint1));
+    ASSERT_EQ( expected, BigInteger::add(bigint1, bigint2));
+    ASSERT_EQ( expected, BigInteger::add(bigint2, bigint1));
 
     bigint1  = llongMaxValue;
     bigint2  = BigInteger(-1);
     expected = BigInteger(llongMaxValue - 1);
     ASSERT_EQ( expected, bigint1 + bigint2);
     ASSERT_EQ( expected, bigint2 + bigint1);
-    ASSERT_EQ( expected, BigInteger::Add(bigint1, bigint2));
-    ASSERT_EQ( expected, BigInteger::Add(bigint2, bigint1));
+    ASSERT_EQ( expected, BigInteger::add(bigint1, bigint2));
+    ASSERT_EQ( expected, BigInteger::add(bigint2, bigint1));
 
     bigint1  = llongMaxValue;
     bigint2  = BigInteger(1);
@@ -107,67 +109,76 @@ TEST(binary, binary_plus)
     expected = BigInteger((uint64_t)llongMaxValue + 1);
     ASSERT_EQ( expected, bigint1 + bigint2);
     ASSERT_EQ( expected, bigint2 + bigint1);
-    ASSERT_EQ( expected, BigInteger::Add(bigint1, bigint2));
-    ASSERT_EQ( expected, BigInteger::Add(bigint2, bigint1));
+    ASSERT_EQ( expected, BigInteger::add(bigint1, bigint2));
+    ASSERT_EQ( expected, BigInteger::add(bigint2, bigint1));
 
-    BigInteger largePositiveBigInt = BigInteger::Parse("123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
-    BigInteger largeNegativeBigInt = BigInteger::Parse("-123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
+    BigInteger largePositiveBigInt = BigInteger::parse(
+            "123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
+    BigInteger largeNegativeBigInt = BigInteger::parse(
+            "-123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
     
-    bigint2 = BigInteger::Parse("234234234234234234234234234234234234234234234234234234234234234234234234");
-    expected = BigInteger::Parse("123123123123123357357357357357357357357357357357357357357357357357357357357357357357357");
+    bigint2 = BigInteger::parse("234234234234234234234234234234234234234234234234234234234234234234234234");
+    expected = BigInteger::parse(
+            "123123123123123357357357357357357357357357357357357357357357357357357357357357357357357");
 
     ASSERT_EQ( expected, largePositiveBigInt + bigint2);
     ASSERT_EQ( expected, bigint2 + largePositiveBigInt);
-    ASSERT_EQ( expected, BigInteger::Add(largePositiveBigInt, bigint2));
-    ASSERT_EQ( expected, BigInteger::Add(bigint2, largePositiveBigInt));
+    ASSERT_EQ( expected, BigInteger::add(largePositiveBigInt, bigint2));
+    ASSERT_EQ( expected, BigInteger::add(bigint2, largePositiveBigInt));
 
     typedef std::vector<std::tuple<BigInteger, BigInteger, BigInteger>> BigIntVec;
     typedef std::tuple<BigInteger, BigInteger, BigInteger> BigIntTup;
     BigIntVec data;
 
     data.push_back(BigIntTup(largePositiveBigInt
-                            ,BigInteger::Parse("234234234234234234234234234234234234234234234234234234234234234234234234")
-                            ,BigInteger::Parse("123123123123123357357357357357357357357357357357357357357357357357357357357357357357357")
+                            , BigInteger::parse(
+                    "234234234234234234234234234234234234234234234234234234234234234234234234")
+                            , BigInteger::parse(
+                    "123123123123123357357357357357357357357357357357357357357357357357357357357357357357357")
                             ));
 
     data.push_back(BigIntTup(largePositiveBigInt
-                            ,BigInteger::Parse("-234234234234234234234234234234234234234234234234234234234234234234234234")
-                            ,BigInteger::Parse("123123123123122888888888888888888888888888888888888888888888888888888888888888888888889")
+                            , BigInteger::parse(
+                    "-234234234234234234234234234234234234234234234234234234234234234234234234")
+                            , BigInteger::parse(
+                    "123123123123122888888888888888888888888888888888888888888888888888888888888888888888889")
                             ));
 
     data.push_back(BigIntTup(largePositiveBigInt
                             ,BigInteger(123)
-                            ,BigInteger::Parse("123123123123123123123123123123123123123123123123123123123123123123123123123123123123246")
+                            , BigInteger::parse(
+                    "123123123123123123123123123123123123123123123123123123123123123123123123123123123123246")
                             ));
 
     data.push_back(BigIntTup(largePositiveBigInt
                             ,BigInteger(-123)
-                            ,BigInteger::Parse("123123123123123123123123123123123123123123123123123123123123123123123123123123123123000")
+                            , BigInteger::parse(
+                    "123123123123123123123123123123123123123123123123123123123123123123123123123123123123000")
                             ));
 
     data.push_back(BigIntTup(largePositiveBigInt
-                            ,BigInteger::Zero()
+                            , BigInteger::zero()
                             ,largePositiveBigInt
                             ));
 
     data.push_back(BigIntTup(largeNegativeBigInt
-                            ,BigInteger::Zero()
+                            , BigInteger::zero()
                             ,largeNegativeBigInt
                             ));
 
     data.push_back(BigIntTup(BigInteger(123)
-                            ,BigInteger::Zero()
+                            , BigInteger::zero()
                             ,BigInteger(123)
                             ));
 
     data.push_back(BigIntTup(BigInteger(-123)
-                            ,BigInteger::Zero()
+                            , BigInteger::zero()
                             ,BigInteger(-123)
                             ));
 
-    data.push_back(BigIntTup(BigInteger::Zero()
-                            ,BigInteger::Zero()
-                            ,BigInteger::Zero()
+    data.push_back(BigIntTup(BigInteger::zero()
+                            , BigInteger::zero()
+                            , BigInteger::zero()
                             ));
 
     long long a = pow(2,31) + pow(2,30);
@@ -177,7 +188,7 @@ TEST(binary, binary_plus)
                             ));
 
     a = pow(2,32);
-    data.push_back(BigIntTup(BigInteger::Zero()
+    data.push_back(BigIntTup(BigInteger::zero()
                             ,BigInteger(a)
                             ,BigInteger(a)
                             ));
@@ -290,7 +301,7 @@ TEST(binary, binary_plus)
     {
         ASSERT_EQ( std::get<2>(elem), std::get<0>(elem) + std::get<1>(elem));
         ASSERT_EQ( std::get<2>(elem), std::get<1>(elem) + std::get<0>(elem));
-        ASSERT_EQ( std::get<2>(elem), BigInteger::Add(std::get<0>(elem), std::get<1>(elem)));
-        ASSERT_EQ( std::get<2>(elem), BigInteger::Add(std::get<1>(elem), std::get<0>(elem)));
+        ASSERT_EQ( std::get<2>(elem), BigInteger::add(std::get<0>(elem), std::get<1>(elem)));
+        ASSERT_EQ( std::get<2>(elem), BigInteger::add(std::get<1>(elem), std::get<0>(elem)));
     }
 }

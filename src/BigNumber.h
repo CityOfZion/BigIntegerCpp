@@ -32,11 +32,11 @@ class BigNumber
             bool sign;
         };
 
-        static BigNumberBuffer Create();
-        static BigInteger ParseBigInteger(std::string value);
-        static bool TryParseBigInteger(std::string value, BigInteger& result);
-        static bool NumberToBigInteger(BigNumberBuffer& bignumber, BigInteger& result);
-        static std::string FormatBigInteger(const BigInteger& value);
+        static BigNumberBuffer create();
+        static BigInteger parse_biginteger(std::string value);
+        static bool try_parse_biginteger(std::string value, BigInteger& result);
+        static bool number_to_biginteger(BigNumberBuffer& bignumber, BigInteger& result);
+        static std::string format_biginteger(const BigInteger& value);
 
 
     private:

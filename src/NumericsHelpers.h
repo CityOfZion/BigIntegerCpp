@@ -3,7 +3,7 @@
 class NumericsHelpers {
     public:
 
-    static int CbitHighZero(unsigned int u)
+    static int cbit_high_zero(unsigned int u)
     {
         if (u == 0)
             return 32;
@@ -39,14 +39,14 @@ class NumericsHelpers {
         uint64_t uu;
     };
 
-    static double GetDoubleFromParts(int sign, int exp, uint64_t man) {
+    static double get_double_from_parts(int sign, int exp, uint64_t man) {
         DoubleULong du;
         du.dbl = 0;
 
         if (man == 0)
             du.uu = 0;
         else {
-            int cbitShift = CbitHighZero(man) - 11;
+            int cbitShift = cbit_high_zero(man) - 11;
             if (cbitShift < 0)
                 man >>= -cbitShift;
             else
@@ -74,7 +74,7 @@ class NumericsHelpers {
         return du.dbl;
     }
 
-    static void DangerousMakeTwosComplement(uint_array& d)
+    static void dangerous_make_twos_complement(uint_array& d)
     {
         //dangerous because mutates d!
         if (d.size() > 0)
@@ -95,11 +95,11 @@ class NumericsHelpers {
         }
     }
 
-    static uint64_t MakeUlong(unsigned int uHi, unsigned int uLo) {
+    static uint64_t make_ulong(unsigned int uHi, unsigned int uLo) {
             return (static_cast<uint64_t>(uHi) << BigInteger::kcbitUint) | uLo;
     }
 
-    static void GetDoubleParts(double dbl, int& sign, int& exp, uint64_t& man, bool& fFinite) {
+    static void get_double_parts(double dbl, int& sign, int& exp, uint64_t& man, bool& fFinite) {
         DoubleULong du;
         du.uu = 0;
         du.dbl = dbl;
@@ -128,12 +128,12 @@ class NumericsHelpers {
         }
     }
 
-    static uint CombineHash(uint u1, uint u2)
+    static uint combine_hash(uint u1, uint u2)
     {
         return ((u1 << 7) | (u1 >> 25)) ^ u2;
     }
 
-    static int CombineHash(int n1, int n2) {
-        return static_cast<int>(CombineHash(static_cast<uint>(n1), static_cast<uint>(n2)));
+    static int combine_hash(int n1, int n2) {
+        return static_cast<int>(combine_hash(static_cast<uint>(n1), static_cast<uint>(n2)));
     }
 };

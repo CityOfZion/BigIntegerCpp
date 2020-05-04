@@ -5,12 +5,12 @@
 #include "utils.h"
 #include "../src/exceptions.h"
 
-static void VerifyModPowString(std::string opstring)
+static void Verifymod_powString(std::string opstring)
 {
     StackCalc sc(opstring);
     while (sc.DoNextOperation())
     {
-        ASSERT_EQ(sc.snCalc.top().ToString(), sc.myCalc.top().ToString());
+        ASSERT_EQ(sc.snCalc.top().to_string(), sc.myCalc.top().to_string());
     }
 }
 
@@ -29,7 +29,7 @@ static void VerifyIdentityString(std::string opstring1, std::string opstring2)
         //Run the full calculation
         sc2.DoNextOperation();
     }
-    ASSERT_EQ(sc1.snCalc.top().ToString(), sc2.snCalc.top().ToString());
+    ASSERT_EQ(sc1.snCalc.top().to_string(), sc2.snCalc.top().to_string());
 }
 
 static byte_array GetRandomPosByteArray(Random random, int size)
@@ -80,8 +80,8 @@ static std::string Print(byte_array bytes)
 }
 
 
-TEST(modpow, ModPowValidSmallNumbers) {
-    // ModPow Method - with small numbers - valid
+TEST(modpow, mod_powValidSmallNumbers) {
+    // mod_pow Method - with small numbers - valid
     for (int i = 1; i <= 1; i++)//-2
     {
         for (int j = 0; j <= 1; j++)//2
@@ -90,14 +90,14 @@ TEST(modpow, ModPowValidSmallNumbers) {
             {
                 if (k != 0)
                 {
-                    VerifyModPowString(std::to_string(k) + " " + std::to_string(j) + " " + std::to_string(i) + " tModPow");
+                    Verifymod_powString(std::to_string(k) + " " + std::to_string(j) + " " + std::to_string(i) + " tModPow");
                 }
             }
         }
     }
 }
 
-TEST(modpow, ModPowNegative) {
+TEST(modpow, mod_powNegative) {
     int s_samples = 10;
     Random s_random(100);
 
@@ -105,16 +105,17 @@ TEST(modpow, ModPowNegative) {
     byte_array tempByteArray2;
     byte_array tempByteArray3;
 
-    // ModPow Method - with small numbers - invalid - zero modulus
+    // mod_pow Method - with small numbers - invalid - zero modulus
         for (int i = -2; i <= 2; i++)
         {
             for (int j = 0; j <= 2; j++)
             {
-                EXPECT_THROW(VerifyModPowString(BigInteger::Zero().ToString() + " " + std::to_string(j) + " " + std::to_string(i) + " tModPow"), DivideByZero);
+                EXPECT_THROW(Verifymod_powString(
+                        BigInteger::zero().to_string() + " " + std::to_string(j) + " " + std::to_string(i) + " tModPow"), DivideByZero);
             }
         }
 
-        // ModPow Method - with small numbers - invalid - negative exponent
+        // mod_pow Method - with small numbers - invalid - negative exponent
         for (int i = -2; i <= 2; i++)
         {
             for (int j = -2; j <= -1; j++)
@@ -123,31 +124,32 @@ TEST(modpow, ModPowNegative) {
                 {
                     if (k != 0)
                     {
-                        EXPECT_THROW(VerifyModPowString(std::to_string(k) + " " + std::to_string(j) + " " + std::to_string(i) + " tModPow"), std::out_of_range);
+                        EXPECT_THROW(Verifymod_powString(std::to_string(k) + " " + std::to_string(j) + " " + std::to_string(i) + " tModPow"), std::out_of_range);
                     }
                 }
             }
         }
 
-        // ModPow Method - Negative Exponent
+        // mod_pow Method - Negative Exponent
         for (int i = 0; i < s_samples; i++)
         {
             tempByteArray1 = GetRandomByteArray(s_random);
             tempByteArray2 = GetRandomNegByteArray(s_random, 2);
             tempByteArray3 = GetRandomByteArray(s_random);
-            EXPECT_THROW(VerifyModPowString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow"), std::out_of_range);
+            EXPECT_THROW(Verifymod_powString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow"), std::out_of_range);
         }
 
-        // ModPow Method - Zero Modulus
+        // mod_pow Method - zero Modulus
         for (int i = 0; i < s_samples; i++)
         {
             tempByteArray1 = GetRandomByteArray(s_random);
             tempByteArray2 = GetRandomPosByteArray(s_random, 1);
-            EXPECT_THROW(VerifyModPowString(BigInteger::Zero().ToString() + " " + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow"), DivideByZero);
+            EXPECT_THROW(Verifymod_powString(
+                    BigInteger::zero().to_string() + " " + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow"), DivideByZero);
         }
 }
 
-TEST(modpow, ModPow3SmallInt) {
+TEST(modpow, mod_pow3SmallInt) {
     int s_samples = 10;
     Random s_random(100);
 
@@ -155,17 +157,17 @@ TEST(modpow, ModPow3SmallInt) {
     byte_array tempByteArray2;
     byte_array tempByteArray3;
 
-    // ModPow Method - Three Small BigIntegers
+    // mod_pow Method - Three Small BigIntegers
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random, 2);
         tempByteArray2 = GetRandomPosByteArray(s_random, 2);
         tempByteArray3 = GetRandomByteArray(s_random, 2);
-        VerifyModPowString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow");
+        Verifymod_powString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow");
     }
 }
 
-TEST(modpow, ModPow1Large2SmallInt) {
+TEST(modpow, mod_pow1Large2SmallInt) {
     int s_samples = 10;
     Random s_random(100);
 
@@ -173,27 +175,27 @@ TEST(modpow, ModPow1Large2SmallInt) {
     byte_array tempByteArray2;
     byte_array tempByteArray3;
 
-    // ModPow Method - One large and two small BigIntegers
+    // mod_pow Method - one large and two small BigIntegers
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random, 2);
         tempByteArray2 = GetRandomPosByteArray(s_random);
         tempByteArray3 = GetRandomByteArray(s_random, 2);
-        VerifyModPowString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow");
+        Verifymod_powString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow");
 
         tempByteArray1 = GetRandomByteArray(s_random);
         tempByteArray2 = GetRandomPosByteArray(s_random, 2);
         tempByteArray3 = GetRandomByteArray(s_random, 2);
-        VerifyModPowString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow");
+        Verifymod_powString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow");
 
         tempByteArray1 = GetRandomByteArray(s_random, 2);
         tempByteArray2 = GetRandomPosByteArray(s_random, 1);
         tempByteArray3 = GetRandomByteArray(s_random);
-        VerifyModPowString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow");
+        Verifymod_powString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow");
     }
 }
 
-TEST(modpow, ModPow2Large1SmallInt) {
+TEST(modpow, mod_pow2Large1SmallInt) {
     int s_samples = 10;
     Random s_random(100);
 
@@ -201,17 +203,17 @@ TEST(modpow, ModPow2Large1SmallInt) {
     byte_array tempByteArray2;
     byte_array tempByteArray3;
 
-    // ModPow Method - Two large and one small BigIntegers
+    // mod_pow Method - Two large and one small BigIntegers
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
         tempByteArray2 = GetRandomPosByteArray(s_random);
         tempByteArray3 = GetRandomByteArray(s_random, 2);
-        VerifyModPowString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow");
+        Verifymod_powString(Print(tempByteArray3) + Print(tempByteArray2) + Print(tempByteArray1) + "tModPow");
     }
 }
 
-TEST(modpow, ModPow2Large1SmallInt_Threshold) {
+TEST(modpow, mod_pow2Large1SmallInt_Threshold) {
     struct testdata {
         std::string value;
         std::string exponent;
@@ -272,71 +274,71 @@ TEST(modpow, ModPow2Large1SmallInt_Threshold) {
              "-1905434239471820365929630558127219204166613"});
 
     for (auto& data : testcases) {
-        auto valueInt = BigInteger::Parse(data.value);
-        auto exponentInt = BigInteger::Parse(data.exponent);
-        auto modulusInt = BigInteger::Parse(data.modulus);
-        auto resultInt = BigInteger::Parse(data.expected);
-        ASSERT_EQ(resultInt, BigInteger::ModPow(valueInt, exponentInt, modulusInt));
+        auto valueInt = BigInteger::parse(data.value);
+        auto exponentInt = BigInteger::parse(data.exponent);
+        auto modulusInt = BigInteger::parse(data.modulus);
+        auto resultInt = BigInteger::parse(data.expected);
+        ASSERT_EQ(resultInt, BigInteger::mod_pow(valueInt, exponentInt, modulusInt));
     }
 }
 
-TEST(modpow, ModPow0Power) {
+TEST(modpow, mod_pow0Power) {
     int s_samples = 10;
     Random s_random(100);
 
     byte_array tempByteArray1;
     byte_array tempByteArray2;
 
-    // ModPow Method - zero power
+    // mod_pow Method - zero power
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random, 2);
         tempByteArray2 = GetRandomByteArray(s_random, 2);
-        VerifyModPowString(Print(tempByteArray2) + BigInteger::Zero().ToString() + " " + Print(tempByteArray1) + "tModPow");
+        Verifymod_powString(Print(tempByteArray2) + BigInteger::zero().to_string() + " " + Print(tempByteArray1) + "tModPow");
 
         tempByteArray1 = GetRandomByteArray(s_random, 2);
         tempByteArray2 = GetRandomByteArray(s_random);
-        VerifyModPowString(Print(tempByteArray2) + BigInteger::Zero().ToString() + " " + Print(tempByteArray1) + "tModPow");
+        Verifymod_powString(Print(tempByteArray2) + BigInteger::zero().to_string() + " " + Print(tempByteArray1) + "tModPow");
 
         tempByteArray1 = GetRandomByteArray(s_random);
         tempByteArray2 = GetRandomByteArray(s_random, 2);
-        VerifyModPowString(Print(tempByteArray2) + BigInteger::Zero().ToString() + " " + Print(tempByteArray1) + "tModPow");
+        Verifymod_powString(Print(tempByteArray2) + BigInteger::zero().to_string() + " " + Print(tempByteArray1) + "tModPow");
 
         tempByteArray1 = GetRandomByteArray(s_random);
         tempByteArray2 = GetRandomByteArray(s_random);
-        VerifyModPowString(Print(tempByteArray2) + BigInteger::Zero().ToString() + " " + Print(tempByteArray1) + "tModPow");
+        Verifymod_powString(Print(tempByteArray2) + BigInteger::zero().to_string() + " " + Print(tempByteArray1) + "tModPow");
     }
 }
 
-TEST(modpow, ModPow0Base) {
+TEST(modpow, mod_pow0Base) {
     int s_samples = 10;
     Random s_random(100);
 
     byte_array tempByteArray1;
     byte_array tempByteArray2;
 
-    // ModPow Method - zero base
+    // mod_pow Method - zero base
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomPosByteArray(s_random, 2);
         tempByteArray2 = GetRandomByteArray(s_random, 2);
-        VerifyModPowString(Print(tempByteArray2) + Print(tempByteArray1) + BigInteger::Zero().ToString() + " tModPow");
+        Verifymod_powString(Print(tempByteArray2) + Print(tempByteArray1) + BigInteger::zero().to_string() + " tModPow");
 
         tempByteArray1 = GetRandomPosByteArray(s_random, 2);
         tempByteArray2 = GetRandomByteArray(s_random);
-        VerifyModPowString(Print(tempByteArray2) + Print(tempByteArray1) + BigInteger::Zero().ToString() + " tModPow");
+        Verifymod_powString(Print(tempByteArray2) + Print(tempByteArray1) + BigInteger::zero().to_string() + " tModPow");
 
         tempByteArray1 = GetRandomPosByteArray(s_random);
         tempByteArray2 = GetRandomByteArray(s_random, 2);
-        VerifyModPowString(Print(tempByteArray2) + Print(tempByteArray1) + BigInteger::Zero().ToString() + " tModPow");
+        Verifymod_powString(Print(tempByteArray2) + Print(tempByteArray1) + BigInteger::zero().to_string() + " tModPow");
 
         tempByteArray1 = GetRandomPosByteArray(s_random);
         tempByteArray2 = GetRandomByteArray(s_random);
-        VerifyModPowString(Print(tempByteArray2) + Print(tempByteArray1) + BigInteger::Zero().ToString() + " tModPow");
+        Verifymod_powString(Print(tempByteArray2) + Print(tempByteArray1) + BigInteger::zero().to_string() + " tModPow");
     }
 }
 
-TEST(modpow, ModPowAxiom) {
+TEST(modpow, mod_powAxiom) {
     int s_samples = 10;
     Random s_random(100);
 
@@ -357,12 +359,12 @@ TEST(modpow, ModPowAxiom) {
     }
 }
 
-TEST(modpow, ModPowBoundary) {
+TEST(modpow, mod_powBoundary) {
     // Check interesting cases for boundary conditions
     // You'll either be shifting a 0 or 1 across the boundary
     // 32 bit boundary  n2=0
-    VerifyModPowString(std::to_string(pow(2, 35)) + " " + std::to_string(pow(2, 32)) + " 2 tModPow");
+    Verifymod_powString(std::to_string(pow(2, 35)) + " " + std::to_string(pow(2, 32)) + " 2 tModPow");
 
     // 32 bit boundary  n1=0 n2=1
-    VerifyModPowString(std::to_string(pow(2, 35)) + " " + std::to_string(pow(2, 33)) + " 2 tModPow");
+    Verifymod_powString(std::to_string(pow(2, 35)) + " " + std::to_string(pow(2, 33)) + " 2 tModPow");
 }

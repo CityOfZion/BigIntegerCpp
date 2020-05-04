@@ -6,22 +6,22 @@
 #include <cassert>
 #include <iostream>
 
-BigNumber::BigNumberBuffer BigNumber::Create()
+BigNumber::BigNumberBuffer BigNumber::create()
 {
     BigNumber::BigNumberBuffer number;
     number.digits = std::stringstream("", std::ios_base::ate | std::ios_base::in | std::ios_base::out);
     return number;
 }
 
-BigInteger BigNumber::ParseBigInteger(std::string value)
+BigInteger BigNumber::parse_biginteger(std::string value)
 {
     if (value.empty())
     {
         throw std::invalid_argument("value must not be NULL");
     }
 
-    BigInteger result = BigInteger::Zero();
-    if (!BigNumber::TryParseBigInteger(value, result))
+    BigInteger result = BigInteger::zero();
+    if (!BigNumber::try_parse_biginteger(value, result))
     {
         throw std::runtime_error("value could not be parsed to a BigInteger");
     }
@@ -247,39 +247,39 @@ static bool TryStringToBigInteger(std::string value, std::stringstream& receiver
     }
 }
 
-bool BigNumber::NumberToBigInteger(BigNumber::BigNumberBuffer& number, BigInteger& value)
+bool BigNumber::number_to_biginteger(BigNumber::BigNumberBuffer& bignumber, BigInteger& result)
 {
-    int i = number.scale;
+    int i = bignumber.scale;
     int cur = 0;
 
     BigInteger ten = 10;
-    value = 0;
+    result = 0;
 
     while (--i >= 0)
     {
-        value *= ten;
-        if (number.digits.str()[cur] != '\0')
+        result *= ten;
+        if (bignumber.digits.str()[cur] != '\0')
         {
-            value += static_cast<int>(number.digits.str()[cur++] - '0');
+            result += static_cast<int>(bignumber.digits.str()[cur++] - '0');
         }
     }
 
-    while (number.digits.str()[cur] != '\0')
+    while (bignumber.digits.str()[cur] != '\0')
     {
-        if (number.digits.str()[cur++] != '0') return false; // Disallow non-zero trailing decimal places
+        if (bignumber.digits.str()[cur++] != '0') return false; // Disallow non-zero trailing decimal places
     }
 
-    if (number.sign)
+    if (bignumber.sign)
     {
-        value = -value;
+        result = -result;
     }
     return true;
 }
 
 
-bool BigNumber::TryParseBigInteger(std::string value, BigInteger& result)
+bool BigNumber::try_parse_biginteger(std::string value, BigInteger& result)
 {
-    BigNumber::BigNumberBuffer bignumber = BigNumber::Create();
+    BigNumber::BigNumberBuffer bignumber = BigNumber::create();
     int precision;
     int scale;
     int sign;
@@ -294,7 +294,7 @@ bool BigNumber::TryParseBigInteger(std::string value, BigInteger& result)
     bignumber.sign = sign;
 
     // TODO HexNumberToBigInteger
-    if (!NumberToBigInteger(bignumber, result))
+    if (!number_to_biginteger(bignumber, result))
     {
         return false;
     }
@@ -303,7 +303,7 @@ bool BigNumber::TryParseBigInteger(std::string value, BigInteger& result)
 }
 
 
-std::string BigNumber::FormatBigInteger(const BigInteger& value)
+std::string BigNumber::format_biginteger(const BigInteger& value)
 {
     //TODO HEX
     //assert(formatString == null || formatString.Length == formatSpan.Length);
@@ -316,16 +316,16 @@ std::string BigNumber::FormatBigInteger(const BigInteger& value)
     //}
 
 
-    if (value.GetBits().size() == 0)
+    if (value.get_bits().size() == 0)
     {
-        return std::to_string(value.GetSign());
+        return std::to_string(value.get_sign());
     }
 
     // First convert to base 10^9.
     const uint32_t kuBase = 1000000000; // 10^9
     const int kcchBase = 9;
 
-    int cuSrc = value.GetBits().size();
+    int cuSrc = value.get_bits().size();
     int cuTemp;
     int cuMax;
     if (((cuTemp = cuSrc * 10) < cuSrc))
@@ -342,11 +342,11 @@ std::string BigNumber::FormatBigInteger(const BigInteger& value)
 
     for (int iuSrc = cuSrc; --iuSrc >= 0;)
     {
-        uint32_t uCarry = value.GetBits()[iuSrc];
+        uint32_t uCarry = value.get_bits()[iuSrc];
         for (int iuDst = 0; iuDst < cuDst; iuDst++)
         {
             assert(rguDst[iuDst] < kuBase);
-            uint64_t uuRes = NumericsHelpers::MakeUlong(rguDst[iuDst], uCarry);
+            uint64_t uuRes = NumericsHelpers::make_ulong(rguDst[iuDst], uCarry);
             rguDst[iuDst] = static_cast<uint32_t>(uuRes % kuBase);
             uCarry = static_cast<uint32_t>(uuRes / kuBase);
         }
@@ -437,7 +437,7 @@ std::string BigNumber::FormatBigInteger(const BigInteger& value)
         digits--;
     }
 
-    if (value.GetSign() < 0)
+    if (value.get_sign() < 0)
     {
         std::string negativeSign = "-";
         for (int i = negativeSign.size() - 1; i > -1; i--)

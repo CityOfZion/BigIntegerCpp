@@ -1,7 +1,7 @@
 #include "BigIntegerCalculator.h"
 #include <cassert>
 
-uint_array BigIntegerCalculator::Square(uint_array& value)
+uint_array BigIntegerCalculator::square(uint_array& value)
 {
     assert(!value.empty());
 
@@ -9,12 +9,12 @@ uint_array BigIntegerCalculator::Square(uint_array& value)
     // some nasty index calculations...
 
     uint_array bits(value.size()*2);
-    Square(&value[0], value.size(), &bits[0], bits.size());
+    square(&value[0], value.size(), &bits[0], bits.size());
 
     return bits;
 }
 
-void BigIntegerCalculator::Square(uint32_t* value, int valueLength, uint32_t* bits, int bitsLength)
+void BigIntegerCalculator::square(uint32_t* value, int valueLength, uint32_t* bits, int bitsLength)
 {
     assert(valueLength >= 0);
     assert(bitsLength == valueLength + valueLength);
@@ -87,12 +87,12 @@ void BigIntegerCalculator::Square(uint32_t* value, int valueLength, uint32_t* bi
         int bitsHighLength = bitsLength - n2;
 
         // ... compute z_0 = a_0 * a_0 (squaring again!)
-        Square(valueLow, valueLowLength,
-                           bitsLow, bitsLowLength);
+        square(valueLow, valueLowLength,
+               bitsLow, bitsLowLength);
 
         // ... compute z_2 = a_1 * a_1 (squaring again!)
-        Square(valueHigh, valueHighLength,
-                           bitsHigh, bitsHighLength);
+        square(valueHigh, valueHighLength,
+               bitsHigh, bitsHighLength);
 
         int foldLength = valueHighLength + 1;
         int coreLength = foldLength + foldLength;
@@ -103,44 +103,44 @@ void BigIntegerCalculator::Square(uint32_t* value, int valueLength, uint32_t* bi
             uint_array core(coreLength, 0);
 
             // ... compute z_a = a_1 + a_0 (call it fold...)
-            Add(valueHigh, valueHighLength,
-                            valueLow, valueLowLength,
-                            fold.data(), foldLength);
+            add(valueHigh, valueHighLength,
+                valueLow, valueLowLength,
+                fold.data(), foldLength);
 
             // ... compute z_1 = z_a * z_a - z_0 - z_2
-            Square(fold.data(), foldLength,
-                               core.data(), coreLength);
+            square(fold.data(), foldLength,
+                   core.data(), coreLength);
 
-            SubtractCore(bitsHigh, bitsHighLength,
-                                     bitsLow, bitsLowLength,
-                                     core.data(), coreLength);
+            subtract_core(bitsHigh, bitsHighLength,
+                          bitsLow, bitsLowLength,
+                          core.data(), coreLength);
 
             // ... and finally merge the result! :-)
-            AddSelf(&bits[n], bitsLength - n, &core[0], coreLength);
+            add_self(&bits[n], bitsLength - n, &core[0], coreLength);
         }
         else
         {
             uint_array fold(foldLength, 0);
             uint_array core(coreLength, 0);
             // ... compute z_a = a_1 + a_0 (call it fold...)
-            Add(valueHigh, valueHighLength,
-                            valueLow, valueLowLength,
-                            fold.data(), foldLength);
+            add(valueHigh, valueHighLength,
+                valueLow, valueLowLength,
+                fold.data(), foldLength);
 
             // ... compute z_1 = z_a * z_a - z_0 - z_2
-            Square(fold.data(), foldLength, core.data(), coreLength);
+            square(fold.data(), foldLength, core.data(), coreLength);
 
-            SubtractCore(bitsHigh, bitsHighLength,
-                                     bitsLow, bitsLowLength,
-                                     core.data(), coreLength);
+            subtract_core(bitsHigh, bitsHighLength,
+                          bitsLow, bitsLowLength,
+                          core.data(), coreLength);
 
             // ... and finally merge the result! :-)
-            AddSelf(&bits[n], bitsLength - n, &core[0], coreLength);
+            add_self(&bits[n], bitsLength - n, &core[0], coreLength);
         }
     }
 }
 
-uint_array BigIntegerCalculator::Multiply(uint_array lhs, uint32_t rhs)
+uint_array BigIntegerCalculator::multiply(uint_array lhs, uint32_t rhs)
 {
     assert(!lhs.empty());
 
@@ -165,7 +165,7 @@ uint_array BigIntegerCalculator::Multiply(uint_array lhs, uint32_t rhs)
     return bits;
 }
 
-uint_array BigIntegerCalculator::Multiply(uint_array lhs, uint_array rhs)
+uint_array BigIntegerCalculator::multiply(uint_array lhs, uint_array rhs)
 {
     assert(!lhs.empty());
     assert(!rhs.empty());
@@ -176,12 +176,12 @@ uint_array BigIntegerCalculator::Multiply(uint_array lhs, uint_array rhs)
 
     uint_array bits(lhs.size() + rhs.size());
 
-    Multiply(&lhs[0], lhs.size(), &rhs[0], rhs.size(), &bits[0], bits.size());
+    multiply(&lhs[0], lhs.size(), &rhs[0], rhs.size(), &bits[0], bits.size());
 
     return bits;
 }
 
-void BigIntegerCalculator::Multiply(uint32_t* left, int leftLength, uint32_t* right, int rightLength, uint32_t* bits, int bitsLength)
+void BigIntegerCalculator::multiply(uint32_t* left, int leftLength, uint32_t* right, int rightLength, uint32_t* bits, int bitsLength)
 {
     assert(leftLength >= 0);
     assert(rightLength >= 0);
@@ -254,12 +254,12 @@ void BigIntegerCalculator::Multiply(uint32_t* left, int leftLength, uint32_t* ri
         int bitsHighLength = bitsLength - n2;
 
         // ... compute z_0 = a_0 * b_0 (multiply again)
-        Multiply(leftLow, leftLowLength,
+        multiply(leftLow, leftLowLength,
                  rightLow, rightLowLength,
                  bitsLow, bitsLowLength);
 
         // ... compute z_2 = a_1 * b_1 (multiply again)
-        Multiply(leftHigh, leftHighLength,
+        multiply(leftHigh, leftHighLength,
                  rightHigh, rightHighLength,
                  bitsHigh, bitsHighLength);
 
@@ -274,26 +274,26 @@ void BigIntegerCalculator::Multiply(uint32_t* left, int leftLength, uint32_t* ri
             uint_array core(coreLength, 0);
 
             // ... compute z_a = a_1 + a_0 (call it fold...)
-            BigIntegerCalculator::Add(leftHigh, leftHighLength,
+            BigIntegerCalculator::add(leftHigh, leftHighLength,
                                       leftLow, leftLowLength,
                                       leftFold.data(), leftFoldLength);
 
             // ... compute z_b = b_1 + b_0 (call it fold...)
-            BigIntegerCalculator::Add(rightHigh, rightHighLength,
+            BigIntegerCalculator::add(rightHigh, rightHighLength,
                                       rightLow, rightLowLength,
                                       rightFold.data(), rightFoldLength);
 
             // ... compute z_1 = z_a * z_b - z_0 - z_2
-            Multiply(leftFold.data(), leftFoldLength,
-                                 rightFold.data(), rightFoldLength,
-                                 core.data(), coreLength);
+            multiply(leftFold.data(), leftFoldLength,
+                     rightFold.data(), rightFoldLength,
+                     core.data(), coreLength);
 
-            SubtractCore(bitsHigh, bitsHighLength,
-                                     bitsLow, bitsLowLength,
-                                     core.data(), coreLength);
+            subtract_core(bitsHigh, bitsHighLength,
+                          bitsLow, bitsLowLength,
+                          core.data(), coreLength);
 
             // ... and finally merge the result! :-)
-            AddSelf(&bits[n], bitsLength - n, &core[0], coreLength);
+            add_self(&bits[n], bitsLength - n, &core[0], coreLength);
         }
         else
         {
@@ -302,30 +302,30 @@ void BigIntegerCalculator::Multiply(uint32_t* left, int leftLength, uint32_t* ri
             uint_array core(coreLength, 0);
 
             // ... compute z_a = a_1 + a_0 (call it fold...)
-            Add(leftHigh, leftHighLength,
-                            leftLow, leftLowLength,
-                            leftFold.data(), leftFoldLength);
+            add(leftHigh, leftHighLength,
+                leftLow, leftLowLength,
+                leftFold.data(), leftFoldLength);
 
             // ... compute z_b = b_1 + b_0 (call it fold...)
-            Add(rightHigh, rightHighLength,
-                            rightLow, rightLowLength,
-                            rightFold.data(), rightFoldLength);
+            add(rightHigh, rightHighLength,
+                rightLow, rightLowLength,
+                rightFold.data(), rightFoldLength);
 
             // ... compute z_1 = z_a * z_b - z_0 - z_2
-            Multiply(leftFold.data(), leftFoldLength,
-                                 rightFold.data(), rightFoldLength,
-                                 core.data(), coreLength);
-            SubtractCore(bitsHigh, bitsHighLength,
-                                     bitsLow, bitsLowLength,
-                                     core.data(), coreLength);
+            multiply(leftFold.data(), leftFoldLength,
+                     rightFold.data(), rightFoldLength,
+                     core.data(), coreLength);
+            subtract_core(bitsHigh, bitsHighLength,
+                          bitsLow, bitsLowLength,
+                          core.data(), coreLength);
 
             // ... and finally merge the result! :-)
-            AddSelf(&bits[n], bitsLength - n, &core[0], coreLength);
+            add_self(&bits[n], bitsLength - n, &core[0], coreLength);
         }
     }
 }
 
-void BigIntegerCalculator::SubtractCore(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength, uint32_t* core, int coreLength)
+void BigIntegerCalculator::subtract_core(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength, uint32_t* core, int coreLength)
 {
 
     assert(lhsLength>= 0);

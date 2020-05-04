@@ -16,8 +16,10 @@ TEST(unary, unary_minus)
     long long llongMinValue = std::numeric_limits<long long>::min();
     long long llongMaxValue = std::numeric_limits<long long>::max();
 
-    BigInteger largePositiveBigInt = BigInteger::Parse("123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
-    BigInteger largeNegativeBigInt = BigInteger::Parse("-123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
+    BigInteger largePositiveBigInt = BigInteger::parse(
+            "123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
+    BigInteger largeNegativeBigInt = BigInteger::parse(
+            "-123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");
 
     data.push_back(BigIntTup(largePositiveBigInt, largeNegativeBigInt));
     data.push_back(BigIntTup(largeNegativeBigInt, largePositiveBigInt));
@@ -34,7 +36,7 @@ TEST(unary, unary_minus)
     for (auto elem : data)
     {
         ASSERT_EQ( std::get<1>(elem), -std::get<0>(elem));
-        ASSERT_EQ( std::get<1>(elem), BigInteger::Negate(std::get<0>(elem)));
+        ASSERT_EQ( std::get<1>(elem), BigInteger::negate(std::get<0>(elem)));
     }
 }
 
@@ -61,28 +63,36 @@ TEST(binary, binary_minus)
     data.push_back(BigIntTup(BigInteger(llongMaxValue), BigInteger(1),  BigInteger(llongMaxValue - 1)));
 
     const std::string LargePositiveBigIntString1 = "123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123";
-    BigInteger largePositiveBigInt1 = BigInteger::Parse(LargePositiveBigIntString1);
+    BigInteger largePositiveBigInt1 = BigInteger::parse(LargePositiveBigIntString1);
     BigInteger largeNegativeBigInt1 = -largePositiveBigInt1;
 
     const std::string LargePositiveBigIntString2 = "234234234234234234234234234234234234234234234234234234234234234234234234";
-    BigInteger largePositiveBigInt2 = BigInteger::Parse(LargePositiveBigIntString2);
+    BigInteger largePositiveBigInt2 = BigInteger::parse(LargePositiveBigIntString2);
     BigInteger largeNegativeBigInt2 = -largePositiveBigInt2;
 
     // Big - Big
     const std::string LargePositiveBigIntMinusLargePositiveBigIntString = "123123123123123123123122888888888888888888888888888888888888888888888888888888888888888888888889";
     const std::string LargePositiveBigIntMinusLargeNegativeBigIntString = "123123123123123123123123357357357357357357357357357357357357357357357357357357357357357357357357";
-    data.push_back(BigIntTup(largePositiveBigInt1, largePositiveBigInt2, BigInteger::Parse(LargePositiveBigIntMinusLargePositiveBigIntString)));
-    data.push_back(BigIntTup(largePositiveBigInt1, largeNegativeBigInt2, BigInteger::Parse(LargePositiveBigIntMinusLargeNegativeBigIntString)));
-    data.push_back(BigIntTup(largeNegativeBigInt1, largePositiveBigInt2, BigInteger::Parse("-" + LargePositiveBigIntMinusLargeNegativeBigIntString)));
-    data.push_back(BigIntTup(largeNegativeBigInt1, largeNegativeBigInt2, BigInteger::Parse("-" + LargePositiveBigIntMinusLargePositiveBigIntString)));
+    data.push_back(BigIntTup(largePositiveBigInt1, largePositiveBigInt2,
+                             BigInteger::parse(LargePositiveBigIntMinusLargePositiveBigIntString)));
+    data.push_back(BigIntTup(largePositiveBigInt1, largeNegativeBigInt2,
+                             BigInteger::parse(LargePositiveBigIntMinusLargeNegativeBigIntString)));
+    data.push_back(BigIntTup(largeNegativeBigInt1, largePositiveBigInt2,
+                             BigInteger::parse("-" + LargePositiveBigIntMinusLargeNegativeBigIntString)));
+    data.push_back(BigIntTup(largeNegativeBigInt1, largeNegativeBigInt2,
+                             BigInteger::parse("-" + LargePositiveBigIntMinusLargePositiveBigIntString)));
 
     // Big - small
     const std::string LargePositiveBigIntMinusSmallPositiveBigIntString = "123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123000";
     const std::string LargePositiveBigIntMinusSmallNegativeBigIntString = "123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123246";
-    data.push_back(BigIntTup(largePositiveBigInt1, BigInteger(123),  BigInteger::Parse(LargePositiveBigIntMinusSmallPositiveBigIntString)));
-    data.push_back(BigIntTup(largePositiveBigInt1, BigInteger(-123), BigInteger::Parse(LargePositiveBigIntMinusSmallNegativeBigIntString)));
-    data.push_back(BigIntTup(largeNegativeBigInt1, BigInteger(123),  BigInteger::Parse("-" + LargePositiveBigIntMinusSmallNegativeBigIntString)));
-    data.push_back(BigIntTup(largeNegativeBigInt1, BigInteger(-123), BigInteger::Parse("-" + LargePositiveBigIntMinusSmallPositiveBigIntString)));
+    data.push_back(BigIntTup(largePositiveBigInt1, BigInteger(123),
+                             BigInteger::parse(LargePositiveBigIntMinusSmallPositiveBigIntString)));
+    data.push_back(BigIntTup(largePositiveBigInt1, BigInteger(-123),
+                             BigInteger::parse(LargePositiveBigIntMinusSmallNegativeBigIntString)));
+    data.push_back(BigIntTup(largeNegativeBigInt1, BigInteger(123),
+                             BigInteger::parse("-" + LargePositiveBigIntMinusSmallNegativeBigIntString)));
+    data.push_back(BigIntTup(largeNegativeBigInt1, BigInteger(-123),
+                             BigInteger::parse("-" + LargePositiveBigIntMinusSmallPositiveBigIntString)));
 
     byte_array big1;
     byte_array big2;
@@ -199,7 +209,7 @@ TEST(binary, binary_minus)
 
         ASSERT_EQ( expected,  bigInteger1 - bigInteger2);
         ASSERT_EQ( -expected, bigInteger2 - bigInteger1);
-        ASSERT_EQ( expected,  BigInteger::Subtract(bigInteger1, bigInteger2));
-        ASSERT_EQ( -expected, BigInteger::Subtract(bigInteger2, bigInteger1));
+        ASSERT_EQ( expected, BigInteger::subtract(bigInteger1, bigInteger2));
+        ASSERT_EQ( -expected, BigInteger::subtract(bigInteger2, bigInteger1));
     }
 }

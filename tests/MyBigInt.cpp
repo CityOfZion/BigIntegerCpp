@@ -17,7 +17,7 @@ std::string MyBigIntImp::Print(byte_array bytes) {
 }
 
 BigInteger MyBigIntImp::DoUnaryOperatorMine(BigInteger num1, std::string op) {
-    auto bytes1 = num1.ToByteArray();
+    auto bytes1 = num1.to_byte_array();
     int factor;
     double result;
 
@@ -35,7 +35,7 @@ BigInteger MyBigIntImp::DoUnaryOperatorMine(BigInteger num1, std::string op) {
     } else if (op == "u~") {
         return BigInteger(Not(bytes1));
     } else if (op == "uLog10") {
-        factor = static_cast<int>(BigInteger::Log(num1, 10));
+        factor = static_cast<int>(BigInteger::log(num1, 10));
         if (factor > 100)
         {
             BigInteger b10(10);
@@ -54,7 +54,7 @@ BigInteger MyBigIntImp::DoUnaryOperatorMine(BigInteger num1, std::string op) {
         }
         return ApproximateBigInteger(result);
     } else if (op == "uLog") {
-        factor = static_cast<int>(BigInteger::Log(num1, 10));
+        factor = static_cast<int>(BigInteger::log(num1, 10));
         if (factor > 100)
         {
             BigInteger b10(10);
@@ -94,9 +94,9 @@ BigInteger MyBigIntImp::DoUnaryOperatorMine(BigInteger num1, std::string op) {
 }
 
 BigInteger MyBigIntImp::DoTertanaryOperatorMine(BigInteger num1, BigInteger num2, BigInteger num3, std::string op) {
-    auto bytes1 = num1.ToByteArray();
-    auto bytes2 = num2.ToByteArray();
-    auto bytes3 = num3.ToByteArray();
+    auto bytes1 = num1.to_byte_array();
+    auto bytes2 = num2.to_byte_array();
+    auto bytes3 = num3.to_byte_array();
     if (op == "tModPow")
         return BigInteger(ModPow(bytes1, bytes2, bytes3));
     else
@@ -109,8 +109,8 @@ BigInteger MyBigIntImp::DoBinaryOperatorMine(BigInteger num1, BigInteger num2, s
 }
 
 BigInteger MyBigIntImp::DoBinaryOperatorMine(BigInteger num1, BigInteger num2, std::string op, BigInteger* num3) {
-    auto bytes1 = num1.ToByteArray();
-    auto bytes2 = num2.ToByteArray();
+    auto bytes1 = num1.to_byte_array();
+    auto bytes2 = num2.to_byte_array();
     *num3 = 0;
 
     if (op == "bMin") {
@@ -133,12 +133,12 @@ BigInteger MyBigIntImp::DoBinaryOperatorMine(BigInteger num1, BigInteger num2, s
         return BigInteger(GCD(bytes1, bytes2));
     } else if (op == "bPow") {
         int arg2 = (int)num2;
-        bytes2 = BigInteger(arg2).ToByteArray();
+        bytes2 = BigInteger(arg2).to_byte_array();
         return BigInteger(Pow(bytes1, bytes2));
     } else if (op == "bDivRem") {
         BigInteger ret = BigInteger(Divide(bytes1, bytes2));
-        bytes1 = num1.ToByteArray();
-        bytes2 = num2.ToByteArray();
+        bytes1 = num1.to_byte_array();
+        bytes2 = num2.to_byte_array();
         *num3 = BigInteger(Remainder(bytes1, bytes2));
         return ret;
     } else if (op == "bRemainder" || op == "b%") {
@@ -586,7 +586,7 @@ BigInteger MyBigIntImp::ApproximateBigInteger(double value) {
 
     BigInteger result(round_up(value, 0));
 
-    if (result != BigInteger::Zero())
+    if (result != BigInteger::zero())
     {
         bool pos = (value > 0);
         if (!pos)
@@ -599,7 +599,7 @@ BigInteger MyBigIntImp::ApproximateBigInteger(double value) {
         //keep only the first 17 significant digits;
         if (size > 17)
         {
-            result = result - (result % BigInteger::Pow(10, size - 17));
+            result = result - (result % BigInteger::pow(10, size - 17));
         }
 
         if (!pos)

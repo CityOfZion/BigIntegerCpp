@@ -2,7 +2,7 @@
 #include <cassert>
 #include <exceptions.h>
 
-uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint32_t rhs, uint32_t& remainder)
+uint_array BigIntegerCalculator::divide(uint_array& lhs, uint32_t rhs, uint32_t& remainder)
 {
 
     assert(!lhs.empty());
@@ -29,7 +29,7 @@ uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint32_t rhs, uint32_t&
     return quotient;
 }
 
-uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint32_t rhs)
+uint_array BigIntegerCalculator::divide(uint_array& lhs, uint32_t rhs)
 {
     assert(!lhs.empty());
     assert(lhs.size() >= 1);
@@ -52,7 +52,7 @@ uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint32_t rhs)
     return quotient;
 }
 
-uint32_t BigIntegerCalculator::Remainder(const uint_array& lhs, const uint rhs)
+uint32_t BigIntegerCalculator::remainder(const uint_array& lhs, const uint rhs)
 {
     assert(!lhs.empty());
     assert(lhs.size() >= 1);
@@ -71,7 +71,7 @@ uint32_t BigIntegerCalculator::Remainder(const uint_array& lhs, const uint rhs)
     return static_cast<uint32_t>(carry);
 }
 
-uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint_array& rhs, uint_array& remainder)
+uint_array BigIntegerCalculator::divide(uint_array& lhs, uint_array& rhs, uint_array& remainder)
 {
     assert(!lhs.empty());
     assert(!rhs.empty());
@@ -84,7 +84,7 @@ uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint_array& rhs, uint_a
     uint_array localLeft = uint_array(lhs);
     uint_array bits(lhs.size() - rhs.size() + 1);
 
-    Divide(&localLeft[0], localLeft.size(), &rhs[0], rhs.size(), &bits[0], bits.size());
+    divide(&localLeft[0], localLeft.size(), &rhs[0], rhs.size(), &bits[0], bits.size());
 
     remainder = localLeft;
 
@@ -92,7 +92,7 @@ uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint_array& rhs, uint_a
 }
 
 
-uint_array BigIntegerCalculator::Divide(const uint_array& lhs, const uint_array& rhs)
+uint_array BigIntegerCalculator::divide(const uint_array& lhs, const uint_array& rhs)
 {
     assert(!lhs.empty());
     assert(!rhs.empty());
@@ -107,12 +107,12 @@ uint_array BigIntegerCalculator::Divide(const uint_array& lhs, const uint_array&
     uint_array localRight = uint_array(rhs);
     uint_array bits(lhs.size() - rhs.size() + 1);
 
-    Divide(&localLeft[0], localLeft.size(), &localRight[0], localRight.size(), &bits[0], bits.size());
+    divide(&localLeft[0], localLeft.size(), &localRight[0], localRight.size(), &bits[0], bits.size());
 
     return bits;
 }
 
-uint_array BigIntegerCalculator::Remainder(const uint_array& lhs, const uint_array& rhs)
+uint_array BigIntegerCalculator::remainder(const uint_array& lhs, const uint_array& rhs)
 {
     assert(!lhs.empty());
     assert(!rhs.empty());
@@ -125,12 +125,12 @@ uint_array BigIntegerCalculator::Remainder(const uint_array& lhs, const uint_arr
     // NOTE: left will get overwritten, we need a local copy
     uint_array localLeft = uint_array(lhs);
 
-    Divide(&localLeft[0], localLeft.size(), &rhs[0], rhs.size(), nullptr, 0);
+    divide(&localLeft[0], localLeft.size(), &rhs[0], rhs.size(), nullptr, 0);
 
     return localLeft;
 }
 
-void BigIntegerCalculator::Divide(uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint32_t* bits, int bitsLength)
+void BigIntegerCalculator::divide(uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint32_t* bits, int bitsLength)
 {
     assert(lhsLength >= 1);
     assert(rhsLength >= 1);
@@ -146,7 +146,7 @@ void BigIntegerCalculator::Divide(uint32_t* lhs, int lhsLength, const uint32_t* 
     uint32_t divLo = rhsLength > 1 ? rhs[rhsLength - 2] : 0;
 
     // We measure the leading zeros of the divisor
-    int shift = LeadingZeros(divHi);
+    int shift = leading_zeros(divHi);
     int backShift = 32 - shift;
 
     // And, we make sure the most significant bit is set
@@ -186,20 +186,20 @@ void BigIntegerCalculator::Divide(uint32_t* lhs, int lhsLength, const uint32_t* 
             digit = 0xFFFFFFFF;
 
         // Our first guess may be a little bit to big
-        while (DivideGuessTooBig(digit, valHi, valLo, divHi, divLo))
+        while (divide_guess_too_big(digit, valHi, valLo, divHi, divLo))
             --digit;
 
         if (digit > 0)
         {
             // Now it's time to subtract our current quotient
-            uint32_t carry = SubtractDivisor(&lhs[n], lhsLength - n, &rhs[0], rhsLength, digit);
+            uint32_t carry = subtract_divisor(&lhs[n], lhsLength - n, &rhs[0], rhsLength, digit);
 
             if (carry != t)
             {
                 assert(carry == t + 1);
 
                 // Our guess was still exactly one too high
-                carry = AddDivisor(&lhs[n], lhsLength - n, &rhs[0], rhsLength);
+                carry = add_divisor(&lhs[n], lhsLength - n, &rhs[0], rhsLength);
                 --digit;
 
                 assert(carry == 1);
@@ -214,7 +214,7 @@ void BigIntegerCalculator::Divide(uint32_t* lhs, int lhsLength, const uint32_t* 
     }
 }
 
-uint32_t BigIntegerCalculator::AddDivisor(uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength)
+uint32_t BigIntegerCalculator::add_divisor(uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength)
 {
     assert(lhsLength >= 0);
     assert(rhsLength >= 0);
@@ -234,7 +234,7 @@ uint32_t BigIntegerCalculator::AddDivisor(uint32_t* lhs, int lhsLength, const ui
     return static_cast<uint32_t>(carry);
 }
 
-uint32_t BigIntegerCalculator::SubtractDivisor(uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint64_t q)
+uint32_t BigIntegerCalculator::subtract_divisor(uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint64_t q)
 {
     assert(lhsLength >= 0);
     assert(rhsLength >= 0);
@@ -259,7 +259,7 @@ uint32_t BigIntegerCalculator::SubtractDivisor(uint32_t* lhs, int lhsLength, con
     return static_cast<uint32_t>(carry);
 }
 
-bool BigIntegerCalculator::DivideGuessTooBig(uint64_t q, uint64_t valHi, uint32_t valLo, uint32_t divHi, uint32_t divLo)
+bool BigIntegerCalculator::divide_guess_too_big(uint64_t q, uint64_t valHi, uint32_t valLo, uint32_t divHi, uint32_t divLo)
 {
     assert(q <= 0xFFFFFFFF);
 
@@ -287,7 +287,7 @@ bool BigIntegerCalculator::DivideGuessTooBig(uint64_t q, uint64_t valHi, uint32_
     return false;
 }
 
-int BigIntegerCalculator::LeadingZeros(uint32_t value)
+int BigIntegerCalculator::leading_zeros(uint32_t value)
 {
     if (value == 0)
         return 32;

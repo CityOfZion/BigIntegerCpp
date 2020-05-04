@@ -9,7 +9,7 @@ static void VerifyDecrementString(std::string opstring)
     StackCalc sc(opstring);
     while (sc.DoNextOperation())
     {
-        ASSERT_EQ(sc.snCalc.top().ToString(), sc.myCalc.top().ToString());
+        ASSERT_EQ(sc.snCalc.top().to_string(), sc.myCalc.top().to_string());
     }
 }
 

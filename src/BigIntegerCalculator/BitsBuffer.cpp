@@ -8,7 +8,7 @@ BitsBuffer::BitsBuffer(int size, uint32_t value) {
 }
 
 BitsBuffer::BitsBuffer(int size, uint_array value) {
-    _length = BigIntegerCalculator::ActualLength(value);
+    _length = BigIntegerCalculator::actual_length(value);
     _bits = std::vector<uint32_t>(size, 0);
     std::copy(value.begin(), value.begin()+_length, _bits.begin());
 }
@@ -19,9 +19,9 @@ void BitsBuffer::MultiplySelf(BitsBuffer& value, BitsBuffer& temp) {
     unsigned int* t = temp._bits.data();
 
     if (_length < value._length)
-        BigIntegerCalculator::Multiply(v, value._length, b, _length, t, _length + value._length);
+        BigIntegerCalculator::multiply(v, value._length, b, _length, t, _length + value._length);
     else
-        BigIntegerCalculator::Multiply(b, _length, v, value._length, t, _length + value._length);
+        BigIntegerCalculator::multiply(b, _length, v, value._length, t, _length + value._length);
     Apply(temp, _length + value._length);
 }
 
@@ -29,7 +29,7 @@ void BitsBuffer::SquareSelf(BitsBuffer& temp) {
     unsigned int* b = _bits.data();
     unsigned int* t = temp._bits.data();
 
-    BigIntegerCalculator::Square(b, _length, t, _length + _length);
+    BigIntegerCalculator::square(b, _length, t, _length + _length);
     Apply(temp, _length + _length);
 }
 
@@ -39,8 +39,8 @@ void BitsBuffer::Reduce(FastReducer& reducer) {
 
 void BitsBuffer::Reduce(const uint_array& modulus) {
     if (_length >= modulus.size()) {
-        BigIntegerCalculator::Divide(_bits.data(), _length, modulus.data(), modulus.size(), nullptr, 0);
-        _length = BigIntegerCalculator::ActualLength(_bits, modulus.size());
+        BigIntegerCalculator::divide(_bits.data(), _length, modulus.data(), modulus.size(), nullptr, 0);
+        _length = BigIntegerCalculator::actual_length(_bits, modulus.size());
     }
 }
 
@@ -48,8 +48,8 @@ void BitsBuffer::Reduce(BitsBuffer& modulus) {
     if (_length >= modulus._length) {
         unsigned int* b = _bits.data();
         unsigned int* m = modulus._bits.data();
-        BigIntegerCalculator::Divide(b, _length, m, modulus._length, nullptr, 0);
-        _length = BigIntegerCalculator::ActualLength(_bits, modulus._length);
+        BigIntegerCalculator::divide(b, _length, m, modulus._length, nullptr, 0);
+        _length = BigIntegerCalculator::actual_length(_bits, modulus._length);
     }
 }
 
@@ -73,7 +73,7 @@ void BitsBuffer::Overwrite(uint32_t value) {
 void BitsBuffer::Refresh(int maxLength) {
     if (_length > maxLength)
         std::fill(_bits.begin(), _bits.begin()+(_length-maxLength), maxLength);
-    _length = BigIntegerCalculator::ActualLength(_bits, maxLength);
+    _length = BigIntegerCalculator::actual_length(_bits, maxLength);
 }
 
 void BitsBuffer::Apply(BitsBuffer& temp, int maxLength) {
@@ -82,7 +82,7 @@ void BitsBuffer::Apply(BitsBuffer& temp, int maxLength) {
     uint_array t = temp._bits;
     temp._bits = _bits;
     _bits = t;
-    _length = BigIntegerCalculator::ActualLength(_bits, maxLength);
+    _length = BigIntegerCalculator::actual_length(_bits, maxLength);
 }
 
 

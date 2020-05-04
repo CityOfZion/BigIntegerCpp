@@ -10,7 +10,7 @@ static void VerifyRemainderString(std::string opstring)
     StackCalc sc(opstring);
     while (sc.DoNextOperation())
     {
-        ASSERT_EQ(sc.snCalc.top().ToString(), sc.myCalc.top().ToString());
+        ASSERT_EQ(sc.snCalc.top().to_string(), sc.myCalc.top().to_string());
     }
 }
 
@@ -28,7 +28,7 @@ static void VerifyIdentityString(std::string opstring1, std::string opstring2)
         sc2.DoNextOperation();
     }
 
-    ASSERT_EQ(sc1.snCalc.top().ToString(), sc2.snCalc.top().ToString());
+    ASSERT_EQ(sc1.snCalc.top().to_string(), sc2.snCalc.top().to_string());
 }
 
 static byte_array GetRandomByteArray(Random random, int size)
@@ -67,7 +67,7 @@ TEST(operator_tests, op_modulus_RunRemainderTestsPositive) {
         VerifyRemainderString(Print(tempByteArray1) + Print(tempByteArray2) + "b%");
     }
 
-    // Remainder Method - One large and one small BigIntegers
+    // Remainder Method - one large and one small BigIntegers
     for (int i = 0; i < s_samples; i++) {
         tempByteArray1 = GetRandomByteArray(s_random);
         tempByteArray2 = GetRandomByteArray(s_random, 2);
@@ -86,7 +86,7 @@ TEST(operator_tests, op_modulus_RunRemainderNegative) {
     byte_array tempByteArray1;
     byte_array tempByteArray2;
 
-    // Remainder Method - One large BigIntegers and zero
+    // Remainder Method - one large BigIntegers and zero
     for (int i = 0; i < s_samples; i++) {
         tempByteArray1 = GetRandomByteArray(s_random);
         tempByteArray2 = {0};
@@ -95,7 +95,7 @@ TEST(operator_tests, op_modulus_RunRemainderNegative) {
         EXPECT_THROW(VerifyRemainderString(Print(tempByteArray2) + Print(tempByteArray1) + "b%"), DivideByZero);
     }
 
-    // Remainder Method - One small BigIntegers and zero
+    // Remainder Method - one small BigIntegers and zero
     for (int i = 0; i < s_samples; i++) {
         tempByteArray1 = GetRandomByteArray(s_random, 2);
         tempByteArray2 = {0};
@@ -123,12 +123,12 @@ TEST(operator_tests, op_modulus_RunRemainderAxiomXModX) {
     auto int64_max = std::to_string(std::numeric_limits<int64_t>::max());
 
     // Axiom: X%X = 0
-    VerifyIdentityString(int_max + " " + int_max + " b%", BigInteger::Zero().ToString());
-    VerifyIdentityString(int64_max + " " + int64_max + " b%", BigInteger::Zero().ToString());
+    VerifyIdentityString(int_max + " " + int_max + " b%", BigInteger::zero().to_string());
+    VerifyIdentityString(int64_max + " " + int64_max + " b%", BigInteger::zero().to_string());
 
     for (int i = 0; i < s_samples; i++) {
         std::string randBigInt = Print(GetRandomByteArray(s_random));
-        VerifyIdentityString(randBigInt + randBigInt + "b%", BigInteger::Zero().ToString());
+        VerifyIdentityString(randBigInt + randBigInt + "b%", BigInteger::zero().to_string());
     }
 }
 
@@ -141,8 +141,8 @@ TEST(operator_tests, op_modulus_RunRemainderAxiomXY) {
 
 
     // Axiom: X%(X + Y) = X where Y is 1 if x>=0 and -1 if x<0
-    VerifyIdentityString(BigInteger::Parse(int_max).ToString() + "1" + " " + int_max + " b%", int_max + "");
-    VerifyIdentityString(BigInteger::Parse(int64_max).ToString() + "1" + " " + int64_max + " b%", int64_max + "");
+    VerifyIdentityString(BigInteger::parse(int_max).to_string() + "1" + " " + int_max + " b%", int_max + "");
+    VerifyIdentityString(BigInteger::parse(int64_max).to_string() + "1" + " " + int64_max + " b%", int64_max + "");
 
     for (int i = 0; i < s_samples; i++)
     {
@@ -151,30 +151,30 @@ TEST(operator_tests, op_modulus_RunRemainderAxiomXY) {
         BigInteger modify = BigInteger(1);
         if ((test[test.size() - 1] & 0x80) != 0)
         {
-            modify = BigInteger::Negate(modify);
+            modify = BigInteger::negate(modify);
         }
-        VerifyIdentityString(randBigInt + modify.ToString() + " bAdd " + randBigInt + "b%", randBigInt.substr(0, randBigInt.size() - 1));
+        VerifyIdentityString(randBigInt + modify.to_string() + " bAdd " + randBigInt + "b%", randBigInt.substr(0, randBigInt.size() - 1));
     }
 
     //  SEGFAULT from here
     // Axiom: X%1 = 0
-    auto one_str = BigInteger::One().ToString();
-    VerifyIdentityString(BigInteger::One().ToString() + " " + int_max + " b%", BigInteger::Zero().ToString());
-    VerifyIdentityString(BigInteger::One().ToString() + " " + int64_max + " b%", BigInteger::Zero().ToString());
+    auto one_str = BigInteger::one().to_string();
+    VerifyIdentityString(BigInteger::one().to_string() + " " + int_max + " b%", BigInteger::zero().to_string());
+    VerifyIdentityString(BigInteger::one().to_string() + " " + int64_max + " b%", BigInteger::zero().to_string());
 
     for (int i = 0; i < s_samples; i++)
     {
         std::string randBigInt = Print(GetRandomByteArray(s_random));
-        VerifyIdentityString(BigInteger::One().ToString() + " " + randBigInt + "b%", BigInteger::Zero().ToString());
+        VerifyIdentityString(BigInteger::one().to_string() + " " + randBigInt + "b%", BigInteger::zero().to_string());
     }
 
     // Axiom: 0%X = 0
-    VerifyIdentityString(int_max + " " + BigInteger::Zero().ToString() + " b%", BigInteger::Zero().ToString());
-    VerifyIdentityString(int64_max + " " + BigInteger::Zero().ToString() + " b%", BigInteger::Zero().ToString());
+    VerifyIdentityString(int_max + " " + BigInteger::zero().to_string() + " b%", BigInteger::zero().to_string());
+    VerifyIdentityString(int64_max + " " + BigInteger::zero().to_string() + " b%", BigInteger::zero().to_string());
 
     for (int i = 0; i < s_samples; i++)
     {
         std::string randBigInt = Print(GetRandomByteArray(s_random));
-        VerifyIdentityString(randBigInt + BigInteger::Zero().ToString() + " b%", BigInteger::Zero().ToString());
+        VerifyIdentityString(randBigInt + BigInteger::zero().to_string() + " b%", BigInteger::zero().to_string());
     }
 }

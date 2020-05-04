@@ -39,7 +39,7 @@ TEST(byte_array, int_byte_array)
     for (auto elem : data)
     {
         BigInteger bi = BigInteger(std::get<0>(elem));
-        byte_array bytes = bi.ToByteArray();
+        byte_array bytes = bi.to_byte_array();
         ASSERT_EQ( bytes, std::get<1>(elem) );
 
         BigInteger bi2 = BigInteger(bytes);
@@ -86,7 +86,7 @@ TEST(byte_array, long_byte_array)
     for (auto elem : data)
     {
         BigInteger bi = BigInteger(std::get<0>(elem));
-        byte_array bytes = bi.ToByteArray();
+        byte_array bytes = bi.to_byte_array();
         ASSERT_EQ( bytes, std::get<1>(elem) );
 
         BigInteger bi2 = BigInteger(bytes);
@@ -112,8 +112,8 @@ TEST(byte_array, string_byte_array)
 
     for (auto elem : data)
     {
-        BigInteger bi = BigInteger::Parse(std::get<0>(elem));
-        byte_array bytes = bi.ToByteArray();
+        BigInteger bi = BigInteger::parse(std::get<0>(elem));
+        byte_array bytes = bi.to_byte_array();
         std::reverse(bytes.begin(), bytes.end());
         ASSERT_EQ( bytes, std::get<1>(elem) );
 

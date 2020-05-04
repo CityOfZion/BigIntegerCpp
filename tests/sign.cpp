@@ -8,7 +8,7 @@ static void VerifySignString(std::string opstring)
     StackCalc sc(opstring);
     while (sc.DoNextOperation())
     {
-        ASSERT_EQ(sc.snCalc.top().ToString(), sc.myCalc.top().ToString());
+        ASSERT_EQ(sc.snCalc.top().to_string(), sc.myCalc.top().to_string());
     }
 }
 
@@ -27,7 +27,7 @@ static void VerifyIdentityString(std::string opstring1, std::string opstring2)
         //Run the full calculation
         sc2.DoNextOperation();
     }
-    ASSERT_EQ(sc1.snCalc.top().ToString(), sc2.snCalc.top().ToString());
+    ASSERT_EQ(sc1.snCalc.top().to_string(), sc2.snCalc.top().to_string());
 }
 
 static byte_array GetRandomByteArray(Random random, int size)

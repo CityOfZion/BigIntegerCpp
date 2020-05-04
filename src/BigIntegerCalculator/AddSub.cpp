@@ -1,7 +1,7 @@
 #include "BigIntegerCalculator.h"
 #include <cassert>
 
-uint_array BigIntegerCalculator::Add(const uint_array& lhs, uint32_t rhs)
+uint_array BigIntegerCalculator::add(const uint_array& lhs, uint32_t rhs)
 {
     assert(!lhs.empty());
     assert(lhs.size() >= 1);
@@ -27,7 +27,7 @@ uint_array BigIntegerCalculator::Add(const uint_array& lhs, uint32_t rhs)
     return bits;
 }
 
-uint_array BigIntegerCalculator::Add(const uint_array& lhs, const uint_array& rhs)
+uint_array BigIntegerCalculator::add(const uint_array& lhs, const uint_array& rhs)
 {
     assert(!lhs.empty());
     assert(!rhs.empty());
@@ -35,12 +35,12 @@ uint_array BigIntegerCalculator::Add(const uint_array& lhs, const uint_array& rh
 
     uint_array bits(lhs.size() + 1);
 
-    Add(lhs.data(), lhs.size(), rhs.data(), rhs.size(), bits.data(), bits.size());
+    add(lhs.data(), lhs.size(), rhs.data(), rhs.size(), bits.data(), bits.size());
 
     return bits;
 }
 
-void BigIntegerCalculator::Add(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint32_t* bits, int bitsLength)
+void BigIntegerCalculator::add(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint32_t* bits, int bitsLength)
 {
     assert(lhsLength >= 0);
     assert(rhsLength >= 0);
@@ -67,7 +67,7 @@ void BigIntegerCalculator::Add(const uint32_t* lhs, int lhsLength, const uint32_
     bits[i] = static_cast<uint32_t>(carry);
 }
 
-void BigIntegerCalculator::AddSelf(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength)
+void BigIntegerCalculator::add_self(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength)
 {
     assert(*lhs >= 0);
     assert(*rhs >= 0);
@@ -96,7 +96,7 @@ void BigIntegerCalculator::AddSelf(uint32_t* lhs, int lhsLength, uint32_t* rhs, 
     assert(carry == 0);
 }
 
-uint_array BigIntegerCalculator::Subtract(const uint_array& lhs, uint32_t rhs)
+uint_array BigIntegerCalculator::subtract(const uint_array& lhs, uint32_t rhs)
 {
     assert(!lhs.empty());
     assert(lhs.size() >= 1);
@@ -122,26 +122,26 @@ uint_array BigIntegerCalculator::Subtract(const uint_array& lhs, uint32_t rhs)
     return bits;
 }
 
-uint_array BigIntegerCalculator::Subtract(const uint_array& lhs, const uint_array& rhs)
+uint_array BigIntegerCalculator::subtract(const uint_array& lhs, const uint_array& rhs)
 {
     assert(!lhs.empty());
     assert(!rhs.empty());
     assert(lhs.size() >= rhs.size());
-    assert(Compare(lhs, rhs) >= 0);
+    assert(compare(lhs, rhs) >= 0);
 
     uint_array bits(lhs.size());
 
-    Subtract(lhs.data(), lhs.size(), rhs.data(), rhs.size(), bits.data(), bits.size());
+    subtract(lhs.data(), lhs.size(), rhs.data(), rhs.size(), bits.data(), bits.size());
 
     return bits;
 }
 
-void BigIntegerCalculator::Subtract(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint32_t* bits, int bitsLength)
+void BigIntegerCalculator::subtract(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint32_t* bits, int bitsLength)
 {
     assert(lhsLength >= 0);
     assert(rhsLength >= 0);
     assert(lhsLength >= rhsLength);
-    assert(Compare(lhs, lhsLength, rhs, rhsLength) >= 0);
+    assert(compare(lhs, lhsLength, rhs, rhsLength) >= 0);
     assert(bitsLength == lhsLength);
 
     // Executes the "grammar-school" algorithm for computing z = a - b.
@@ -168,7 +168,7 @@ void BigIntegerCalculator::Subtract(const uint32_t* lhs, int lhsLength, const ui
     assert(carry == 0);
 }
 
-void BigIntegerCalculator::SubtractSelf(uint32_t *left, int leftLength, uint32_t *right, int rightLength) {
+void BigIntegerCalculator::subtract_self(uint32_t *left, int leftLength, uint32_t *right, int rightLength) {
     int i = 0;
     long carry = 0;
 
@@ -184,7 +184,7 @@ void BigIntegerCalculator::SubtractSelf(uint32_t *left, int leftLength, uint32_t
     }
 }
 
-int BigIntegerCalculator::Compare(uint_array lhs, uint_array rhs)
+int BigIntegerCalculator::compare(uint_array lhs, uint_array rhs)
 {
     assert(!lhs.empty());
     assert(!rhs.empty());
@@ -204,7 +204,7 @@ int BigIntegerCalculator::Compare(uint_array lhs, uint_array rhs)
     return 0;
 }
 
-int BigIntegerCalculator::Compare(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength)
+int BigIntegerCalculator::compare(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength)
 {
     assert(lhsLength >= 0);
     assert(rhsLength >= 0);

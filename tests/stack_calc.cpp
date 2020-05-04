@@ -86,7 +86,7 @@ bool StackCalc::DoNextOperation() {
         } else if (op == "Corruption") {
             snCalc.push(-33);
             myCalc.push(-555);
-        } else if (BigInteger::TryParse(op, snnum1)) {
+        } else if (BigInteger::try_parse(op, snnum1)) {
             snCalc.push(snnum1);
             myCalc.push(snnum1);
         } else {
@@ -128,7 +128,7 @@ BigInteger StackCalc::DoBinaryOperatorSN(BigInteger num1, BigInteger num2, std::
 }
 
 BigInteger StackCalc::DoBinaryOperatorSN(BigInteger num1, BigInteger num2, std::string op, BigInteger& num3) {
-    num3 = BigInteger::Zero();
+    num3 = BigInteger::zero();
     if (op == "bMin") {
         return std::min(num1, num2);
     } else if (op == "bMax") {
@@ -154,24 +154,24 @@ BigInteger StackCalc::DoBinaryOperatorSN(BigInteger num1, BigInteger num2, std::
     } else if (op == "b+") {
         return num1 + num2;
     } else if (op == "bLog") {
-        return MyBigIntImp::ApproximateBigInteger(BigInteger::Log(num1, (double) num2));
+        return MyBigIntImp::ApproximateBigInteger(BigInteger::log(num1, (double) num2));
     } else if (op == "bGCD") {
-        return BigInteger::GreatestCommonDivisor(num1, num2);
+        return BigInteger::greatest_common_divisor(num1, num2);
     } else if (op == "bPow") {
         int arg2 = (int) num2;
-        return BigInteger::Pow(num1, arg2);
+        return BigInteger::pow(num1, arg2);
     } else if (op == "bDivRem") {
-        return BigInteger::DivRem(num1, num2, num3);
+        return BigInteger::div_rem(num1, num2, num3);
     } else if (op == "bRemainder") {
-        return BigInteger::Remainder(num1, num2);
+        return BigInteger::remainder(num1, num2);
     } else if (op == "bDivide") {
-        return BigInteger::Divide(num1, num2);
+        return BigInteger::divide(num1, num2);
     } else if (op == "bMultiply") {
-        return BigInteger::Multiply(num1, num2);
+        return BigInteger::multiply(num1, num2);
     } else if (op == "bSubtract") {
-        return BigInteger::Subtract(num1, num2);
+        return BigInteger::subtract(num1, num2);
     } else if (op == "bAdd") {
-        return BigInteger::Add(num1, num2);
+        return BigInteger::add(num1, num2);
     } else {
         throw std::exception();//(string.Format("Invalid operation found: {0}", op));
     }
@@ -179,17 +179,17 @@ BigInteger StackCalc::DoBinaryOperatorSN(BigInteger num1, BigInteger num2, std::
 
 BigInteger StackCalc::DoUnaryOperatorSN(BigInteger num1, std::string op) {
     if (op == "uSign") {
-        return BigInteger(num1.Sign());
+        return BigInteger(num1.sign());
     } else if (op == "u~") {
         return ~num1;
     } else if (op == "uLog10") {
-        return MyBigIntImp::ApproximateBigInteger(BigInteger::Log10(num1));
+        return MyBigIntImp::ApproximateBigInteger(BigInteger::log10(num1));
     } else if (op == "uLog") {
-        return MyBigIntImp::ApproximateBigInteger(BigInteger::Log(num1));
+        return MyBigIntImp::ApproximateBigInteger(BigInteger::log(num1));
     } else if (op == "uAbs") {
-        return BigInteger::Abs(num1);
+        return BigInteger::abs(num1);
     } else if (op == "uNegate") {
-        return BigInteger::Negate(num1);
+        return BigInteger::negate(num1);
     } else if (op == "u--") {
         return (--(num1));
     } else if (op == "u++") {
@@ -199,7 +199,7 @@ BigInteger StackCalc::DoUnaryOperatorSN(BigInteger num1, std::string op) {
     } else if (op == "u+") {
         return (+(num1));
     } else if (op == "uMultiply") {
-        return BigInteger::Multiply(num1, num1);
+        return BigInteger::multiply(num1, num1);
     } else if (op == "u*") {
         return num1 * num1;
     } else {
@@ -209,7 +209,7 @@ BigInteger StackCalc::DoUnaryOperatorSN(BigInteger num1, std::string op) {
 
 BigInteger StackCalc::DoTertanaryOperatorSN(BigInteger num1, BigInteger num2, BigInteger num3, std::string op) {
     if (op == "tModPow") {
-        return BigInteger::ModPow(num1, num2, num3);
+        return BigInteger::mod_pow(num1, num2, num3);
     } else {
         throw std::exception(); // invalid operation found
     }

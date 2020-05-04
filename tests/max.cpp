@@ -8,7 +8,7 @@ static void VerifyMaxString(std::string opstring)
     StackCalc sc(opstring);
     while (sc.DoNextOperation())
     {
-        ASSERT_EQ(sc.snCalc.top().ToString(), sc.myCalc.top().ToString());
+        ASSERT_EQ(sc.snCalc.top().to_string(), sc.myCalc.top().to_string());
     }
 }
 
@@ -52,7 +52,7 @@ TEST(max_tests, RunMaxTests) {
         VerifyMaxString(Print(tempByteArray1) + Print(tempByteArray2) + "bMax");
     }
 
-    // Max Method - One large and one small BigIntegers
+    // Max Method - one large and one small BigIntegers
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -64,7 +64,7 @@ TEST(max_tests, RunMaxTests) {
         VerifyMaxString(Print(tempByteArray1) + Print(tempByteArray2) + "bMax");
     }
 
-    // Max Method - One large BigIntegers and zero
+    // Max Method - one large BigIntegers and zero
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -76,7 +76,7 @@ TEST(max_tests, RunMaxTests) {
         VerifyMaxString(Print(tempByteArray1) + Print(tempByteArray2) + "bMax");
     }
 
-    // Max Method - One small BigIntegers and zero
+    // Max Method - one small BigIntegers and zero
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random, 2);
@@ -89,7 +89,7 @@ TEST(max_tests, RunMaxTests) {
     }
 
 
-    // Max Method - One large BigIntegers and -1
+    // Max Method - one large BigIntegers and -1
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -101,7 +101,7 @@ TEST(max_tests, RunMaxTests) {
         VerifyMaxString(Print(tempByteArray1) + Print(tempByteArray2) + "bMax");
     }
 
-    // Max Method - One small BigIntegers and -1
+    // Max Method - one small BigIntegers and -1
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random, 2);
@@ -114,7 +114,7 @@ TEST(max_tests, RunMaxTests) {
     }
 
 
-    // Max Method - One large BigIntegers and 1
+    // Max Method - one large BigIntegers and 1
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -126,7 +126,7 @@ TEST(max_tests, RunMaxTests) {
         VerifyMaxString(Print(tempByteArray1) + Print(tempByteArray2) + "bMax");
     }
 
-    // Max Method - One small BigIntegers and 1
+    // Max Method - one small BigIntegers and 1
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random, 2);

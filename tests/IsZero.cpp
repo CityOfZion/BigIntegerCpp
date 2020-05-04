@@ -6,7 +6,7 @@
 
 static void VerifyIsZero(BigInteger bigInt, bool expectedAnswer)
 {
-    ASSERT_EQ(expectedAnswer, bigInt.IsZero());
+    ASSERT_EQ(expectedAnswer, bigInt.is_zero());
 }
 
 TEST(is_zero, RunIsZeroTests) {
@@ -14,14 +14,14 @@ TEST(is_zero, RunIsZeroTests) {
     Random random(s_seed);
 
     //Just basic tests
-    // Zero
-    VerifyIsZero(BigInteger::Zero(), true);
+    // zero
+    VerifyIsZero(BigInteger::zero(), true);
 
-    // Negative One
-    VerifyIsZero(BigInteger::MinusOne(), false);
+    // Negative one
+    VerifyIsZero(BigInteger::minus_one(), false);
 
-    // One
-    VerifyIsZero(BigInteger::One(), false);
+    // one
+    VerifyIsZero(BigInteger::one(), false);
 
     // -Int32.MaxValue
     auto int_max = std::numeric_limits<int>::max();

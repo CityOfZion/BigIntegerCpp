@@ -10,7 +10,7 @@ static void VerifyDivideString(std::string opstring)
     StackCalc sc(opstring);
     while (sc.DoNextOperation())
     {
-        ASSERT_EQ(sc.snCalc.top().ToString(), sc.myCalc.top().ToString());
+        ASSERT_EQ(sc.snCalc.top().to_string(), sc.myCalc.top().to_string());
     }
 }
 
@@ -29,7 +29,7 @@ static void VerifyIdentityString(std::string opstring1, std::string opstring2)
         //Run the full calculation
         sc2.DoNextOperation();
     }
-    ASSERT_EQ(sc1.snCalc.top().ToString(), sc2.snCalc.top().ToString());
+    ASSERT_EQ(sc1.snCalc.top().to_string(), sc2.snCalc.top().to_string());
 }
 
 static byte_array GetRandomByteArray(Random random, int size)
@@ -71,7 +71,7 @@ TEST(operator_tests, op_divide_RunDividePositivenonZero) {
         VerifyDivideString(Print(tempByteArray1) + Print(tempByteArray2) + "b/");
     }
 
-    // Divide Method - One large and one small BigIntegers
+    // Divide Method - one large and one small BigIntegers
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -91,7 +91,7 @@ TEST(operator_tests, op_divide_RunDivideNegative) {
     byte_array tempByteArray1;
     byte_array tempByteArray2;
 
-    // Divide Method - One large BigIntegers and zero
+    // Divide Method - one large BigIntegers and zero
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -101,7 +101,7 @@ TEST(operator_tests, op_divide_RunDivideNegative) {
         EXPECT_THROW(VerifyDivideString(Print(tempByteArray2) + Print(tempByteArray1) + "b/"), DivideByZero);
     }
 
-    // Divide Method - One small BigIntegers and zero
+    // Divide Method - one small BigIntegers and zero
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random, 2);
@@ -122,12 +122,12 @@ TEST(operator_tests, op_divide_RunDivideAxiomX1) {
     // Axiom: X/1 = X
     auto int_max = std::to_string(std::numeric_limits<int>::max());
     auto int64_max = std::to_string(std::numeric_limits<int64_t>::max());
-    VerifyIdentityString(BigInteger::One().ToString() + " " + int_max + " b/", int_max);
-    VerifyIdentityString(BigInteger::One().ToString() + " " + int64_max + " b/", int64_max);
+    VerifyIdentityString(BigInteger::one().to_string() + " " + int_max + " b/", int_max);
+    VerifyIdentityString(BigInteger::one().to_string() + " " + int64_max + " b/", int64_max);
 
     for (int i = 0; i < s_samples; i++) {
         auto randBigInt = Print(GetRandomByteArray(s_random));
-        VerifyIdentityString(BigInteger::One().ToString() + " " + randBigInt + "b/", randBigInt.substr(0, randBigInt.size() - 1));
+        VerifyIdentityString(BigInteger::one().to_string() + " " + randBigInt + "b/", randBigInt.substr(0, randBigInt.size() - 1));
     }
 }
 

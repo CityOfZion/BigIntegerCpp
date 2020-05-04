@@ -24,7 +24,7 @@ BigInteger to_biginteger(py::int_& value) {
 
 // TODO: see above. Cleanup and extend
 //    if (value.is(py::int_(0))) {
-//        return BigInteger::Zero();
+//        return BigInteger::zero();
 //    } else if (value < py::int_(0)) {
 //        size_t n_bytes = 1 + std::floor(((_PyLong_NumBits(value.ptr()) + 7) / 8));
 //        std::vector<unsigned char> buffer(n_bytes, 0);
@@ -66,7 +66,7 @@ BigInteger to_biginteger(py::int_& value) {
 //    }
 
     if (value.is(py::int_(0))) {
-        return BigInteger::Zero();
+        return BigInteger::zero();
     } else if (value < py::int_(0)) {
         try {
             auto i = value.cast<int64_t>();
@@ -91,7 +91,7 @@ BigInteger to_biginteger(py::int_& value) {
     fread(&v_data[0], 1, size, fp);
     fclose(fp);
 
-    return BigInteger::Parse(std::string(v_data.begin(), v_data.end()));
+    return BigInteger::parse(std::string(v_data.begin(), v_data.end()));
 }
 
 
@@ -134,7 +134,7 @@ PYBIND11_MODULE(pybiginteger, m) {
             })
             .def("__hash__", [](BigInteger& self) {
                 auto h = 2166136261;
-                h = (h * 16777619) ^ self.GetHashCode();
+                h = (h * 16777619) ^ self.get_hash_code();
                 return h;
             })
             .def("__gt__", [](BigInteger& self, BigInteger& other) {
@@ -157,7 +157,7 @@ PYBIND11_MODULE(pybiginteger, m) {
             })
             .def("__radd__", [](BigInteger& other, py::int_& self) {
                 auto bigi_result = other + to_biginteger(self);
-                return py::int_(py::str(bigi_result.ToString()));
+                return py::int_(py::str(bigi_result.to_string()));
             })
             .def("__sub__", [](BigInteger& self, BigInteger& other) {
                 return self - other;
@@ -167,7 +167,7 @@ PYBIND11_MODULE(pybiginteger, m) {
             })
             .def("__rsub__", [](BigInteger& other, py::int_& self) {
                 auto bigi_result = to_biginteger(self) - other;
-                return py::int_(py::str(bigi_result.ToString()));
+                return py::int_(py::str(bigi_result.to_string()));
             })
             .def("__mul__", [](BigInteger& self, BigInteger& other) {
                 return self * other;
@@ -177,7 +177,7 @@ PYBIND11_MODULE(pybiginteger, m) {
             })
             .def("__rmul__", [](BigInteger& other, py::int_& self) {
                 auto bigi_result = to_biginteger(self) * other;
-                return py::int_(py::str(bigi_result.ToString()));
+                return py::int_(py::str(bigi_result.to_string()));
             })
             .def("__mod__", [](BigInteger& self, BigInteger& other) {
                 return self % other;
@@ -191,7 +191,7 @@ PYBIND11_MODULE(pybiginteger, m) {
                 https://en.wikipedia.org/wiki/Modulo_operation)")
             .def("__rmod__", [](BigInteger& other, py::int_& self) {
                 auto bigi_result = to_biginteger(self) % other;
-                return py::int_(py::str(bigi_result.ToString()));
+                return py::int_(py::str(bigi_result.to_string()));
             }, R"(
                 Note: this always uses the modulo operation of the BigInteger class.
                 C# uses truncated division whereas Python uses floored division.
@@ -199,43 +199,43 @@ PYBIND11_MODULE(pybiginteger, m) {
                 https://en.wikipedia.org/wiki/Modulo_operation)")
             .def("__divmod__", [](BigInteger& self, BigInteger& other) {
                 BigInteger remainder;
-                auto div = BigInteger::DivRem(self, other, remainder);
+                auto div = BigInteger::div_rem(self, other, remainder);
                 return py::make_tuple(div, remainder);
             })
             .def("__divmod__", [](BigInteger& self, py::int_& other) {
                 BigInteger remainder;
                 auto big_other = to_biginteger(other);
-                auto div = BigInteger::DivRem(self, big_other, remainder);
+                auto div = BigInteger::div_rem(self, big_other, remainder);
                 return py::make_tuple(div, remainder);
             })
             .def("__rdivmod__", [](BigInteger& other, py::int_& self) {
                 BigInteger remainder;
                 auto big_self = to_biginteger(self);
-                auto div = BigInteger::DivRem(big_self, other, remainder);
-                return py::make_tuple(py::int_(py::str(div.ToString())), py::int_(py::str(remainder.ToString())));
+                auto div = BigInteger::div_rem(big_self, other, remainder);
+                return py::make_tuple(py::int_(py::str(div.to_string())), py::int_(py::str(remainder.to_string())));
             })
             .def("__pow__", [](BigInteger& base, BigInteger& exp) {
-                return BigInteger::Pow(base, exp);
+                return BigInteger::pow(base, exp);
             })
             .def("__pow__", [](BigInteger& base, py::int_& exp) {
                 try {
                     auto i = exp.cast<int>();
-                    return BigInteger::Pow(base, exp);
+                    return BigInteger::pow(base, exp);
                 } catch (const py::cast_error&) {
                     throw std::overflow_error("Exponent argument size exceeds C++ type 'int'");
                 }
             })
             .def("__rpow__", [](BigInteger& exp, py::int_& base) {
-                return py::int_(py::str(BigInteger::Pow(to_biginteger(base), exp).ToString()));
+                return py::int_(py::str(BigInteger::pow(to_biginteger(base), exp).to_string()));
             })
             .def("__pow__", [](BigInteger& base, BigInteger& exp, BigInteger& modulus) {
-                return BigInteger::ModPow(base, exp, modulus);
+                return BigInteger::mod_pow(base, exp, modulus);
             })
             .def("__pow__", [](BigInteger& base, py::int_& exp, BigInteger& modulus) {
-                return BigInteger::ModPow(base, to_biginteger(exp), modulus);
+                return BigInteger::mod_pow(base, to_biginteger(exp), modulus);
             })
             .def("__pow__", [](BigInteger& base, BigInteger& exp, py::int_& modulus) {
-                return BigInteger::ModPow(base, exp, to_biginteger(modulus));
+                return BigInteger::mod_pow(base, exp, to_biginteger(modulus));
             })
             .def("__truediv__", [](BigInteger& self, BigInteger& other) {
                 return self / other;
@@ -245,7 +245,7 @@ PYBIND11_MODULE(pybiginteger, m) {
             })
             .def("__rtruediv__", [](BigInteger& self, py::int_& other) {
                 auto bigi_result = to_biginteger(other) / self;
-                return py::int_(py::str(bigi_result.ToString()));
+                return py::int_(py::str(bigi_result.to_string()));
             })
             .def("__floordiv__", [](BigInteger& self, BigInteger& other) {
                 return self / other;
@@ -255,7 +255,7 @@ PYBIND11_MODULE(pybiginteger, m) {
             })
             .def("__rfloordiv__", [](BigInteger& self, py::int_& other) {
                 auto bigi_result = to_biginteger(other) / self;
-                return py::int_(py::str(bigi_result.ToString()));
+                return py::int_(py::str(bigi_result.to_string()));
             })
             .def("__lshift__", [](BigInteger& self, BigInteger& other) {
                 return self << other;
@@ -265,7 +265,7 @@ PYBIND11_MODULE(pybiginteger, m) {
             })
             .def("__rlshift__", [](BigInteger& shift, py::int_& base) {
                 auto bigi_result =  to_biginteger(base) << shift;
-                return py::int_(py::str(bigi_result.ToString()));
+                return py::int_(py::str(bigi_result.to_string()));
             })
             .def("__rshift__", [](BigInteger& self, BigInteger& other) {
                 return self >> other;
@@ -275,7 +275,7 @@ PYBIND11_MODULE(pybiginteger, m) {
             })
             .def("__rrshift__", [](BigInteger& shift, py::int_& base) {
                 auto bigi_result =  to_biginteger(base) >> shift;
-                return py::int_(py::str(bigi_result.ToString()));
+                return py::int_(py::str(bigi_result.to_string()));
             })
             .def("__and__", [](BigInteger& self, BigInteger& other) {
                 return self & other;
@@ -287,7 +287,7 @@ PYBIND11_MODULE(pybiginteger, m) {
             .def("__rand__", [](BigInteger& self, py::int_& other) {
                 auto other_bi = to_biginteger(other);
                 auto bigi_result =  self & other_bi;
-                return py::int_(py::str(bigi_result.ToString()));
+                return py::int_(py::str(bigi_result.to_string()));
             })
             .def("__or__", [](BigInteger& self, BigInteger& other) {
                 return self | other;
@@ -299,7 +299,7 @@ PYBIND11_MODULE(pybiginteger, m) {
             .def("__ror__", [](BigInteger& self, py::int_& other) {
                 auto other_bi = to_biginteger(other);
                 auto bigi_result =  self | other_bi;
-                return py::int_(py::str(bigi_result.ToString()));
+                return py::int_(py::str(bigi_result.to_string()));
             })
             .def("__xor__", [](BigInteger& self, BigInteger& other) {
                 return self ^ other;
@@ -311,14 +311,14 @@ PYBIND11_MODULE(pybiginteger, m) {
             .def("__rxor__", [](BigInteger& self, py::int_& other) {
                 auto other_bi = to_biginteger(other);
                 auto bigi_result =  self ^ other_bi;
-                return py::int_(py::str(bigi_result.ToString()));
+                return py::int_(py::str(bigi_result.to_string()));
             })
             .def("__neg__", [](BigInteger& self) { return -self; })
             .def("__pos__", [](BigInteger& self) { return +self;})
-            .def("__abs__", [](BigInteger& self) { return BigInteger::Abs(self);})
+            .def("__abs__", [](BigInteger& self) { return BigInteger::abs(self);})
             .def("__invert__", [](BigInteger& self) { return ~self; })
             .def("__bytes__", [](BigInteger& self) {
-                auto v_bytes = self.ToByteArray();
+                auto v_bytes = self.to_byte_array();
                 return py::bytes(std::string(v_bytes.begin(), v_bytes.end()));
             }, R"(
                 Return the value of the BigInteger in little endian order.
@@ -326,7 +326,7 @@ PYBIND11_MODULE(pybiginteger, m) {
                 https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger.tobytearray?view=netcore-3.1)")
             .def("to_bytes",
                  [](BigInteger& self, bool is_unsigned, bool is_bigendian) {
-                     auto v_bytes = self.ToByteArray(is_unsigned, is_bigendian);
+                     auto v_bytes = self.to_byte_array(is_unsigned, is_bigendian);
                      return py::bytes(std::string(v_bytes.begin(), v_bytes.end()));
                  }, R"(
                 Return the value of the BigInteger.
@@ -334,7 +334,7 @@ PYBIND11_MODULE(pybiginteger, m) {
                 https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger.tobytearray?view=netcore-3.1#System_Numerics_BigInteger_ToByteArray_System_Boolean_System_Boolean_)",
                  py::arg("is_unsigned") = false,
                  py::arg("is_bigendian") = false)
-            .def("__int__", [](BigInteger& self) { return py::int_(py::str(self.ToString())); })   // support int()
-            .def("__index__", [](BigInteger& self) { return py::int_(py::str(self.ToString())); }) // support range()
-            .def("__str__", &BigInteger::ToString);
+            .def("__int__", [](BigInteger& self) { return py::int_(py::str(self.to_string())); })   // support int()
+            .def("__index__", [](BigInteger& self) { return py::int_(py::str(self.to_string())); }) // support range()
+            .def("__str__", &BigInteger::to_string);
 }

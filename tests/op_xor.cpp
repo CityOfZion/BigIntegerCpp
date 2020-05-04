@@ -9,7 +9,7 @@ static void VerifyXorString(std::string opstring)
     StackCalc sc(opstring);
     while (sc.DoNextOperation())
     {
-        ASSERT_EQ(sc.snCalc.top().ToString(), sc.myCalc.top().ToString());
+        ASSERT_EQ(sc.snCalc.top().to_string(), sc.myCalc.top().to_string());
     }
 }
 
@@ -53,7 +53,7 @@ TEST(operator_tests, op_xor) {
         VerifyXorString(Print(tempByteArray1) + Print(tempByteArray2) + "b^");
     }
 
-    // Xor Method - One large and one small BigIntegers
+    // Xor Method - one large and one small BigIntegers
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -65,7 +65,7 @@ TEST(operator_tests, op_xor) {
         VerifyXorString(Print(tempByteArray1) + Print(tempByteArray2) + "b^");
     }
 
-    // Xor Method - One large BigIntegers and zero
+    // Xor Method - one large BigIntegers and zero
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -77,7 +77,7 @@ TEST(operator_tests, op_xor) {
         VerifyXorString(Print(tempByteArray1) + Print(tempByteArray2) + "b^");
     }
 
-    // Xor Method - One small BigIntegers and zero
+    // Xor Method - one small BigIntegers and zero
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random, 2);
@@ -89,7 +89,7 @@ TEST(operator_tests, op_xor) {
         VerifyXorString(Print(tempByteArray1) + Print(tempByteArray2) + "b^");
     }
 
-    // Xor Method - One large BigIntegers and -1
+    // Xor Method - one large BigIntegers and -1
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -101,7 +101,7 @@ TEST(operator_tests, op_xor) {
         VerifyXorString(Print(tempByteArray1) + Print(tempByteArray2) + "b^");
     }
 
-    // Xor Method - One small BigIntegers and -1
+    // Xor Method - one small BigIntegers and -1
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random, 2);
@@ -113,7 +113,7 @@ TEST(operator_tests, op_xor) {
         VerifyXorString(Print(tempByteArray1) + Print(tempByteArray2) + "b^");
     }
 
-    // Xor Method - One large BigIntegers and Int.MaxValue+1
+    // Xor Method - one large BigIntegers and Int.MaxValue+1
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -125,7 +125,7 @@ TEST(operator_tests, op_xor) {
         VerifyXorString(Print(tempByteArray1) + Print(tempByteArray2) + "b^");
     }
 
-    // Xor Method - One small BigIntegers and Int.MaxValue+1
+    // Xor Method - one small BigIntegers and Int.MaxValue+1
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random, 2);

@@ -12,7 +12,7 @@ static void VerifyPowString(std::string opstring)
     StackCalc sc(opstring);
     while (sc.DoNextOperation())
     {
-        ASSERT_EQ(sc.snCalc.top().ToString(), sc.myCalc.top().ToString());
+        ASSERT_EQ(sc.snCalc.top().to_string(), sc.myCalc.top().to_string());
     }
 }
 
@@ -31,7 +31,7 @@ static void VerifyIdentityString(std::string opstring1, std::string opstring2)
         //Run the full calculation
         sc2.DoNextOperation();
     }
-    ASSERT_EQ(sc1.snCalc.top().ToString(), sc2.snCalc.top().ToString());
+    ASSERT_EQ(sc1.snCalc.top().to_string(), sc2.snCalc.top().to_string());
 }
 
 static byte_array GetRandomByteArray(Random random, int size)
@@ -90,10 +90,10 @@ TEST(pow_tests, RunPowPositive) {
     byte_array tempByteArray2;
 
     // Pow Method - 0^(1)
-    VerifyPowString(BigInteger::One().ToString() + " " + BigInteger::Zero().ToString() + " bPow");
+    VerifyPowString(BigInteger::one().to_string() + " " + BigInteger::zero().to_string() + " bPow");
 
     // Pow Method - 0^(0)
-    VerifyPowString(BigInteger::Zero().ToString() + " " + BigInteger::Zero().ToString() + " bPow");
+    VerifyPowString(BigInteger::zero().to_string() + " " + BigInteger::zero().to_string() + " bPow");
 
     // Pow Method - Two Small BigIntegers
     for (int i = 0; i < s_samples; i++)
@@ -103,7 +103,7 @@ TEST(pow_tests, RunPowPositive) {
         VerifyPowString(Print(tempByteArray1) + Print(tempByteArray2) + "bPow");
     }
 
-    // Pow Method - One large and one small BigIntegers
+    // Pow Method - one large and one small BigIntegers
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomPosByteArray(s_random, 1);
@@ -111,7 +111,7 @@ TEST(pow_tests, RunPowPositive) {
         VerifyPowString(Print(tempByteArray1) + Print(tempByteArray2) + "bPow");
     }
 
-    // Pow Method - One large BigIntegers and zero
+    // Pow Method - one large BigIntegers and zero
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -119,7 +119,7 @@ TEST(pow_tests, RunPowPositive) {
         VerifyPowString(Print(tempByteArray2) + Print(tempByteArray1) + "bPow");
     }
 
-    // Pow Method - One small BigIntegers and zero
+    // Pow Method - one small BigIntegers and zero
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomPosByteArray(s_random, 2);
@@ -136,13 +136,13 @@ TEST(pow_tests, RunPowAxiomXPow1) {
     // Axiom: X^1 = X
     auto str_int_max = std::to_string(std::numeric_limits<int>::max());
     auto str_long_max = std::to_string(std::numeric_limits<long>::max());
-    VerifyIdentityString(BigInteger::One().ToString() + " " + str_int_max + " bPow", str_int_max);
-    VerifyIdentityString(BigInteger::One().ToString() + " " + str_long_max + " bPow", str_long_max);
+    VerifyIdentityString(BigInteger::one().to_string() + " " + str_int_max + " bPow", str_int_max);
+    VerifyIdentityString(BigInteger::one().to_string() + " " + str_long_max + " bPow", str_long_max);
 
     for (int i = 0; i < s_samples; i++)
     {
         auto randBigInt = Print(GetRandomByteArray(s_random));
-        VerifyIdentityString(BigInteger::One().ToString() + " " + randBigInt + "bPow", randBigInt.substr(0, randBigInt.size() - 1));
+        VerifyIdentityString(BigInteger::one().to_string() + " " + randBigInt + "bPow", randBigInt.substr(0, randBigInt.size() - 1));
     }
 }
 
@@ -154,13 +154,13 @@ TEST(pow_tests, RunPowAxiomXPow0) {
     auto str_int_max = std::to_string(std::numeric_limits<int>::max());
     auto str_long_max = std::to_string(std::numeric_limits<long>::max());
 
-    VerifyIdentityString(BigInteger::Zero().ToString() + " " + str_int_max + " bPow", BigInteger::One().ToString());
-    VerifyIdentityString(BigInteger::Zero().ToString() + " " + str_long_max + " bPow", BigInteger::One().ToString());
+    VerifyIdentityString(BigInteger::zero().to_string() + " " + str_int_max + " bPow", BigInteger::one().to_string());
+    VerifyIdentityString(BigInteger::zero().to_string() + " " + str_long_max + " bPow", BigInteger::one().to_string());
 
     for (int i = 0; i < s_samples; i++)
     {
         auto randBigInt = Print(GetRandomByteArray(s_random));
-        VerifyIdentityString(BigInteger::Zero().ToString() + " " + randBigInt + "bPow", BigInteger::One().ToString());
+        VerifyIdentityString(BigInteger::zero().to_string() + " " + randBigInt + "bPow", BigInteger::one().to_string());
     }
 }
 
@@ -171,12 +171,12 @@ TEST(pow_tests, RunPowAxiom0PowX) {
 
     // Axiom: 0^X = 0
     auto str_int_max = std::to_string(std::numeric_limits<int>::max());
-    VerifyIdentityString(str_int_max + " " + BigInteger::Zero().ToString() + " bPow", BigInteger::Zero().ToString());
+    VerifyIdentityString(str_int_max + " " + BigInteger::zero().to_string() + " bPow", BigInteger::zero().to_string());
 
     for (int i = 0; i < s_samples; i++)
     {
         auto randBigInt = Print(GetRandomPosByteArray(s_random, 4));
-        VerifyIdentityString(randBigInt + BigInteger::Zero().ToString() + " bPow", BigInteger::Zero().ToString());
+        VerifyIdentityString(randBigInt + BigInteger::zero().to_string() + " bPow", BigInteger::zero().to_string());
     }
 }
 
@@ -186,12 +186,12 @@ TEST(pow_tests, RunPowAxiom1PowX) {
 
     // Axiom: 1^X = 1
     auto str_int_max = std::to_string(std::numeric_limits<int>::max());
-    VerifyIdentityString(str_int_max + " " + BigInteger::One().ToString() + " bPow", BigInteger::One().ToString());
+    VerifyIdentityString(str_int_max + " " + BigInteger::one().to_string() + " bPow", BigInteger::one().to_string());
 
     for (int i = 0; i < s_samples; i++)
     {
         auto randBigInt = Print(GetRandomPosByteArray(s_random, 4));
-        VerifyIdentityString(randBigInt + BigInteger::One().ToString() + " bPow", BigInteger::One().ToString());
+        VerifyIdentityString(randBigInt + BigInteger::one().to_string() + " bPow", BigInteger::one().to_string());
     }
 }
 
@@ -213,10 +213,12 @@ TEST(pow_tests, RunPowNegative) {
     byte_array tempByteArray2;
 
     // Pow Method - 1^(-1)
-    EXPECT_THROW_WITH_MESSAGE(VerifyPowString(BigInteger::MinusOne().ToString() + " " + BigInteger::One().ToString() + " bPow"), std::out_of_range, "SR.ArgumentOutOfRange_MustBeNonNeg");
+    EXPECT_THROW_WITH_MESSAGE(VerifyPowString(
+            BigInteger::minus_one().to_string() + " " + BigInteger::one().to_string() + " bPow"), std::out_of_range, "SR.ArgumentOutOfRange_MustBeNonNeg");
 
     // Pow Method - 0^(-1)
-    EXPECT_THROW_WITH_MESSAGE(VerifyPowString(BigInteger::MinusOne().ToString() + " " + BigInteger::Zero().ToString() + " bPow"), std::out_of_range, "SR.ArgumentOutOfRange_MustBeNonNeg");
+    EXPECT_THROW_WITH_MESSAGE(VerifyPowString(
+            BigInteger::minus_one().to_string() + " " + BigInteger::zero().to_string() + " bPow"), std::out_of_range, "SR.ArgumentOutOfRange_MustBeNonNeg");
 
     // Pow Method - Negative Exponent
     for (int i = 0; i < s_samples; i++)
@@ -230,5 +232,5 @@ TEST(pow_tests, RunOverflow) {
     byte_array bytes(1000, 0);
     bytes[bytes.size() - 1] = 1;
 
-    EXPECT_THROW_WITH_MESSAGE(BigInteger::Pow(BigInteger(bytes), std::numeric_limits<int>::max()), std::overflow_error, "checked() int overflow");
+    EXPECT_THROW_WITH_MESSAGE(BigInteger::pow(BigInteger(bytes), std::numeric_limits<int>::max()), std::overflow_error, "checked() int overflow");
 }

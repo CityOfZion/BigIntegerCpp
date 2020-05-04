@@ -10,7 +10,7 @@ static void VerifyMultiplyString(const std::string& opstring)
     StackCalc sc(opstring);
     while (sc.DoNextOperation())
     {
-        ASSERT_EQ(sc.snCalc.top().ToString(), sc.myCalc.top().ToString());
+        ASSERT_EQ(sc.snCalc.top().to_string(), sc.myCalc.top().to_string());
     }
 }
 
@@ -29,7 +29,7 @@ static void VerifyIdentityString(const std::string& opstring1, const std::string
         //Run the full calculation
         sc2.DoNextOperation();
     }
-    ASSERT_EQ(sc1.snCalc.top().ToString(), sc2.snCalc.top().ToString());
+    ASSERT_EQ(sc1.snCalc.top().to_string(), sc2.snCalc.top().to_string());
 }
 
 static byte_array GetRandomByteArray(Random random, int size)
@@ -54,7 +54,7 @@ TEST(operator_tests, op_multiply_RunMultiplyPositive) {
     byte_array tempByteArray1;
     byte_array tempByteArray2;
 
-    // Multiply Method - One Large BigInteger
+    // Multiply Method - one Large BigInteger
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -77,7 +77,7 @@ TEST(operator_tests, op_multiply_RunMultiplyPositive) {
         VerifyMultiplyString(Print(tempByteArray1) + Print(tempByteArray2) + "b*");
     }
 
-    // Multiply Method - One large and one small BigIntegers
+    // Multiply Method - one large and one small BigIntegers
     for (int i = 0; i < s_samples; i++)
     {
         try
@@ -106,7 +106,7 @@ TEST(operator_tests, op_multiply_RunMultiplyPositiveWith0) {
     byte_array tempByteArray1;
     byte_array tempByteArray2;
 
-    // Multiply Method - One large BigIntegers and zero
+    // Multiply Method - one large BigIntegers and zero
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random);
@@ -118,7 +118,7 @@ TEST(operator_tests, op_multiply_RunMultiplyPositiveWith0) {
         VerifyMultiplyString(Print(tempByteArray1) + Print(tempByteArray2) + "b*");
     }
 
-    // Multiply Method - One small BigIntegers and zero
+    // Multiply Method - one small BigIntegers and zero
     for (int i = 0; i < s_samples; i++)
     {
         tempByteArray1 = GetRandomByteArray(s_random, 2);
@@ -141,13 +141,13 @@ TEST(operator_tests, op_multiply_RunMultiplyAxiomXmult1) {
     // Axiom: X*1 = X
     auto int32_max = std::to_string(std::numeric_limits<int32_t>::max());
     auto int64_max = std::to_string(std::numeric_limits<int64_t>::max());
-    VerifyIdentityString(int32_max + " " + BigInteger::One().ToString() + " b*", int32_max);
-    VerifyIdentityString(int64_max + " " + BigInteger::One().ToString() + " b*", int64_max);
+    VerifyIdentityString(int32_max + " " + BigInteger::one().to_string() + " b*", int32_max);
+    VerifyIdentityString(int64_max + " " + BigInteger::one().to_string() + " b*", int64_max);
 
     for (int i = 0; i < s_samples; i++)
     {
         auto randBigInt = Print(GetRandomByteArray(s_random));
-        VerifyIdentityString(randBigInt + BigInteger::One().ToString() + " b*", randBigInt + "u+");
+        VerifyIdentityString(randBigInt + BigInteger::one().to_string() + " b*", randBigInt + "u+");
     }
 }
 
@@ -161,13 +161,13 @@ TEST(operator_tests, op_multiply_RunMultiplyAxiomXmult0) {
     // Axiom: X*0 = 0
     auto int_max = std::to_string(std::numeric_limits<int>::max());
     auto long_max = std::to_string(std::numeric_limits<long>::max());
-    VerifyIdentityString(int_max + " " + BigInteger::Zero().ToString() + " b*", BigInteger::Zero().ToString());
-    VerifyIdentityString(long_max + " " + BigInteger::Zero().ToString() + " b*", BigInteger::Zero().ToString());
+    VerifyIdentityString(int_max + " " + BigInteger::zero().to_string() + " b*", BigInteger::zero().to_string());
+    VerifyIdentityString(long_max + " " + BigInteger::zero().to_string() + " b*", BigInteger::zero().to_string());
 
     for (int i = 0; i < s_samples; i++)
     {
         auto randBigInt = Print(GetRandomByteArray(s_random));
-        VerifyIdentityString(randBigInt + BigInteger::Zero().ToString() + " b*", BigInteger::Zero().ToString());
+        VerifyIdentityString(randBigInt + BigInteger::zero().to_string() + " b*", BigInteger::zero().to_string());
     }
 }
 
