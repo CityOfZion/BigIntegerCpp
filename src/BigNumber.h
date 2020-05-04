@@ -36,7 +36,7 @@ class BigNumber
         static BigInteger ParseBigInteger(std::string value);
         static bool TryParseBigInteger(std::string value, BigInteger& result);
         static bool NumberToBigInteger(BigNumberBuffer& bignumber, BigInteger& result);
-        static std::string FormatBigInteger(BigInteger& value);
+        static std::string FormatBigInteger(const BigInteger& value);
 
 
     private:

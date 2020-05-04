@@ -52,7 +52,7 @@ uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint32_t rhs)
     return quotient;
 }
 
-uint32_t BigIntegerCalculator::Remainder(uint_array& lhs, uint rhs)
+uint32_t BigIntegerCalculator::Remainder(const uint_array& lhs, const uint rhs)
 {
     assert(!lhs.empty());
     assert(lhs.size() >= 1);
@@ -92,7 +92,7 @@ uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint_array& rhs, uint_a
 }
 
 
-uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint_array& rhs)
+uint_array BigIntegerCalculator::Divide(const uint_array& lhs, const uint_array& rhs)
 {
     assert(!lhs.empty());
     assert(!rhs.empty());
@@ -104,14 +104,15 @@ uint_array BigIntegerCalculator::Divide(uint_array& lhs, uint_array& rhs)
 
     // NOTE: left will get overwritten, we need a local copy
     uint_array localLeft = uint_array(lhs);
+    uint_array localRight = uint_array(rhs);
     uint_array bits(lhs.size() - rhs.size() + 1);
 
-    Divide(&localLeft[0], localLeft.size(), &rhs[0], rhs.size(), &bits[0], bits.size());
+    Divide(&localLeft[0], localLeft.size(), &localRight[0], localRight.size(), &bits[0], bits.size());
 
     return bits;
 }
 
-uint_array BigIntegerCalculator::Remainder(uint_array& lhs, uint_array& rhs)
+uint_array BigIntegerCalculator::Remainder(const uint_array& lhs, const uint_array& rhs)
 {
     assert(!lhs.empty());
     assert(!rhs.empty());
@@ -129,7 +130,7 @@ uint_array BigIntegerCalculator::Remainder(uint_array& lhs, uint_array& rhs)
     return localLeft;
 }
 
-void BigIntegerCalculator::Divide(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength, uint32_t* bits, int bitsLength)
+void BigIntegerCalculator::Divide(uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint32_t* bits, int bitsLength)
 {
     assert(lhsLength >= 1);
     assert(rhsLength >= 1);
@@ -213,7 +214,7 @@ void BigIntegerCalculator::Divide(uint32_t* lhs, int lhsLength, uint32_t* rhs, i
     }
 }
 
-uint32_t BigIntegerCalculator::AddDivisor(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength)
+uint32_t BigIntegerCalculator::AddDivisor(uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength)
 {
     assert(lhsLength >= 0);
     assert(rhsLength >= 0);
@@ -233,7 +234,7 @@ uint32_t BigIntegerCalculator::AddDivisor(uint32_t* lhs, int lhsLength, uint32_t
     return static_cast<uint32_t>(carry);
 }
 
-uint32_t BigIntegerCalculator::SubtractDivisor(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength, uint64_t q)
+uint32_t BigIntegerCalculator::SubtractDivisor(uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint64_t q)
 {
     assert(lhsLength >= 0);
     assert(rhsLength >= 0);

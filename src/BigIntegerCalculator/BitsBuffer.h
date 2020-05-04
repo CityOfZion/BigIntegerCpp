@@ -7,12 +7,13 @@
 
 struct BitsBuffer {
 public:
+    BitsBuffer() =default;
     BitsBuffer(int size, uint32_t value);
     BitsBuffer(int size, uint_array value);
     void MultiplySelf(BitsBuffer& value, BitsBuffer& temp);
     void SquareSelf(BitsBuffer& temp);
     void Reduce(FastReducer& reducer);
-    void Reduce(uint_array modulus);
+    void Reduce(const uint_array& modulus);
     void Reduce(BitsBuffer& modulus);
     void Overwrite(uint64_t value);
     void Overwrite(uint32_t value);
@@ -25,5 +26,5 @@ public:
 
 private:
     uint_array _bits;
-    int _length;
+    int _length = 0;
 };

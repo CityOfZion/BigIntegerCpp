@@ -37,11 +37,9 @@ void BitsBuffer::Reduce(FastReducer& reducer) {
     _length = reducer.Reduce(_bits, _length);
 }
 
-void BitsBuffer::Reduce(uint_array modulus) {
+void BitsBuffer::Reduce(const uint_array& modulus) {
     if (_length >= modulus.size()) {
-        unsigned int* b = _bits.data();
-        unsigned int* m = modulus.data();
-        BigIntegerCalculator::Divide(b, _length, m, modulus.size(), nullptr, 0);
+        BigIntegerCalculator::Divide(_bits.data(), _length, modulus.data(), modulus.size(), nullptr, 0);
         _length = BigIntegerCalculator::ActualLength(_bits, modulus.size());
     }
 }
@@ -86,7 +84,6 @@ void BitsBuffer::Apply(BitsBuffer& temp, int maxLength) {
     _bits = t;
     _length = BigIntegerCalculator::ActualLength(_bits, maxLength);
 }
-
 
 
 

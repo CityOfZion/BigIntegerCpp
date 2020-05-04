@@ -9,7 +9,7 @@ uint_array BigIntegerCalculator::Pow(uint32_t value, uint32_t power) {
     return PowCore(power, v);
 }
 
-uint_array BigIntegerCalculator::Pow(uint_array& value, uint32_t power) {
+uint_array BigIntegerCalculator::Pow(const uint_array& value, uint32_t power) {
     int size = PowBound(power, value.size(), 1);
     BitsBuffer v(size, value);
     return PowCore(power, v);
@@ -83,13 +83,14 @@ uint32_t BigIntegerCalculator::PowCore(uint32_t power, uint32_t modulus, uint64_
     return static_cast<uint32_t>(result % modulus);
 }
 
-uint32_t BigIntegerCalculator::Pow(uint_array& value, uint32_t power, uint32_t modulus) {
+uint32_t BigIntegerCalculator::Pow(const uint_array& value, uint32_t power, uint32_t modulus) {
     uint32_t v = Remainder(value, modulus);
     return PowCore(power, modulus, v, 1);
 }
 
-uint32_t BigIntegerCalculator::PowCore(uint_array& power, uint32_t modulus, uint64_t value, uint64_t result) {
-    for (auto& p : power) {
+uint32_t BigIntegerCalculator::PowCore(const uint_array& power, uint32_t modulus, uint64_t value, uint64_t result) {
+    for (int i = 0; i < power.size()-1; i++) {
+        unsigned int p = power[i];
         for (int j = 0; j < 32; j++) {
             if ((p & 1) == 1)
                 result = (result * value) % modulus;
@@ -100,18 +101,18 @@ uint32_t BigIntegerCalculator::PowCore(uint_array& power, uint32_t modulus, uint
     return PowCore(power[power.size()-1], modulus, value, result);
 }
 
-uint32_t BigIntegerCalculator::Pow(uint_array& value, uint_array& power, uint32_t modulus) {
+uint32_t BigIntegerCalculator::Pow(const uint_array& value, const uint_array& power, uint32_t modulus) {
     auto v = Remainder(value, modulus);
     return PowCore(power, modulus, v, 1);
 }
 
-uint_array BigIntegerCalculator::Pow(uint32_t value, uint32_t power, uint_array& modulus) {
+uint_array BigIntegerCalculator::Pow(uint32_t value, uint32_t power, const uint_array& modulus) {
     int size = modulus.size() + modulus.size();
     BitsBuffer v(size, value);
     return PowCore(power, modulus, v);
 }
 
-uint_array BigIntegerCalculator::PowCore(uint32_t power, uint_array& modulus, BitsBuffer& value) {
+uint_array BigIntegerCalculator::PowCore(uint32_t power, const uint_array& modulus, BitsBuffer& value) {
     int size = value.GetSize();
 
     BitsBuffer temp(size, 0);
@@ -126,18 +127,22 @@ uint_array BigIntegerCalculator::PowCore(uint32_t power, uint_array& modulus, Bi
     return result.GetBits();
 }
 
-uint_array BigIntegerCalculator::Pow(uint_array& value, uint32_t power, uint_array& modulus) {
-    if (value.size() > modulus.size())
-        value = Remainder(value, modulus);
-
+uint_array BigIntegerCalculator::Pow(const uint_array& value, uint32_t power, const uint_array& modulus) {
     int size = modulus.size() + modulus.size();
-    BitsBuffer v(size, value);
+    BitsBuffer v;
+
+    if (value.size() > modulus.size()) {
+        auto tmp = Remainder(value, modulus);
+        v = BitsBuffer(size, tmp);
+    } else {
+        v = BitsBuffer(size, value);
+    }
+
     return PowCore(power, modulus, v);
 }
 
-void BigIntegerCalculator::PowCore(uint_array& power, uint_array& modulus, BitsBuffer& value, BitsBuffer& result,
+void BigIntegerCalculator::PowCore(const uint_array& power, const uint_array& modulus, BitsBuffer& value, BitsBuffer& result,
                                    BitsBuffer& temp) {
-//    for(auto& b : power) {
     for (int i = 0; i < power.size() - 1; i++) {
         unsigned int p = power[i];
         for (int j = 0; j < 32; j++) {
@@ -153,7 +158,7 @@ void BigIntegerCalculator::PowCore(uint_array& power, uint_array& modulus, BitsB
     PowCore(power[power.size()-1], modulus, value, result, temp);
 }
 
-void BigIntegerCalculator::PowCore(uint32_t power, uint_array& modulus, BitsBuffer& value, BitsBuffer& result,
+void BigIntegerCalculator::PowCore(uint32_t power, const uint_array& modulus, BitsBuffer& value, BitsBuffer& result,
                                    BitsBuffer& temp) {
     while (power != 0) {
         if ((power & 1) == 1) {
@@ -168,22 +173,27 @@ void BigIntegerCalculator::PowCore(uint32_t power, uint_array& modulus, BitsBuff
     }
 }
 
-uint_array BigIntegerCalculator::Pow(uint32_t value, uint_array& power, uint_array& modulus) {
+uint_array BigIntegerCalculator::Pow(uint32_t value, const uint_array& power, const uint_array& modulus) {
     int size = modulus.size() + modulus.size();
     BitsBuffer v(size, value);
     return PowCore(power, modulus, v);
 }
 
-uint_array BigIntegerCalculator::Pow(uint_array& value, uint_array& power, uint_array& modulus) {
-    if (value.size() > modulus.size())
-        value = Remainder(value, modulus);
-
+uint_array BigIntegerCalculator::Pow(const uint_array& value, const uint_array& power, const uint_array& modulus) {
+    BitsBuffer v;
     int size = modulus.size() + modulus.size();
-    BitsBuffer v(size, value);
+
+    if (value.size() > modulus.size()) {
+        auto tmp = Remainder(value, modulus);
+        v = BitsBuffer(size, tmp);
+    } else {
+        v = BitsBuffer(size, value);
+    }
+
     return PowCore(power, modulus, v);
 }
 
-uint_array BigIntegerCalculator::PowCore(uint_array& power, uint_array& modulus, BitsBuffer& value) {
+uint_array BigIntegerCalculator::PowCore(const uint_array& power, const uint_array& modulus, BitsBuffer& value) {
     int size = value.GetSize();
 
     BitsBuffer temp(size, 0);
@@ -198,9 +208,9 @@ uint_array BigIntegerCalculator::PowCore(uint_array& power, uint_array& modulus,
     return result.GetBits();
 }
 
-void BigIntegerCalculator::PowCore(uint_array& power, FastReducer& reducer, BitsBuffer& value, BitsBuffer& result,
+void BigIntegerCalculator::PowCore(const uint_array& power, FastReducer& reducer, BitsBuffer& value, BitsBuffer& result,
                                    BitsBuffer& temp) {
-    for (auto& p : power) {
+    for (auto p : power) {
         for (int j = 0; j < 32; j++) {
             if ((p & 1) == 1) {
                 result.MultiplySelf(value, temp);
@@ -233,6 +243,6 @@ uint32_t BigIntegerCalculator::Pow(uint32_t value, uint32_t power, uint32_t modu
     return PowCore(power, modulus, value, 1);
 }
 
-uint32_t BigIntegerCalculator::Pow(uint32_t value, uint_array& power, uint32_t modulus) {
+uint32_t BigIntegerCalculator::Pow(uint32_t value, const uint_array& power, uint32_t modulus) {
     return PowCore(power, modulus, value, 1);
 }

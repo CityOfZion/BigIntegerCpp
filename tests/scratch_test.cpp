@@ -5,6 +5,22 @@
 #include "stack_calc.h"
 #include <chrono>
 
+//
+//class B {
+//public:
+//    B();
+//    B(int value) :v(value) {};
+//    B(unsigned int value) :v(value) {};
+////    bool operator<(const B& rhs) const { return true; } // no implicit conversion e.g. auto r1 = 3 < B() fails
+////    friend bool operator<(const B& lhs, const B& rhs) { return true; } // yes implicit conversion
+//
+//private:
+//    int v = 0;
+//};
+//
+//bool operator<(const B& lhs, const B& rhs) { return true; } // yes implicit conversion
+
+
 TEST(scratch1, scratch_tests)
 {
     std::string s("12937123987123987123987123987123987123987123129387129387123987123987");
@@ -12,13 +28,37 @@ TEST(scratch1, scratch_tests)
 //    BigInteger::Parse(s);
 //    auto t2 = std::chrono::high_resolution_clock::now();
 //    auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+//    auto r0 = 3 < B();
+    auto b1 = BigInteger::One();
+    auto r1 = b1 + BigInteger::One();
+    ASSERT_EQ(2, r1);
+    std::cout << "addr b1: " << &b1 << "\n";
+    b1 += BigInteger::One();
+    std::cout << "addr b1: " << &b1 << "\n";
+    ASSERT_EQ(2, b1);
 
-//    std::cout << duration;
-    std::vector<int> sizes;
-    sizes.push_back(sizeof(int));
-    sizes.push_back(sizeof(long));
-    sizes.push_back(sizeof(long long));
-    sizes.push_back(sizeof(double));
-    for (auto i : sizes)
-        std::cout << std::to_string(i) << "\n";
+    b1 = BigInteger::One();
+    r1 = b1 - BigInteger::One();
+    ASSERT_EQ(0, r1);
+    b1 -= BigInteger::One();
+    ASSERT_EQ(0, b1);
+
+    b1 = BigInteger::One();
+    r1 = b1 * BigInteger(2);
+    ASSERT_EQ(2, r1);
+    b1 *= BigInteger(2);
+    ASSERT_EQ(2, b1);
+
+    b1 = BigInteger(6);
+    r1 = b1 / BigInteger(2);
+    ASSERT_EQ(3, r1);
+    b1 /= BigInteger(2);
+    ASSERT_EQ(3, b1);
+
+    b1 = BigInteger::Parse("123123123123123123");
+    auto b2 = BigInteger::Parse("4545645645646456456");
+    b1 *= b2;
+    std::cout << b1.ToString() << "\n";
+
+
 }

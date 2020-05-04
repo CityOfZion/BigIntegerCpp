@@ -5,9 +5,9 @@
 #include <string>
 #include <iostream>
 
- using uint_array = std::vector<uint32_t>;
- using byte_array = std::vector<unsigned char>;
- using byte = unsigned char;
+using uint_array = std::vector<uint32_t>;
+using byte_array = std::vector<unsigned char>;
+using byte = unsigned char;
 
 class BigInteger {
     public:
@@ -31,10 +31,8 @@ class BigInteger {
         friend bool operator>(const BigInteger& lhs, const BigInteger& rhs) { return rhs < lhs; }
         friend bool operator<=(const BigInteger& lhs, const BigInteger& rhs) { return !(lhs > rhs); }
         friend bool operator>=(const BigInteger& lhs, const BigInteger& rhs) { return !(lhs < rhs); }
-        friend bool operator==(const BigInteger& lhs, const BigInteger& rhs) { return lhs.Equals(rhs); };
-
-        bool operator ==(const BigInteger& rhs);
-        bool operator !=(const BigInteger& rhs);
+        friend bool operator==(const BigInteger& lhs, const BigInteger& rhs) { return lhs.Equals(rhs); }
+        friend bool operator!=(const BigInteger& lhs, const BigInteger& rhs) { return !lhs.Equals(rhs); }
 
         // explicit casts
         operator int();
@@ -44,10 +42,10 @@ class BigInteger {
         operator double();
         operator float();
 
-        bool IsPowerOfTwo();
-        bool IsZero();
-        bool IsOne();
-        bool IsEven();
+        bool IsPowerOfTwo() const;
+        bool IsZero() const;
+        bool IsOne() const;
+        bool IsEven() const;
 
         static BigInteger Zero();
         static BigInteger One();
@@ -59,79 +57,73 @@ class BigInteger {
         static BigInteger Negate(BigInteger& value);
         static BigInteger Abs(BigInteger& value);
 
-        static double Log(BigInteger value);
-        static double Log(BigInteger value, double baseValue);
-        static double Log10(BigInteger value);
+        static double Log(const BigInteger& value);
+        static double Log(const BigInteger& value, double baseValue);
+        static double Log10(const BigInteger& value);
 
-        static BigInteger ModPow(BigInteger value, BigInteger exponent, BigInteger modulus);
-        static BigInteger Pow(BigInteger value, int exponent);
+        static BigInteger ModPow(const BigInteger& value, const BigInteger& exponent, const BigInteger& modulus);
+        static BigInteger Pow(const BigInteger& value, int exponent);
 
-        static BigInteger GreatestCommonDivisor(BigInteger& left, BigInteger& right);
-        static BigInteger GreatestCommonDivisor(uint_array leftBits, uint_array rightBits);
+        static BigInteger GreatestCommonDivisor(const BigInteger& left, const BigInteger& right);
+        static BigInteger GreatestCommonDivisor(const uint_array& leftBits, const uint_array& rightBits);
 
-        //bool Equals(long long other) const;
-        //bool Equals(unsigned long other) const;
-        //bool Equals(std::any obj);
-        bool Equals(uint64_t other) const;
+        // Returns a value that indicates whether the current instance and a specified BigInteger object have the same value.
         bool Equals(const BigInteger& other) const;
 
+        // Compares this instance to a second BigInteger and returns an integer that indicates whether the value of this instance is less than, equal to, or greater than the value of the specified object.
+        int CompareTo(const BigInteger& other) const;
+
         // Divide & Modulo
-        BigInteger operator%(const BigInteger& rhs);
-        BigInteger operator/(const BigInteger& divisor);
-        BigInteger operator/=(const BigInteger& divisor);
-        static BigInteger Divide(BigInteger& dividend, BigInteger& divisor);
+        BigInteger& operator/=(const BigInteger& divisor);
+        BigInteger& operator%=(const BigInteger& rhs);
+        static BigInteger Divide(BigInteger& dividend, const BigInteger& divisor);
         static BigInteger DivRem(BigInteger& dividend, BigInteger& divisor, BigInteger& remainder);
-        static BigInteger Remainder(BigInteger& dividend, BigInteger& divisor);
+        static BigInteger Remainder(BigInteger& dividend, const BigInteger& divisor);
 
         // Multiply & Square
-        BigInteger operator*(const BigInteger& rhs);
-        BigInteger operator*=(const BigInteger& rhs);
-        static BigInteger Multiply(BigInteger& lhs, BigInteger& rhs);
+        BigInteger& operator*=(const BigInteger& rhs);
+        static BigInteger Multiply(BigInteger& lhs, const BigInteger& rhs);
 
         // Add
         BigInteger operator+();
-        BigInteger operator+(const BigInteger& rhs);
-        BigInteger operator+=(const BigInteger& rhs);
-        BigInteger operator+=(uint64_t rhs);
-        BigInteger& operator ++();
-        static BigInteger Add(BigInteger& lhs, BigInteger& rhs);
-        BigInteger Add(uint_array& lhs, int lhsSign, uint_array& rhs, int rhsSign);
+        BigInteger& operator+=(const BigInteger& rhs);
+        BigInteger& operator++(); // prefix
+        BigInteger& operator++(int unused); // postfix
+
+        static BigInteger Add(BigInteger& lhs, const BigInteger& rhs);
+        BigInteger Add(const uint_array& lhs, int lhsSign, const uint_array& rhs, int rhsSign);
 
         // Subtract
-        BigInteger operator -();
-        BigInteger operator -(const BigInteger& rhs);
-        BigInteger operator -=(const BigInteger& rhs);
-        BigInteger& operator --();
-        static BigInteger Subtract(BigInteger& lhs, BigInteger& rhs);
-        BigInteger Subtract(uint_array& lhs, int lhsSign, uint_array& rhs, int rhsSign);
+        BigInteger operator-();
+        BigInteger& operator-=(const BigInteger& rhs);
+        BigInteger& operator--(); // prefix
+        BigInteger& operator--(int unused); // postfix
+        static BigInteger Subtract(BigInteger& lhs, const BigInteger& rhs);
+        BigInteger Subtract(const uint_array& lhs, int lhsSign, const uint_array& rhs, int rhsSign);
 
-        // Compare
-        int CompareTo(long other) const;
-        int CompareTo(const BigInteger& other) const;
-
-        BigInteger operator <<(int shift);
-        BigInteger operator >>(int shift);
-        BigInteger operator ^(BigInteger& rhs);
-        BigInteger operator &(BigInteger& rhs);
-        BigInteger operator |(BigInteger& rhs);
+        BigInteger& operator<<=(const int shift);
+        BigInteger& operator>>=(const int shift);
+        BigInteger& operator^=(const BigInteger& rhs);
+        BigInteger& operator&=(const BigInteger& rhs);
+        BigInteger& operator|=(const BigInteger& rhs);
         BigInteger operator ~();
 
         enum GetBytesMode { AllocateArray, Count }; // currently AllocateArray only
-        int Sign();
-        int GetSign() ;
-        uint_array GetBits();
-        int GetHashCode();
+        int Sign() const;
+        int GetSign() const;
+        uint_array GetBits() const;
+        int GetHashCode() const;
 
-        std::string ToString();
-        uint_array ToUInt32Array();
-        byte_array ToByteArray(bool isUnsigned = false, bool isBigEndian = false);
-        byte_array ToByteArray(GetBytesMode mode, bool isUnsigned = false, bool isBigEndian = false, int* bytesWritten = 0);
-        int GetByteCount(bool isUnsigned = false);
+        std::string ToString() const;
+        uint_array ToUInt32Array() const;
+        byte_array ToByteArray(bool isUnsigned = false, bool isBigEndian = false) const;
+        byte_array ToByteArray(GetBytesMode mode, bool isUnsigned = false, bool isBigEndian = false, int* bytesWritten = 0) const;
+        int GetByteCount(bool isUnsigned = false) const;
 
         static bool double_IsFinite(double value);
         static bool double_IsInfinity(double value);
         static bool double_IsNaN(double value);
-        
+
 private:
     int _sign;
     uint_array _bits;
@@ -143,8 +135,18 @@ private:
 
     BigInteger(uint_array value);
 
-    static int GetDiffLength(uint_array rgu1, uint_array rgu2, int cu);
-    static bool GetPartsForBitManipulation(BigInteger& x, uint_array& xd, int& xl);
+    static int GetDiffLength(const uint_array& rgu1, const uint_array& rgu2, int cu);
+    static bool GetPartsForBitManipulation(const BigInteger& x, uint_array& xd, int& xl);
     void AssertValid() const;
 };
 
+BigInteger operator+(BigInteger lhs, const BigInteger& rhs);
+BigInteger operator-(BigInteger lhs, const BigInteger& rhs);
+BigInteger operator*(BigInteger lhs, const BigInteger& rhs);
+BigInteger operator/(BigInteger lhs, const BigInteger& rhs);
+BigInteger operator%(BigInteger lhs, const BigInteger& rhs);
+BigInteger operator&(BigInteger lhs, const BigInteger& rhs);
+BigInteger operator|(BigInteger lhs, const BigInteger& rhs);
+BigInteger operator^(BigInteger lhs, const BigInteger& rhs);
+BigInteger operator<<(BigInteger lhs, const int shift);
+BigInteger operator>>(BigInteger lhs, const int shift);

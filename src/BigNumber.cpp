@@ -303,7 +303,7 @@ bool BigNumber::TryParseBigInteger(std::string value, BigInteger& result)
 }
 
 
-std::string BigNumber::FormatBigInteger(BigInteger& value)
+std::string BigNumber::FormatBigInteger(const BigInteger& value)
 {
     //TODO HEX
     //assert(formatString == null || formatString.Length == formatSpan.Length);
