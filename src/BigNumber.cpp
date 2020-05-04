@@ -318,7 +318,7 @@ std::string BigNumber::format_biginteger(const BigInteger& value)
 
     if (value.get_bits().size() == 0)
     {
-        return std::to_string(value.get_sign());
+        return std::to_string(value.sign());
     }
 
     // First convert to base 10^9.
@@ -437,7 +437,7 @@ std::string BigNumber::format_biginteger(const BigInteger& value)
         digits--;
     }
 
-    if (value.get_sign() < 0)
+    if (value.sign() < 0)
     {
         std::string negativeSign = "-";
         for (int i = negativeSign.size() - 1; i > -1; i--)

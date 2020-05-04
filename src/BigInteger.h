@@ -110,7 +110,6 @@ class BigInteger {
 
         enum GetBytesMode { AllocateArray, Count }; // currently AllocateArray only
         int sign() const;
-        int get_sign() const;
         uint_array get_bits() const;
         int get_hash_code() const;
 

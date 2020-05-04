@@ -719,10 +719,10 @@ BigInteger BigInteger::div_rem(BigInteger& dividend, BigInteger& divisor, BigInt
 
    if (trivialDividend && trivialDivisor)
    {
-       remainder = dividend.get_sign() % divisor.get_sign();
-       if (divisor.get_sign() == 0)
+       remainder = dividend._sign % divisor._sign;
+       if (divisor._sign == 0)
            throw DivideByZero();
-       return dividend.get_sign() / divisor.get_sign();
+       return dividend._sign / divisor._sign;
    }
 
    if (trivialDividend)
@@ -739,10 +739,10 @@ BigInteger BigInteger::div_rem(BigInteger& dividend, BigInteger& divisor, BigInt
    {
        uint32_t rest;
        uint_array rbits = dividend.get_bits();
-       uint_array bits = BigIntegerCalculator::divide(rbits, std::abs(divisor.get_sign()), rest);
+       uint_array bits = BigIntegerCalculator::divide(rbits, std::abs(divisor._sign), rest);
 
-       remainder = dividend.get_sign() < 0 ? -1 * rest : rest;
-       return BigInteger(bits, (dividend.get_sign() < 0) ^ (divisor.get_sign() < 0));
+       remainder = dividend._sign < 0 ? -1 * rest : rest;
+       return BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
    }
 
    assert(!divisor.get_bits().empty());
@@ -759,8 +759,8 @@ BigInteger BigInteger::div_rem(BigInteger& dividend, BigInteger& divisor, BigInt
        uint_array rbits = divisor.get_bits();
        uint_array bits = BigIntegerCalculator::divide(lbits, rbits, rest);
 
-       remainder = BigInteger(rest, dividend.get_sign() < 0);
-       return BigInteger(bits, (dividend.get_sign() < 0) ^ (divisor.get_sign() < 0));
+       remainder = BigInteger(rest, dividend._sign < 0);
+       return BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
    }
 }
 
@@ -937,11 +937,6 @@ int BigInteger::sign() const
     return (_sign >> (kcbitUint - 1)) - (-_sign >> (kcbitUint - 1));
 }
 
-int BigInteger::get_sign() const
-{
-    return _sign;
-}
-
 uint_array BigInteger::get_bits() const
 {
     return _bits;
@@ -986,13 +981,13 @@ bool BigInteger::get_parts_for_bit_manipulation(const BigInteger& x, uint_array&
 {
     if (x.get_bits().size() == 0)
     {
-        if (x.get_sign() < 0)
+        if (x._sign < 0)
         {
-            xd.push_back(static_cast<uint32_t>(-x.get_sign()));
+            xd.push_back(static_cast<uint32_t>(-x._sign));
         }
         else
         {
-            xd.push_back(static_cast<uint32_t>(x.get_sign()));
+            xd.push_back(static_cast<uint32_t>(x._sign));
         }
     }
     else
@@ -1000,7 +995,7 @@ bool BigInteger::get_parts_for_bit_manipulation(const BigInteger& x, uint_array&
         xd = x.get_bits();
     }
     xl = (x.get_bits().size() == 0 ? 1 : x.get_bits().size());
-    return x.get_sign() < 0;
+    return x._sign < 0;
 }
 
 BigInteger operator<<(BigInteger lhs, const int shift) {
@@ -1221,15 +1216,15 @@ BigInteger& BigInteger::operator&=(const BigInteger& rhs)
 
     if (lhs.get_bits().size() == 0 && rhs.get_bits().size() == 0)
     {
-        *this = lhs.get_sign() & rhs.get_sign();
+        *this = lhs._sign & rhs._sign;
         return *this;
     }
 
     uint_array x = lhs.to_uint32_array();
     uint_array y = rhs.to_uint32_array();
     uint_array z(std::max(x.size(), y.size()), 0);
-    uint xExtend = (lhs.get_sign() < 0) ? std::numeric_limits<uint32_t>::max() : 0;
-    uint yExtend = (rhs.get_sign() < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+    uint xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+    uint yExtend = (rhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
 
     for (size_t i = 0; i < z.size(); i++)
     {
