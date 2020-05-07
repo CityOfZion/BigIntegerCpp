@@ -109,7 +109,8 @@ class BigInteger {
         BigInteger operator ~();
 
         enum GetBytesMode { AllocateArray, Count }; // currently AllocateArray only
-        int sign() const;
+        int sign() const; // equals the C# sign property. Returns negative, zero or positive
+        int sign_internal() const { return _sign; }; // return the actual internal _sign value
         uint_array get_bits() const;
         int get_hash_code() const;
 
