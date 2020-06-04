@@ -41,7 +41,8 @@ add_executable(
         divide.cpp
         multiply.cpp
         absolutevalue.cpp
-        divrem.cpp)
+        divrem.cpp
+        gcd.cpp)
 
 target_link_libraries(
         unit_tests

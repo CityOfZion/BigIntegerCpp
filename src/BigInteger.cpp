@@ -717,9 +717,9 @@ BigInteger BigInteger::div_rem(BigInteger& dividend, BigInteger& divisor, BigInt
 
    if (trivialDividend && trivialDivisor)
    {
-       remainder = dividend._sign % divisor._sign;
        if (divisor._sign == 0)
            throw DivideByZero();
+       remainder = dividend._sign % divisor._sign;
        return dividend._sign / divisor._sign;
    }
 
@@ -1731,7 +1731,7 @@ BigInteger BigInteger::greatest_common_divisor(const BigInteger& left, const Big
     if (trivialRight)
     {
         assert(!left._bits.empty());
-        if (left._sign != 0) {
+        if (right._sign != 0) {
             auto result = BigIntegerCalculator::gcd(left._bits, std::abs(right._sign));
             return BigInteger{result};
         } else {
