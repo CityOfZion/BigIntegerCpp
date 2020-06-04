@@ -39,7 +39,8 @@ add_executable(
         log02.cpp
         log10.cpp
         divide.cpp
-        multiply.cpp)
+        multiply.cpp
+        absolutevalue.cpp)
 
 target_link_libraries(
         unit_tests
