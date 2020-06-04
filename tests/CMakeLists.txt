@@ -37,7 +37,8 @@ add_executable(
         modpow.cpp
         log.cpp
         log02.cpp
-        log10.cpp)
+        log10.cpp
+divide.cpp)
 
 target_link_libraries(
         unit_tests
