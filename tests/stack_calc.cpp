@@ -32,7 +32,7 @@ bool StackCalc::DoNextOperation() {
     op = operators.front();
     operators.pop();
 
-    if (op.rfind("u") == 0) {
+    if (op.rfind("u", 0) == 0) {
         checkValues = true;
 
         snnum1 = snCalc.top();
@@ -44,7 +44,7 @@ bool StackCalc::DoNextOperation() {
         myCalc.push(MyBigIntImp::DoUnaryOperatorMine(mynum1, op));
 
         ret = true;
-    } else if (op.rfind("b") == 0) {
+    } else if (op.rfind("b", 0) == 0) {
         checkValues = true;
         snnum1 = snCalc.top();
         snCalc.pop();
@@ -59,7 +59,7 @@ bool StackCalc::DoNextOperation() {
         myCalc.push(MyBigIntImp::DoBinaryOperatorMine(mynum1, mynum2, op, &_myOut));
 
         ret = true;
-    } else if (op.rfind("t") == 0) {
+    } else if (op.rfind("t", 0) == 0) {
         checkValues = true;
         snnum1 = snCalc.top();
         snCalc.pop();

@@ -38,7 +38,8 @@ add_executable(
         log.cpp
         log02.cpp
         log10.cpp
-divide.cpp)
+        divide.cpp
+        multiply.cpp)
 
 target_link_libraries(
         unit_tests
