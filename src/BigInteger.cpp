@@ -1230,9 +1230,9 @@ BigInteger& BigInteger::operator&=(const BigInteger& rhs)
     return *this;
 }
 
-BigInteger BigInteger::negate(BigInteger& value)
+BigInteger BigInteger::negate(const BigInteger& value)
 {
-    return -value;
+    return BigInteger(-value._sign, value._bits);
 }
 
 int Compare(BigInteger& lhs, BigInteger& rhs)

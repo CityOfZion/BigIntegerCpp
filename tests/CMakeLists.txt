@@ -42,7 +42,8 @@ add_executable(
         multiply.cpp
         absolutevalue.cpp
         divrem.cpp
-        gcd.cpp)
+        gcd.cpp
+        properties.cpp)
 
 target_link_libraries(
         unit_tests

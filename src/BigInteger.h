@@ -54,7 +54,7 @@ class BigInteger {
         static BigInteger parse(std::string value);
         static bool try_parse(std::string value, BigInteger& result);
 
-        static BigInteger negate(BigInteger& value);
+        static BigInteger negate(const BigInteger& value);
         static BigInteger abs(BigInteger& value);
 
         static double log(const BigInteger& value);
