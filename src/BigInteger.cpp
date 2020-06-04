@@ -16,8 +16,6 @@ const BigInteger BigInteger::s_bnOneInt = BigInteger(1);
 const BigInteger BigInteger::s_bnZeroInt = BigInteger(0);
 const BigInteger BigInteger::s_bnMinusOneInt = BigInteger(-1);
 
-const double double_NaN = static_cast<double>(0.0)/static_cast<double>(0.0);
-
 
 BigInteger::BigInteger()
 {
@@ -1600,21 +1598,21 @@ BigInteger::operator float() {
 }
 
 double BigInteger::log(const BigInteger& value) {
-    return log(value, 2.7182818284590451);
+    return BigInteger::log(value, 2.7182818284590451);
 }
 
 double BigInteger::log(const BigInteger& value, double baseValue) {
     if (value._sign < 0 || baseValue == 1.0)
-        return double_NaN;
+        return std::nan("");
 
     if (baseValue == std::numeric_limits<double>::infinity())
-        return value.is_one() ? 0.0 : double_NaN;
+        return value.is_one() ? 0.0 : std::nan("");
 
     if (baseValue == 0.0 && !value.is_one())
-        return double_NaN;
+        return std::nan("");
 
     if (value._bits.empty())
-        return log(value._sign) / log(baseValue);
+        return NumericsHelpers::csharp_log_wrapper(value._sign, baseValue);
 
     uint64_t h = value._bits[value._bits.size() - 1];
     uint64_t m = value._bits.size() > 1 ? value._bits[value._bits.size() - 2] : 0;
@@ -1624,11 +1622,11 @@ double BigInteger::log(const BigInteger& value, double baseValue) {
     int64_t b = static_cast<int64_t>(value._bits.size() * 32 - c);
 
     uint64_t x = (h << (32 + c)) | (m << c) | (l >> (32 - c));
-    return (log(x) / log(baseValue)) + (b - 64) / log2(baseValue);
+    return NumericsHelpers::csharp_log_wrapper(x, baseValue) + (b - 64) / NumericsHelpers::csharp_log_wrapper(baseValue, 2);
 }
 
 double BigInteger::log10(const BigInteger& value) {
-    return log(value, 10);
+    return BigInteger::log(value, 10);
 }
 
 BigInteger BigInteger::pow(const BigInteger& value, int exponent) {

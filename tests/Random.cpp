@@ -15,3 +15,7 @@ void Random::NextBytes(byte_array& buffer) {
     for (auto& element : buffer)
         element = static_cast<byte>(Next(0, 0x7f));
 }
+
+double Random::NextDouble() {
+    return Next() * (1.0 / std::numeric_limits<int>::max());
+}

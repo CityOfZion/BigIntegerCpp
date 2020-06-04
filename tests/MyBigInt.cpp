@@ -1,4 +1,5 @@
 #include <bitset>
+#include <NumericsHelpers.h>
 #include "MyBigInt.h"
 #include "BitArray.h"
 
@@ -44,7 +45,7 @@ BigInteger MyBigIntImp::DoUnaryOperatorMine(BigInteger num1, std::string op) {
                 num1 = num1 / b10;
             }
         }
-        result = log10((double)num1);
+        result = NumericsHelpers::csharp_log_wrapper((double)num1, 10);
         if (factor > 100)
         {
             for (int i = 0; i < factor - 100; i++)
@@ -63,12 +64,12 @@ BigInteger MyBigIntImp::DoUnaryOperatorMine(BigInteger num1, std::string op) {
                 num1 = num1 / b10;
             }
         }
-        result = log((double)num1);
+        result = std::log((double)num1);
         if (factor > 100)
         {
             for (int i = 0; i < factor - 100; i++)
             {
-                result = result + log(10);
+                result = result + std::log(10);
             }
         }
         return ApproximateBigInteger(result);
@@ -128,7 +129,7 @@ BigInteger MyBigIntImp::DoBinaryOperatorMine(BigInteger num1, BigInteger num2, s
     } else if (op == "b&") {
         return BigInteger(And(bytes1, bytes2));
     } else if (op == "bLog") {
-        return ApproximateBigInteger(log((double)num1) / log((double)num2));
+        return ApproximateBigInteger(NumericsHelpers::csharp_log_wrapper((double)num1, (double)num2));
     } else if (op == "bGCD") {
         return BigInteger(GCD(bytes1, bytes2));
     } else if (op == "bPow") {
@@ -571,7 +572,7 @@ double round_up(double value, int decimal_places) {
 
 BigInteger MyBigIntImp::ApproximateBigInteger(double value) {
     //Special case values;
-    if (BigInteger::double_IsNaN(value))
+    if (isnan(value))
     {
         return BigInteger(-101);
     }

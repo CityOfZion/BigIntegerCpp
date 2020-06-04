@@ -1,7 +1,17 @@
 #pragma once
 
+#include <BigInteger.h>
+#include <cmath>
+
 class NumericsHelpers {
     public:
+
+    static int cbit_high_zero(uint64_t uu)
+    {
+        if ((uu & 0xFFFFFFFF00000000) == 0)
+            return 32 + cbit_high_zero(static_cast<unsigned int>(uu));
+        return cbit_high_zero(static_cast<unsigned int>((uu >> 32)));
+    }
 
     static int cbit_high_zero(unsigned int u)
     {
@@ -35,8 +45,10 @@ class NumericsHelpers {
     }
 
     struct DoubleULong {
-        double dbl;
-        uint64_t uu;
+        union {
+            uint64_t uu;
+            double dbl;
+        };
     };
 
     static double get_double_from_parts(int sign, int exp, uint64_t man) {
@@ -134,6 +146,30 @@ class NumericsHelpers {
     }
 
     static int combine_hash(int n1, int n2) {
-        return static_cast<int>(combine_hash(static_cast<uint>(n1), static_cast<uint>(n2)));
+        return static_cast<int>(combine_hash(static_cast<unsigned int>(n1), static_cast<unsigned int>(n2)));
+    }
+
+    static double csharp_log_wrapper(double a, double newBase) {
+        if (isnan(a))
+        {
+            return a; // IEEE 754-2008: NaN payload must be preserved
+        }
+
+        if (isnan(newBase))
+        {
+            return newBase; // IEEE 754-2008: NaN payload must be preserved
+        }
+
+        if (newBase == 1)
+        {
+            return nan("");
+        }
+
+        if ((a != 1) && ((newBase == 0) || BigInteger::double_IsInfinity(newBase)))
+        {
+            return nan("");
+        }
+
+        return (std::log(a) / std::log(newBase));
     }
 };

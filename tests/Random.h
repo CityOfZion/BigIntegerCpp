@@ -8,6 +8,7 @@ public:
     int Next() { return abs(static_cast<int>(engine())); };
     int Next(int min, int max);
 
+    double NextDouble();
     void NextBytes(std::vector<unsigned char>& vector);
 
 private:
