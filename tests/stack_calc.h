@@ -22,6 +22,7 @@ public:
 
     StackCalc(const std::string& _input);
     bool DoNextOperation();
+    void VerifyOutParameter();
 
 private:
     BigInteger _snOut{0};

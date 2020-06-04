@@ -215,4 +215,10 @@ BigInteger StackCalc::DoTertanaryOperatorSN(BigInteger num1, BigInteger num2, Bi
     }
 }
 
+void StackCalc::VerifyOutParameter() {
+    assert(_snOut == _myOut);
+    _snOut = 0;
+    _myOut = 0;
+}
+
 

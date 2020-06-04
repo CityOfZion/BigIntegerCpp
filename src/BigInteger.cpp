@@ -731,8 +731,6 @@ BigInteger BigInteger::div_rem(BigInteger& dividend, BigInteger& divisor, BigInt
        return BigInteger::zero();
    }
 
-   assert(dividend.get_bits().empty());
-
    if (trivialDivisor)
    {
        uint32_t rest;
@@ -742,8 +740,6 @@ BigInteger BigInteger::div_rem(BigInteger& dividend, BigInteger& divisor, BigInt
        remainder = dividend._sign < 0 ? -1 * rest : rest;
        return BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
    }
-
-   assert(!divisor.get_bits().empty());
 
    if (dividend.get_bits().size() < divisor.get_bits().size())
    {
