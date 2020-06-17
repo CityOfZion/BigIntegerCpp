@@ -41,7 +41,7 @@ The output should be similar to
 
 ## Including in your CMake project
 
-
+TODO
 
 ## FAQ
 1) Why this project? 
@@ -57,9 +57,3 @@ The output should be similar to
 3) How fast is it?
     
     We don't know. The focus has been on conformity to the C# BigInteger class, not on speed. If you want speed you might want to look at https://gmplib.org/
-     
-    
-    mkdir build 
-    cd build; cmake ..
-    cmake --build .
-    ./bin/unit_tests
