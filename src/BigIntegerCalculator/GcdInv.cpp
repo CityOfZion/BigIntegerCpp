@@ -1,4 +1,4 @@
-#include "BigIntegerCalculator.h"
+#include "../../include/BigIntegerCalculator.h"
 #include <cassert>
 
 uint32_t BigIntegerCalculator::gcd(uint32_t left, uint32_t right) {

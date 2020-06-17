@@ -1,5 +1,5 @@
-#include "FastReducer.h"
-#include "BigIntegerCalculator.h"
+#include "../../include/FastReducer.h"
+#include "../../include/BigIntegerCalculator.h"
 
 FastReducer::FastReducer(uint_array modulus) {
     uint_array r(modulus.size() * 2 + 1, 0);

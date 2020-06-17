@@ -1,7 +1,7 @@
-#include "../src/BigInteger.h"
+#include "../include/public/BigInteger.h"
 #include "gtest/gtest.h"
 #include <string>
-#include <NumericsHelpers.h>
+#include "../include/NumericsHelpers.h"
 #include "stack_calc.h"
 #include "Random.h"
 
@@ -53,8 +53,8 @@ static std::string Print(byte_array bytes) {
 
 static bool ApproxEqual(double value1, double value2) {
     //Special case values;
-    if (isnan(value1)) {
-        return isnan(value2);
+    if (std::isnan(value1)) {
+        return std::isnan(value2);
     }
     if (value1 == -std::numeric_limits<double>::infinity()) {
         return value2 == -std::numeric_limits<double>::infinity();
@@ -136,7 +136,7 @@ TEST(log_tests, log) {
         while (bi == b1) {
             bi = BigInteger(GetRandomPosByteArray(s_random, 8));
         }
-        ASSERT_TRUE((isnan(BigInteger::log(bi, 0))));
+        ASSERT_TRUE((std::isnan(BigInteger::log(bi, 0))));
     }
 
     // Log Method - base = 1
@@ -152,7 +152,7 @@ TEST(log_tests, log) {
 
     // Log Method - base = +Infinity
     for (int i = 0; i < s_samples; i++) {
-        ASSERT_TRUE(isnan(BigInteger::log(BigInteger(GetRandomByteArray(s_random, 10)), std::numeric_limits<double>::infinity())));
+        ASSERT_TRUE(std::isnan(BigInteger::log(BigInteger(GetRandomByteArray(s_random, 10)), std::numeric_limits<double>::infinity())));
     }
 
     // Log Method - Log(0,1)
@@ -163,7 +163,7 @@ TEST(log_tests, log) {
         tempByteArray1 = GetRandomByteArray(s_random, 10);
         tempByteArray2 = GetRandomNegByteArray(s_random, 1);
         VerifyLogString(Print(tempByteArray2) + Print(tempByteArray1) + "bLog");
-        ASSERT_TRUE(isnan(
+        ASSERT_TRUE(std::isnan(
                 BigInteger::log(BigInteger(GetRandomByteArray(s_random, 10)), -s_random.NextDouble())));
     }
 

@@ -1,3 +1,14 @@
+if (NOT GTEST_FOUND)
+    FetchContent_Declare(
+            googletest
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG        release-1.10.0
+    )
+    FetchContent_MakeAvailable(googletest)
+endif()
+
+enable_testing()
+
 add_executable(
         unit_tests
         bigint_test_sa.cpp
@@ -10,7 +21,6 @@ add_executable(
         Random.h
         BitArray.cpp
         BitArray.h
-        scratch_test.cpp
         stack_calc.cpp
         utils.h
         utils.cpp
@@ -48,12 +58,12 @@ add_executable(
 target_link_libraries(
         unit_tests
         gtest_main
-        BigInteger
+        $<TARGET_OBJECTS:BigIntegerCpp-obj>
 )
 
 add_test(
         NAME
         add
         COMMAND
-        ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/unit_tests
+        ${CMAKE_BINARY_DIR}/tests/unit_tests
 )

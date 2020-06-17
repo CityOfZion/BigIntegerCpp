@@ -1,5 +1,5 @@
 #pragma once
-#include "BigInteger.h"
+#include "../include/public/BigInteger.h"
 #include "Random.h"
 #include "BitArray.h"
 #include <string>

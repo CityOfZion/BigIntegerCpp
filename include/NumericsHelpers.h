@@ -1,6 +1,6 @@
 #pragma once
 
-#include <BigInteger.h>
+#include "public/BigInteger.h"
 #include <cmath>
 
 class NumericsHelpers {

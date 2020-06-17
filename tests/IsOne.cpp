@@ -1,4 +1,4 @@
-#include "../src/BigInteger.h"
+#include "../include/public/BigInteger.h"
 #include "gtest/gtest.h"
 #include "Random.h"
 #include "stack_calc.h"

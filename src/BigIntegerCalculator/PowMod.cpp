@@ -1,7 +1,7 @@
 #include <stdexcept>
-#include "BigIntegerCalculator.h"
-#include "BitsBuffer.h"
-#include "exceptions.h"
+#include "../../include/BigIntegerCalculator.h"
+#include "../../include/BitsBuffer.h"
+#include "../../include/exceptions.h"
 
 uint_array BigIntegerCalculator::pow(uint32_t value, uint32_t power) {
     int size = pow_bound(power, 1, 1);

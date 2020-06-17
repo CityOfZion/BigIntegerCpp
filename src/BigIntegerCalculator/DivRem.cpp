@@ -1,6 +1,6 @@
-#include "BigIntegerCalculator.h"
+#include "../../include/BigIntegerCalculator.h"
 #include <cassert>
-#include <exceptions.h>
+#include "../../include/exceptions.h"
 
 uint_array BigIntegerCalculator::divide(uint_array& lhs, uint32_t rhs, uint32_t& remainder)
 {

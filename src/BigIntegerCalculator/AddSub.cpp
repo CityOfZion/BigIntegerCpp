@@ -1,4 +1,4 @@
-#include "BigIntegerCalculator.h"
+#include "../../include/BigIntegerCalculator.h"
 #include <cassert>
 
 uint_array BigIntegerCalculator::add(const uint_array& lhs, uint32_t rhs)

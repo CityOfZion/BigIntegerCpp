@@ -1,7 +1,7 @@
 #include <variant>
 #include <vector>
 #include <math.h>
-#include "../src/BigInteger.h"
+#include "../include/public/BigInteger.h"
 #include "gtest/gtest.h"
 
 TEST(byte_array, int_byte_array)

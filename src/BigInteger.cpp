@@ -1,7 +1,7 @@
-#include "BigInteger.h"
-#include "BigNumber.h"
-#include "NumericsHelpers.h"
-#include "exceptions.h"
+#include "../include/public/BigInteger.h"
+#include "../include/BigNumber.h"
+#include "../include/NumericsHelpers.h"
+#include "../include/exceptions.h"
 
 #include <limits>
 #include <cassert>
@@ -9,7 +9,7 @@
 #include <any>
 #include <iostream>
 #include <cmath>
-#include <BigIntegerCalculator/BigIntegerCalculator.h>
+#include "../include/BigIntegerCalculator.h"
 
 const BigInteger BigInteger::s_bnMinInt = BigInteger(-1, uint_array {kuMaskHighBit});
 const BigInteger BigInteger::s_bnOneInt = BigInteger(1);

@@ -1,7 +1,7 @@
 #include <pybind11/pybind11.h>
 
 #include <pybind11/stl.h>
-#include "../src/BigInteger.h"
+#include "../../include/public/BigInteger.h"
 #include <chrono>
 
 namespace py = pybind11;
@@ -26,6 +26,7 @@ BigInteger to_biginteger(py::int_& value) {
 //    if (value.is(py::int_(0))) {
 //        return BigInteger::zero();
 //    } else if (value < py::int_(0)) {
+//        TODO: have a close look at to why we'ree doing 1+ std:;floor etc see which does not do 1+: https://docs.python.org/3.3/library/stdtypes.html?highlight=to_bytes#int.to_bytes
 //        size_t n_bytes = 1 + std::floor(((_PyLong_NumBits(value.ptr()) + 7) / 8));
 //        std::vector<unsigned char> buffer(n_bytes, 0);
 //        if (_PyLong_AsByteArray((PyLongObject *)value.ptr(), buffer.data(), n_bytes, 1, 1) < 0) {

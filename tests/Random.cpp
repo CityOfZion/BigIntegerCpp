@@ -1,5 +1,5 @@
 #include <stdexcept>
-#include <BigInteger.h>
+#include "../include/public/BigInteger.h"
 #include "Random.h"
 
 int Random::Next(int min, int max) {

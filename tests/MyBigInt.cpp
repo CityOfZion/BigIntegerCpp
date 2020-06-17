@@ -1,5 +1,5 @@
 #include <bitset>
-#include <NumericsHelpers.h>
+#include "../include/NumericsHelpers.h"
 #include "MyBigInt.h"
 #include "BitArray.h"
 

@@ -1,5 +1,7 @@
 import unittest
 from collections import abc
+import sys
+sys.path.append('/Users/erik/Documents/code/BigIntegerCpp/build/bindings/pybiginteger/')
 from pybiginteger import BigInteger
 
 

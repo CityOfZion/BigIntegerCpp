@@ -1,9 +1,9 @@
-#include "../src/BigInteger.h"
+#include "../include/public/BigInteger.h"
 #include "gtest/gtest.h"
 #include "Random.h"
 #include "stack_calc.h"
 #include "utils.h"
-#include "../src/exceptions.h"
+#include "../include/exceptions.h"
 
 static byte_array GetRandomByteArray(Random random) {
     return MyBigIntImp::GetRandomByteArray(random, random.Next(0, 1024));

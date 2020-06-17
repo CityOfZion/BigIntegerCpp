@@ -1,5 +1,5 @@
-#include "BitsBuffer.h"
-#include "BigIntegerCalculator.h"
+#include "../../include/BitsBuffer.h"
+#include "../../include/BigIntegerCalculator.h"
 
 BitsBuffer::BitsBuffer(int size, uint32_t value) {
     _length = value != 0 ? 1 : 0;

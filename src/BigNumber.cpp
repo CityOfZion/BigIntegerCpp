@@ -1,6 +1,6 @@
-#include "BigNumber.h"
-#include "BigInteger.h"
-#include "NumericsHelpers.h"
+#include "../include/BigNumber.h"
+#include "../include/public/BigInteger.h"
+#include "../include/NumericsHelpers.h"
 #include <sstream>
 #include <limits>
 #include <cassert>

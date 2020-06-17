@@ -1,9 +1,9 @@
-#include "../src/BigInteger.h"
+#include "../include/public/BigInteger.h"
 #include "gtest/gtest.h"
 #include "Random.h"
 #include "stack_calc.h"
 #include "utils.h"
-#include "../src/exceptions.h"
+#include "../include/exceptions.h"
 
 static void VerifyDivideString(std::string opstring) {
     StackCalc sc(opstring);
