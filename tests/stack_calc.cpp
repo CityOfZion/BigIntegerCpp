@@ -1,4 +1,5 @@
 #include "stack_calc.h"
+#include <cassert>
 
 StackCalc::StackCalc(const std::string& _input) {
     std::string delimiter = " ";

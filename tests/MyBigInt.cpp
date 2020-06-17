@@ -572,7 +572,7 @@ double round_up(double value, int decimal_places) {
 
 BigInteger MyBigIntImp::ApproximateBigInteger(double value) {
     //Special case values;
-    if (isnan(value))
+    if (std::isnan(value))
     {
         return BigInteger(-101);
     }

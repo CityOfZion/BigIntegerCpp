@@ -150,24 +150,24 @@ class NumericsHelpers {
     }
 
     static double csharp_log_wrapper(double a, double newBase) {
-        if (isnan(a))
+        if (std::isnan(a))
         {
             return a; // IEEE 754-2008: NaN payload must be preserved
         }
 
-        if (isnan(newBase))
+        if (std::isnan(newBase))
         {
             return newBase; // IEEE 754-2008: NaN payload must be preserved
         }
 
         if (newBase == 1)
         {
-            return nan("");
+            return std::nan("");
         }
 
         if ((a != 1) && ((newBase == 0) || BigInteger::double_IsInfinity(newBase)))
         {
-            return nan("");
+            return std::nan("");
         }
 
         return (std::log(a) / std::log(newBase));

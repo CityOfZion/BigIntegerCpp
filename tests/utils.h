@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 std::string BuildRandomNumber(int maxdigits, int seed);
 
