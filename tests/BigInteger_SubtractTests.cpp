@@ -13,8 +13,8 @@ TEST(unary, unary_minus)
 
     int intMinValue = std::numeric_limits<int>::min();
     int intMaxValue = std::numeric_limits<int>::max();
-    long long llongMinValue = std::numeric_limits<long long>::min();
-    long long llongMaxValue = std::numeric_limits<long long>::max();
+    int64_t llongMinValue = std::numeric_limits<int64_t>::min();
+    int64_t llongMaxValue = std::numeric_limits<int64_t>::max();
 
     BigInteger largePositiveBigInt = BigInteger::parse(
             "123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123123");

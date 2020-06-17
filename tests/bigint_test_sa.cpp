@@ -41,8 +41,8 @@ TEST(simple_arithmetic, simple_mul)
 
 TEST(simple_arithmetic, simple_mul_big)
 {
-    BigInteger a = 9899809879LL;
-    BigInteger b = 9878980980LL;
+    BigInteger a = static_cast<int64_t>(9899809879);
+    BigInteger b = static_cast<int64_t>(9878980980);
     BigInteger c;
     BigInteger result = BigInteger::parse("97800033500257101420");
 
@@ -53,8 +53,8 @@ TEST(simple_arithmetic, simple_mul_big)
 
 TEST(simple_arithmetic, simple_mul_big_2)
 {
-    BigInteger a = -9899809879LL;
-    BigInteger b = -9878980980LL;
+    BigInteger a = static_cast<int64_t>(-9899809879);
+    BigInteger b = static_cast<int64_t>(-9878980980);
     BigInteger c;
     BigInteger result = BigInteger::parse("97800033500257101420");
 
@@ -65,8 +65,8 @@ TEST(simple_arithmetic, simple_mul_big_2)
 
 TEST(simple_arithmetic, simple_mul_big_3)
 {
-    BigInteger a = 9899809879LL;
-    BigInteger b = -9878980980LL;
+    BigInteger a = static_cast<int64_t>(9899809879);
+    BigInteger b = static_cast<int64_t>(-9878980980);
     BigInteger c;
     BigInteger result = BigInteger::parse("-97800033500257101420");
 
@@ -134,8 +134,8 @@ TEST(simple_arithmetic, simple_div)
 
 TEST(simple_arithmetic, simple_div_big)
 {
-    BigInteger a = 892374832784LL;
-    BigInteger b = 3294723897LL;
+    BigInteger a = static_cast<int64_t>(892374832784);
+    BigInteger b = static_cast<int64_t>(3294723897);
     BigInteger c;
     BigInteger result = 270;
 
@@ -146,8 +146,8 @@ TEST(simple_arithmetic, simple_div_big)
 
 TEST(simple_arithmetic, simple_div_big_2)
 {
-    BigInteger a = -892374832784LL;
-    BigInteger b = -3294723897LL;
+    BigInteger a = static_cast<int64_t>(-892374832784);
+    BigInteger b = static_cast<int64_t>(-3294723897);
     BigInteger c;
     BigInteger result = 270;
 
@@ -158,8 +158,8 @@ TEST(simple_arithmetic, simple_div_big_2)
 
 TEST(simple_arithmetic, simple_div_big_3)
 {
-    BigInteger a = -892374832784LL;
-    BigInteger b = 3294723897LL;
+    BigInteger a = static_cast<int64_t>(-892374832784);
+    BigInteger b = static_cast<int64_t>(3294723897);
     BigInteger c;
     BigInteger result = -270;
 
@@ -241,7 +241,7 @@ TEST(simple_arithmetic, simple_mod)
 
 TEST(simple_arithmetic, simple_mod_big)
 {
-    BigInteger a = 2834789327894723894LL;
+    BigInteger a = static_cast<int64_t>(2834789327894723894);
     BigInteger b = 7123;
     BigInteger c;
     BigInteger result = 64;
@@ -253,7 +253,7 @@ TEST(simple_arithmetic, simple_mod_big)
 
 TEST(simple_arithmetic, simple_mod_big_2)
 {
-    BigInteger a = 2834789327894723894LL;
+    BigInteger a = static_cast<int64_t>(2834789327894723894);
     BigInteger b = 7123;
     BigInteger c;
     BigInteger result = 7123;
@@ -265,7 +265,7 @@ TEST(simple_arithmetic, simple_mod_big_2)
 
 TEST(simple_arithmetic, simple_mod_big_3)
 {
-    BigInteger a = -2834789327894723894LL;
+    BigInteger a = static_cast<int64_t>(-2834789327894723894);
     BigInteger b = 7123;
     BigInteger c;
     BigInteger result = -64;
@@ -277,8 +277,8 @@ TEST(simple_arithmetic, simple_mod_big_3)
 
 TEST(simple_arithmetic, simple_mod_big_4)
 {
-    BigInteger a = -2834789327894723894LL;
-    BigInteger b = -2834789327894723894LL;
+    BigInteger a = static_cast<int64_t>(-2834789327894723894);
+    BigInteger b = static_cast<int64_t>(-2834789327894723894);
     BigInteger c;
     BigInteger result = 0;
 
@@ -289,8 +289,8 @@ TEST(simple_arithmetic, simple_mod_big_4)
 
 TEST(simple_arithmetic, simple_mod_big_5)
 {
-    BigInteger a = -2834789327894723894LL;
-    BigInteger b = 2834789327894723894LL;
+    BigInteger a = static_cast<int64_t>(-2834789327894723894);
+    BigInteger b = static_cast<int64_t>(2834789327894723894);
     BigInteger c;
     BigInteger result = 0;
 

@@ -181,10 +181,10 @@ TEST(binary, binary_plus)
                             , BigInteger::zero()
                             ));
 
-    long long a = pow(2,31) + pow(2,30);
+    int64_t a = pow(2,31) + pow(2,30);
     data.push_back(BigIntTup(BigInteger(a)
                             ,BigInteger(a)
-                            ,BigInteger(6442450944LL)
+                            ,BigInteger(static_cast<int64_t>(6442450944LL))
                             ));
 
     a = pow(2,32);
