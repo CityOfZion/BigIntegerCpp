@@ -1,3 +1,5 @@
+![](https://raw.githubusercontent.com/CityOfZion/visual-identity/develop/_CoZ%20Branding/_Logo/_Logo%20icon/_PNG%20200x178px/CoZ_Icon_DARKBLUE_200x178px.png)
+    
 # BigIntegerCpp
 A C++ port of the [C# BigInteger](https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger?view=netcore-3.1) class, with bindings for Python.
 
