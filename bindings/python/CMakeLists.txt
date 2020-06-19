@@ -9,9 +9,8 @@ if (NOT pybind11_FOUND)
     )
     FetchContent_MakeAvailable(pybind11)
 endif()
-# copy files into a python package to make it easy to build a wheel
-configure_file(__init__.py ${CMAKE_CURRENT_BINARY_DIR}/pybiginteger/__init__.py)
-configure_file(setup.py ${CMAKE_CURRENT_BINARY_DIR}/pybiginteger/setup.py)
+# copy files into a folder to make it easy to build a wheel
+configure_file(setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/pybiginteger/setup.py)
 
 # create a monolith module
 # saves us a lot of pain when creating a wheel later on

@@ -68,45 +68,45 @@ endif()
 # Installation
 
 
-include(GNUInstallDirs)
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/BigIntegerCpp)
-
-install(TARGETS BigIntegerCpp-obj
-        EXPORT BigIntegerCpp-targets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} # shared
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} # static
-)
-
-set_target_properties(BigIntegerCpp-obj PROPERTIES EXPORT_NAME BigIntegerCpp)
-
-install(DIRECTORY include/public DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-install(EXPORT BigIntegerCpp-targets
-        FILE
-        BigIntegerCppTargets.cmake
-        DESTINATION
-        ${INSTALL_CONFIGDIR}
-        )
-
-#Create a ConfigVersion.cmake file
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-        ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfigVersion.cmake
-        VERSION ${PROJECT_VERSION}
-        COMPATIBILITY AnyNewerVersion
-)
-
-configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/BigIntegerCppConfig.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfig.cmake
-        INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
-        )
-
-#Install the config, configversion and custom find modules
-install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfig.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfigVersion.cmake
-        DESTINATION ${INSTALL_CONFIGDIR}
-        )
-
-export(EXPORT BigIntegerCpp-targets
-        FILE ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppTargets.cmake)
+#include(GNUInstallDirs)
+#set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/BigIntegerCpp)
+#
+#install(TARGETS BigIntegerCpp-obj
+#        EXPORT BigIntegerCpp-targets
+#        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} # shared
+#        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} # static
+#)
+#
+#set_target_properties(BigIntegerCpp-obj PROPERTIES EXPORT_NAME BigIntegerCpp)
+#
+#install(DIRECTORY include/public DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+#
+#install(EXPORT BigIntegerCpp-targets
+#        FILE
+#        BigIntegerCppTargets.cmake
+#        DESTINATION
+#        ${INSTALL_CONFIGDIR}
+#        )
+#
+##Create a ConfigVersion.cmake file
+#include(CMakePackageConfigHelpers)
+#write_basic_package_version_file(
+#        ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfigVersion.cmake
+#        VERSION ${PROJECT_VERSION}
+#        COMPATIBILITY AnyNewerVersion
+#)
+#
+#configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/BigIntegerCppConfig.cmake.in
+#        ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfig.cmake
+#        INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+#        )
+#
+##Install the config, configversion and custom find modules
+#install(FILES
+#        ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfig.cmake
+#        ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfigVersion.cmake
+#        DESTINATION ${INSTALL_CONFIGDIR}
+#        )
+#
+#export(EXPORT BigIntegerCpp-targets
+#        FILE ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppTargets.cmake)
