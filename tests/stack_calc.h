@@ -7,7 +7,7 @@
 #include <iterator>
 #include <list>
 
-#include "../include/public/BigInteger.h"
+#include "../include/public/bigintegercpp/BigInteger.h"
 #include "MyBigInt.h"
 
 using string_array = std::vector<std::string>;

@@ -20,7 +20,7 @@ You can define various options during the configure stage to control the output
 |-----------------------|---------|------------------------------|
 | BUILD_SHARED_LIB      | ON      |                              |
 | BUILD_STATIC_LIB      | OFF     |                              |
-| BUILD_TESTS           | OFF     |                              |
+| BUILD_TESTSING        | OFF     |                              |
 | BUILD_PYTHON_BINDINGS | OFF     | For more information go [here](bindings/python/README.md) |
 
 ### Running the tests
@@ -42,9 +42,28 @@ The output should be similar to
     [  PASSED  ] 117 tests.
 
 ## Including in your CMake project
+   The project can be included in 2 ways
 
-TODO
+    add_subdirectory(BigIntegerCpp)
+    
+or if it has been installed via `make install` you can use
 
+    find_library(bigintegercpp)
+   
+It is possible to build both a `SHARED` and `STATIC` library simultaneously, as such 2 link targets exists to differentiate between them, respectively
+
+    BigIntegerCpp::BigIntegerCpp
+    BigIntegerCpp::BigIntegerCpp-static
+
+To use in your target add
+
+    target_include_directories(your_target PUBLIC ${bigintegercpp_INCLUDE_DIRS})
+    target_link_libraries(your_target PRIVATE BigIntegerCpp::BigIntegerCpp)
+    
+Source.cpp
+
+    #include <bigintegercpp/BigInteger.h>
+    
 ## FAQ
 1) Why this project? 
 

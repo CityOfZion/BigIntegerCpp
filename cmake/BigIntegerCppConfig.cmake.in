@@ -1,0 +1,11 @@
+@PACKAGE_INIT@
+
+set_and_check(BigIntegerCpp_INCLUDE_DIR "@PACKGE_INCLUDE_INSTALL_DIR@")
+
+get_filename_component(BigIntegerCpp_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+if(NOT TARGET BigIntegerCpp::BigIntegerCpp)
+    message(STATUS "Trying to include targets from: ${BigIntegerCpp_CMAKE_DIR}")
+    include("${BigIntegerCpp_CMAKE_DIR}/BigIntegerCppTargets.cmake")
+endif()
+
+check_required_components(BigIntegerCpp)
