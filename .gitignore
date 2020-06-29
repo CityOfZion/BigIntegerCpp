@@ -31,11 +31,11 @@
 *.out
 *.app
 
-cmake-build-debug/
+cmake-build-*
 CMakeCache.txt
 CMakeFiles/
 Makefile
 cmake_install.cmake
-build
+build*
 .idea
 .DS_Store

@@ -2,7 +2,7 @@
 #include <variant>
 #include <vector>
 #include <math.h>
-#include "../include/public/BigInteger.h"
+#include "../include/public/bigintegercpp/BigInteger.h"
 #include "gtest/gtest.h"
 
 TEST(unary, unary_minus)

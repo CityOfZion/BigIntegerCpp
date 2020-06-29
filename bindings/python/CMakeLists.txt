@@ -9,12 +9,13 @@ if (NOT pybind11_FOUND)
     )
     FetchContent_MakeAvailable(pybind11)
 endif()
+
 # copy files into a folder to make it easy to build a wheel
 configure_file(setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/pybiginteger/setup.py)
 
 # create a monolith module
 # saves us a lot of pain when creating a wheel later on
-pybind11_add_module(pybiginteger python-bindings.cpp ${SOURCES} ${PUBLIC_INCLUDE} ${PRIVATE_INCLUDE})
+pybind11_add_module(pybiginteger python-bindings.cpp ${bigintegercpp_SOURCES} ${bigintegercpp_INCLUDE} ${bigintegercpp_PRIVATE_INCLUDE})
 
 set_target_properties(pybiginteger
         PROPERTIES

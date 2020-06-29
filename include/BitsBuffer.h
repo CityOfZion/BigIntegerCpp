@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "public/BigInteger.h"
+#include "public/bigintegercpp/BigInteger.h"
 #include "FastReducer.h"
 
 

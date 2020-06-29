@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../include/public/BigInteger.h"
+#include "../include/public/bigintegercpp/BigInteger.h"
 #include <random>
 #include "MyBigInt.h"
 #include "stack_calc.h"

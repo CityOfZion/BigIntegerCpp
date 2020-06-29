@@ -1,4 +1,4 @@
-#include "../include/public/BigInteger.h"
+#include "../include/public/bigintegercpp/BigInteger.h"
 #include "gtest/gtest.h"
 #include <string>
 #include "../include/NumericsHelpers.h"

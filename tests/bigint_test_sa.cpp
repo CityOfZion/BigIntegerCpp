@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../include/public/BigInteger.h"
+#include "../include/public/bigintegercpp/BigInteger.h"
 #include "gtest/gtest.h"
 
 // Tests for simple arithmetic

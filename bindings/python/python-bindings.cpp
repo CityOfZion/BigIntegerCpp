@@ -1,9 +1,6 @@
 #include <pybind11/pybind11.h>
-
-#include <pybind11/stl.h>
-#include "../../include/public/BigInteger.h"
+#include "../../include/public/bigintegercpp/BigInteger.h"
 #include <chrono>
-
 namespace py = pybind11;
 
 BigInteger to_biginteger(py::int_& value) {

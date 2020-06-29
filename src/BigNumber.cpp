@@ -1,5 +1,5 @@
 #include "../include/BigNumber.h"
-#include "../include/public/BigInteger.h"
+#include "../include/public/bigintegercpp/BigInteger.h"
 #include "../include/NumericsHelpers.h"
 #include <sstream>
 #include <limits>
