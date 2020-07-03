@@ -53,6 +53,14 @@ class BigIntegerTestCase(unittest.TestCase):
         bb = b.to_bytes(is_unsigned=True, is_bigendian=True)
         self.assertEqual(b'\x80\xFE', bb)
 
+        b = BigInteger(0x78)
+        bb = b.to_bytes(is_unsigned=False, is_bigendian=False)
+        self.assertEqual(b'\x78', bb)
+
+        b = BigInteger(0x80)
+        bb = b.to_bytes(is_unsigned=False, is_bigendian=False)
+        self.assertEqual(b'\x80\x00', bb)
+
     def test_add(self):
         b = BigInteger(1)
         i = 12937123987123987123987123987123987123987123129387129387123987123987
@@ -118,15 +126,15 @@ class BigIntegerTestCase(unittest.TestCase):
         bi = BigInteger(12937123987123987123987123987123987123987123129387129387123987123987)
 
         # test __mul__ with value > long long
-        r = b * i # big * int
+        r = b * i  # big * int
         self.assertIsInstance(r, BigInteger)
         self.assertEqual(25874247974247974247974247974247974247974246258774258774247974247974, r)
 
-        r = b * bi # big * big
+        r = b * bi  # big * big
         self.assertIsInstance(r, BigInteger)
         self.assertEqual(25874247974247974247974247974247974247974246258774258774247974247974, r)
 
-        bi *= 2 # big * int
+        bi *= 2  # big * int
         self.assertIsInstance(b, BigInteger)
         self.assertEqual(25874247974247974247974247974247974247974246258774258774247974247974, bi)
 
