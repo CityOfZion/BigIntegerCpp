@@ -61,6 +61,6 @@ int FastReducer::SubMod(uint_array left, int leftLength, uint_array right, int r
         leftLength = BigIntegerCalculator::actual_length(left, leftLength);
     }
 
-    std::fill(left.begin(), left.begin()+leftLength, left.size() - leftLength);
+    std::fill(left.begin(), left.begin() + leftLength, left.size() - leftLength);
     return leftLength;
 }

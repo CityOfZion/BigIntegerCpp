@@ -89,7 +89,7 @@ uint32_t BigIntegerCalculator::pow(const uint_array& value, uint32_t power, uint
 }
 
 uint32_t BigIntegerCalculator::pow_core(const uint_array& power, uint32_t modulus, uint64_t value, uint64_t result) {
-    for (int i = 0; i < power.size()-1; i++) {
+    for (int i = 0; i < power.size() - 1; i++) {
         unsigned int p = power[i];
         for (int j = 0; j < 32; j++) {
             if ((p & 1) == 1)
@@ -121,7 +121,7 @@ uint_array BigIntegerCalculator::pow_core(uint32_t power, const uint_array& modu
     if (modulus.size() < ReducerThreshold) {
         pow_core(power, modulus, value, result, temp);
     } else {
-      FastReducer reducer(modulus);
+        FastReducer reducer(modulus);
         pow_core(power, reducer, value, result, temp);
     }
     return result.GetBits();
@@ -141,7 +141,8 @@ uint_array BigIntegerCalculator::pow(const uint_array& value, uint32_t power, co
     return pow_core(power, modulus, v);
 }
 
-void BigIntegerCalculator::pow_core(const uint_array& power, const uint_array& modulus, BitsBuffer& value, BitsBuffer& result,
+void BigIntegerCalculator::pow_core(const uint_array& power, const uint_array& modulus, BitsBuffer& value,
+                                    BitsBuffer& result,
                                     BitsBuffer& temp) {
     for (int i = 0; i < power.size() - 1; i++) {
         unsigned int p = power[i];
@@ -208,8 +209,9 @@ uint_array BigIntegerCalculator::pow_core(const uint_array& power, const uint_ar
     return result.GetBits();
 }
 
-void BigIntegerCalculator::pow_core(const uint_array& power, FastReducer& reducer, BitsBuffer& value, BitsBuffer& result,
-                                    BitsBuffer& temp) {
+void
+BigIntegerCalculator::pow_core(const uint_array& power, FastReducer& reducer, BitsBuffer& value, BitsBuffer& result,
+                               BitsBuffer& temp) {
     for (auto p : power) {
         for (int j = 0; j < 32; j++) {
             if ((p & 1) == 1) {

@@ -6,8 +6,7 @@ uint32_t BigIntegerCalculator::gcd(uint32_t left, uint32_t right) {
 
     // https://en.wikipedia.org/wiki/Euclidean_algorithm
 
-    while (right != 0)
-    {
+    while (right != 0) {
         uint temp = left % right;
         left = right;
         right = temp;
@@ -16,12 +15,10 @@ uint32_t BigIntegerCalculator::gcd(uint32_t left, uint32_t right) {
     return left;
 }
 
-uint64_t BigIntegerCalculator::gcd(uint64_t left, uint64_t right)
-{
+uint64_t BigIntegerCalculator::gcd(uint64_t left, uint64_t right) {
     // Same as above, but for 64-bit values.
 
-    while (right > 0xFFFFFFFF)
-    {
+    while (right > 0xFFFFFFFF) {
         uint64_t temp = left % right;
         left = right;
         right = temp;
@@ -33,8 +30,7 @@ uint64_t BigIntegerCalculator::gcd(uint64_t left, uint64_t right)
     return left;
 }
 
-uint32_t BigIntegerCalculator::gcd(uint_array left, uint32_t right)
-{
+uint32_t BigIntegerCalculator::gcd(uint_array left, uint32_t right) {
     assert(left.size() >= 1);
     assert(right != 0);
 
@@ -46,18 +42,17 @@ uint32_t BigIntegerCalculator::gcd(uint_array left, uint32_t right)
     return gcd(right, temp);
 }
 
-uint_array BigIntegerCalculator::gcd(uint_array left, uint_array right)
-{
-assert(left.size() >= 2);
-assert(right.size() >= 2);
-assert(compare(left, right) >= 0);
+uint_array BigIntegerCalculator::gcd(uint_array left, uint_array right) {
+    assert(left.size() >= 2);
+    assert(right.size() >= 2);
+    assert(compare(left, right) >= 0);
 
-BitsBuffer leftBuffer(left.size(), left);
-BitsBuffer rightBuffer(right.size(), right);
+    BitsBuffer leftBuffer(left.size(), left);
+    BitsBuffer rightBuffer(right.size(), right);
 
     BigIntegerCalculator::gcd(leftBuffer, rightBuffer);
 
-return leftBuffer.GetBits();
+    return leftBuffer.GetBits();
 }
 
 void BigIntegerCalculator::gcd(BitsBuffer& left, BitsBuffer& right) {
@@ -72,8 +67,7 @@ void BigIntegerCalculator::gcd(BitsBuffer& left, BitsBuffer& right) {
     // http://cacr.uwaterloo.ca/hac/about/chap14.pdf (see 14.4.2)
     // ftp://ftp.risc.uni-linz.ac.at/pub/techreports/1992/92-69.ps.gz
 
-    while (right.GetLength() > 2)
-    {
+    while (right.GetLength() > 2) {
         uint64_t x, y;
 
         extract_digits(left, right, x, y);
@@ -84,8 +78,7 @@ void BigIntegerCalculator::gcd(BitsBuffer& left, BitsBuffer& right) {
         int iteration = 0;
 
         // Lehmer's guessing
-        while (y != 0)
-        {
+        while (y != 0) {
             uint64_t q, r, s, t;
 
             // Odd iteration
@@ -103,8 +96,8 @@ void BigIntegerCalculator::gcd(BitsBuffer& left, BitsBuffer& right) {
             if (t < s || t + r > y - c)
                 break;
 
-            a = (uint)r;
-            b = (uint)s;
+            a = (uint) r;
+            b = (uint) s;
             x = t;
 
             ++iteration;
@@ -126,8 +119,8 @@ void BigIntegerCalculator::gcd(BitsBuffer& left, BitsBuffer& right) {
             if (t < s || t + r > x - b)
                 break;
 
-            d = (uint)r;
-            c = (uint)s;
+            d = (uint) r;
+            c = (uint) s;
             y = t;
 
             ++iteration;
@@ -135,22 +128,18 @@ void BigIntegerCalculator::gcd(BitsBuffer& left, BitsBuffer& right) {
                 break;
         }
 
-        if (b == 0)
-        {
+        if (b == 0) {
             // Euclid's step
             left.Reduce(right);
 
             BitsBuffer temp = left;
             left = right;
             right = temp;
-        }
-        else
-        {
+        } else {
             // Lehmer's step
             lehmer_core(left, right, a, b, c, d);
 
-            if (iteration % 2 == 1)
-            {
+            if (iteration % 2 == 1) {
                 // Ensure left is larger than right
                 BitsBuffer temp = left;
                 left = right;
@@ -159,8 +148,7 @@ void BigIntegerCalculator::gcd(BitsBuffer& left, BitsBuffer& right) {
         }
     }
 
-    if (right.GetLength() > 0)
-    {
+    if (right.GetLength() > 0) {
         // Euclid's step
         left.Reduce(right);
 
@@ -175,7 +163,7 @@ void BigIntegerCalculator::gcd(BitsBuffer& left, BitsBuffer& right) {
     }
 }
 
-void BigIntegerCalculator::extract_digits(BitsBuffer &xBuffer, BitsBuffer &yBuffer, uint64_t& x, uint64_t& y) {
+void BigIntegerCalculator::extract_digits(BitsBuffer& xBuffer, BitsBuffer& yBuffer, uint64_t& x, uint64_t& y) {
     assert(xBuffer.GetLength() >= 3);
     assert(yBuffer.GetLength() >= 3);
     assert(xBuffer.GetLength() >= yBuffer.GetLength());
@@ -196,8 +184,7 @@ void BigIntegerCalculator::extract_digits(BitsBuffer &xBuffer, BitsBuffer &yBuff
     uint64_t yh, ym, yl;
 
     // arrange the bits
-    switch (xLength - yLength)
-    {
+    switch (xLength - yLength) {
         case 0:
             yh = yBits[yLength - 1];
             ym = yBits[yLength - 2];
@@ -232,7 +219,7 @@ void BigIntegerCalculator::extract_digits(BitsBuffer &xBuffer, BitsBuffer &yBuff
     assert(x >= y);
 }
 
-void BigIntegerCalculator::lehmer_core(BitsBuffer &xBuffer, BitsBuffer &yBuffer, long a, long b, long c, long d) {
+void BigIntegerCalculator::lehmer_core(BitsBuffer& xBuffer, BitsBuffer& yBuffer, long a, long b, long c, long d) {
     assert(xBuffer.GetLength() >= 1);
     assert(yBuffer.GetLength() >= 1);
     assert(xBuffer.GetLength() >= yBuffer.GetLength());
@@ -247,8 +234,7 @@ void BigIntegerCalculator::lehmer_core(BitsBuffer &xBuffer, BitsBuffer &yBuffer,
     int length = yBuffer.GetLength();
 
     long xCarry = 0L, yCarry = 0L;
-    for (int i = 0; i < length; i++)
-    {
+    for (int i = 0; i < length; i++) {
         long xDigit = a * x[i] - b * y[i] + xCarry;
         long yDigit = d * y[i] - c * x[i] + yCarry;
         xCarry = xDigit >> 32;

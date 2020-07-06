@@ -10,76 +10,56 @@
 #include <cmath>
 #include "../include/BigIntegerCalculator.h"
 
-const BigInteger BigInteger::s_bnMinInt = BigInteger(-1, uint_array {kuMaskHighBit});
+const BigInteger BigInteger::s_bnMinInt = BigInteger(-1, uint_array{kuMaskHighBit});
 const BigInteger BigInteger::s_bnOneInt = BigInteger(1);
 const BigInteger BigInteger::s_bnZeroInt = BigInteger(0);
 const BigInteger BigInteger::s_bnMinusOneInt = BigInteger(-1);
 
 
-BigInteger::BigInteger()
-{
-	_sign = 0;
+BigInteger::BigInteger() {
+    _sign = 0;
     _bits = uint_array();
 }
 
-BigInteger::BigInteger(int32_t value)
-{
-	if (value == std::numeric_limits<int32_t>::min())
-	{
-		*this = s_bnMinInt;
-	}
-	else
-	{
-		_sign = value;
-		_bits.clear();
-	}
+BigInteger::BigInteger(int32_t value) {
+    if (value == std::numeric_limits<int32_t>::min()) {
+        *this = s_bnMinInt;
+    } else {
+        _sign = value;
+        _bits.clear();
+    }
     assert_valid();
 }
 
 BigInteger::BigInteger(uint32_t value) {
-    if (value <= static_cast<uint32_t>(std::numeric_limits<int32_t>::max()))
-    {
+    if (value <= static_cast<uint32_t>(std::numeric_limits<int32_t>::max())) {
         _sign = static_cast<int32_t>(value);
         _bits.clear();
-    }
-    else
-    {
+    } else {
         _sign = +1;
         _bits.push_back(value);
     }
     assert_valid();
 }
 
-BigInteger::BigInteger(int64_t value)
-{
-    if (std::numeric_limits<int32_t>::min() < value && value <= std::numeric_limits<int32_t>::max())
-    {
+BigInteger::BigInteger(int64_t value) {
+    if (std::numeric_limits<int32_t>::min() < value && value <= std::numeric_limits<int32_t>::max()) {
         _sign = static_cast<int32_t>(value);
-    }
-    else if (value == std::numeric_limits<int32_t>::min())
-    {
+    } else if (value == std::numeric_limits<int32_t>::min()) {
         *this = s_bnMinInt;
-    }
-    else
-    {
+    } else {
         uint64_t x = 0;
-        if (value < 0)
-        {
+        if (value < 0) {
             x = static_cast<uint64_t>(-value);
             _sign = -1;
-        }
-        else
-        {
+        } else {
             x = static_cast<uint64_t>(value);
             _sign = +1;
         }
 
-        if (x <= std::numeric_limits<uint32_t>::max())
-        {
+        if (x <= std::numeric_limits<uint32_t>::max()) {
             _bits.push_back(static_cast<uint32_t>(x));
-        }
-        else
-        {
+        } else {
             _bits.push_back(static_cast<uint32_t>(x));
             _bits.push_back(static_cast<uint32_t>(x >> kcbitUint));
         }
@@ -88,19 +68,13 @@ BigInteger::BigInteger(int64_t value)
     assert_valid();
 }
 
-BigInteger::BigInteger(uint64_t value)
-{
-    if (value <= static_cast<uint64_t>(std::numeric_limits<int32_t>::max()))
-    {
+BigInteger::BigInteger(uint64_t value) {
+    if (value <= static_cast<uint64_t>(std::numeric_limits<int32_t>::max())) {
         _sign = static_cast<int32_t>(value);
-    }
-    else if (value <= std::numeric_limits<uint32_t>::max())
-    {
+    } else if (value <= std::numeric_limits<uint32_t>::max()) {
         _sign = +1;
         _bits.push_back(static_cast<uint32_t>(value));
-    }
-    else
-    {
+    } else {
         _sign = +1;
         _bits.push_back(static_cast<uint32_t>(value));
         _bits.push_back(static_cast<uint32_t>(value >> kcbitUint));
@@ -110,82 +84,64 @@ BigInteger::BigInteger(uint64_t value)
 }
 
 BigInteger::BigInteger(int n, uint_array value) {
-     _sign = n;
+    _sign = n;
     _bits = value;
     assert_valid();
 }
 
-BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
-{
+BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian) {
     int byteCount = value.size();
 
     bool isNegative;
-    if (byteCount > 0)
-    {
+    if (byteCount > 0) {
         byte mostSignificantByte = isBigEndian ? value[0] : value[byteCount - 1];
         isNegative = (mostSignificantByte & 0x80) != 0 && !isUnsigned;
 
-        if (mostSignificantByte == 0)
-        {
+        if (mostSignificantByte == 0) {
             // Try to conserve space as much as possible by checking for wasted leading byte[] entries
-            if (isBigEndian)
-            {
+            if (isBigEndian) {
                 int offset = 1;
 
-                while (offset < byteCount && value[offset] == 0)
-                {
+                while (offset < byteCount && value[offset] == 0) {
                     offset++;
                 }
 
                 value = byte_array(value.begin() + offset, value.end());
                 byteCount = value.size();
-            }
-            else
-            {
+            } else {
                 byteCount -= 2;
-                while (byteCount >= 0 && value[byteCount] == 0)
-                {
+                while (byteCount >= 0 && value[byteCount] == 0) {
                     byteCount--;
                 }
                 byteCount++;
             }
         }
-    }
-    else
-    {
+    } else {
         isNegative = false;
     }
 
-    if (byteCount == 0)
-    {
+    if (byteCount == 0) {
         _sign = 0;
         _bits = uint_array();
         assert_valid();
         return;
     }
 
-    if (byteCount <= 4)
-    {
+    if (byteCount <= 4) {
         _sign = isNegative ? static_cast<int>(0xffffffff) : 0;
 
-        if (isBigEndian)
-        {
-            for (int i = 0; i < byteCount; i++)
-            {
+        if (isBigEndian) {
+            for (int i = 0; i < byteCount; i++) {
                 _sign = (_sign << 8) | value[i];
             }
-        }
-        else
-        {
-            for (int i = byteCount - 1; i >= 0; i--)
-            {
+        } else {
+            for (int i = byteCount - 1; i >= 0; i--) {
                 _sign = (_sign << 8) | value[i];
             }
         }
 
         _bits = uint_array();
-        if (_sign < 0 && !isNegative)
-        {
+        if (_sign < 0 && !isNegative) {
             // Int32 overflow
             // Example: Int64 value 2362232011 (0xCB, 0xCC, 0xCC, 0x8C, 0x0)
             // can be naively packed into 4 bytes (due to the leading 0x0)
@@ -193,13 +149,10 @@ BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
             _bits.push_back(static_cast<uint32_t>(_sign));
             _sign = +1;
         }
-        if (_sign == std::numeric_limits<int>::min())
-        {
+        if (_sign == std::numeric_limits<int>::min()) {
             *this = s_bnMinInt;
         }
-    }
-    else
-    {
+    } else {
         int unalignedBytes = byteCount % 4;
         int dwordCount = byteCount / 4 + (unalignedBytes == 0 ? 0 : 1);
         uint_array val(dwordCount);
@@ -208,13 +161,10 @@ BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
         // Copy all dwords, except don't do the last one if it's not a full four bytes
         int curDword, curByte;
 
-        if (isBigEndian)
-        {
+        if (isBigEndian) {
             curByte = byteCount - sizeof(int);
-            for (curDword = 0; curDword < dwordCount - (unalignedBytes == 0 ? 0 : 1); curDword++)
-            {
-                for (int byteInDword = 0; byteInDword < 4; byteInDword++)
-                {
+            for (curDword = 0; curDword < dwordCount - (unalignedBytes == 0 ? 0 : 1); curDword++) {
+                for (int byteInDword = 0; byteInDword < 4; byteInDword++) {
                     byte curByteValue = value[curByte];
                     val[curDword] = (val[curDword] << 8) | curByteValue;
                     curByte++;
@@ -222,14 +172,10 @@ BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
 
                 curByte -= 8;
             }
-        }
-        else
-        {
+        } else {
             curByte = sizeof(int) - 1;
-            for (curDword = 0; curDword < dwordCount - (unalignedBytes == 0 ? 0 : 1); curDword++)
-            {
-                for (int byteInDword = 0; byteInDword < 4; byteInDword++)
-                {
+            for (curDword = 0; curDword < dwordCount - (unalignedBytes == 0 ? 0 : 1); curDword++) {
+                for (int byteInDword = 0; byteInDword < 4; byteInDword++) {
                     byte curByteValue = value[curByte];
                     val[curDword] = (val[curDword] << 8) | curByteValue;
                     curByte--;
@@ -240,33 +186,25 @@ BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
         }
 
         // Copy the last dword specially if it's not aligned
-        if (unalignedBytes != 0)
-        {
-            if (isNegative)
-            {
+        if (unalignedBytes != 0) {
+            if (isNegative) {
                 val[dwordCount - 1] = 0xffffffff;
             }
 
-            if (isBigEndian)
-            {
-                for (curByte = 0; curByte < unalignedBytes; curByte++)
-                {
+            if (isBigEndian) {
+                for (curByte = 0; curByte < unalignedBytes; curByte++) {
                     byte curByteValue = value[curByte];
                     val[curDword] = (val[curDword] << 8) | curByteValue;
                 }
-            }
-            else
-            {
-                for (curByte = byteCountMinus1; curByte >= byteCount - unalignedBytes; curByte--)
-                {
+            } else {
+                for (curByte = byteCountMinus1; curByte >= byteCount - unalignedBytes; curByte--) {
                     byte curByteValue = value[curByte];
                     val[curDword] = (val[curDword] << 8) | curByteValue;
                 }
             }
         }
 
-        if (isNegative)
-        {
+        if (isNegative) {
             NumericsHelpers::dangerous_make_twos_complement(val); // Mutates val
 
             // Pack _bits to remove any wasted space after the twos complement
@@ -274,10 +212,8 @@ BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
             while (len >= 0 && val[len] == 0) len--;
             len++;
 
-            if (len == 1)
-            {
-                switch (val[0])
-                {
+            if (len == 1) {
+                switch (val[0]) {
                     case 1: // abs(-1)
                         *this = s_bnMinusOneInt;
                         return;
@@ -287,9 +223,8 @@ BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
                         return;
 
                     default:
-                        if (static_cast<int>(val[0]) > 0)
-                        {
-                            _sign = (-1) * ((int)val[0]);
+                        if (static_cast<int>(val[0]) > 0) {
+                            _sign = (-1) * ((int) val[0]);
                             _bits = uint_array();
                             assert_valid();
                             return;
@@ -299,20 +234,15 @@ BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
                 }
             }
 
-            if (static_cast<size_t>(len) != val.size())
-            {
+            if (static_cast<size_t>(len) != val.size()) {
                 _sign = -1;
                 _bits = uint_array();
                 _bits = uint_array(val.begin(), val.begin() + len);
-            }
-            else
-            {
+            } else {
                 _sign = -1;
                 _bits = val;
             }
-        }
-        else
-        {
+        } else {
             _sign = +1;
             _bits = val;
         }
@@ -320,52 +250,42 @@ BigInteger::BigInteger(byte_array value, bool isUnsigned, bool isBigEndian)
     assert_valid();
 }
 
-BigInteger::BigInteger(uint_array value)
-{
+BigInteger::BigInteger(uint_array value) {
     int dwordCount = value.size();
     bool isNegative = dwordCount > 0 && ((value[dwordCount - 1] & 0x80000000) == 0x80000000);
 
     // Try to conserve space as much as possible by checking for wasted leading uint[] entries
     while (dwordCount > 0 && value[dwordCount - 1] == 0) dwordCount--;
 
-    if (dwordCount == 0)
-    {
+    if (dwordCount == 0) {
         // BigInteger.zero
         *this = BigInteger::s_bnZeroInt;
         assert_valid();
         return;
     }
-    if (dwordCount == 1)
-    {
-        if (static_cast<int>(value[0]) < 0 && !isNegative)
-        {
+    if (dwordCount == 1) {
+        if (static_cast<int>(value[0]) < 0 && !isNegative) {
             _bits.push_back(value[0]);
             _sign = +1;
         }
-        // Handle the special cases where the BigInteger likely fits into _sign
-        else if (std::numeric_limits<int>::min() == static_cast<int>(value[0]))
-        {
+            // Handle the special cases where the BigInteger likely fits into _sign
+        else if (std::numeric_limits<int>::min() == static_cast<int>(value[0])) {
             *this = BigInteger::s_bnMinInt;
-        }
-        else
-        {
+        } else {
             _sign = static_cast<int>(value[0]);
         }
         assert_valid();
         return;
     }
 
-    if (!isNegative)
-    {
+    if (!isNegative) {
         // Handle the simple positive value cases where the input is already in sign magnitude
-        if (dwordCount != static_cast<int>(value.size()))
-        {
+        if (dwordCount != static_cast<int>(value.size())) {
             _sign = +1;
             _bits = uint_array(value.begin(), value.begin() + dwordCount);
         }
-        // No trimming is possible.  Assign value directly to _bits.
-        else
-        {
+            // No trimming is possible.  Assign value directly to _bits.
+        else {
             _sign = +1;
             _bits = value;
         }
@@ -381,31 +301,23 @@ BigInteger::BigInteger(uint_array value)
     while (len > 0 && value[len - 1] == 0) len--;
 
     // The number is represented by a single dword
-    if (len == 1 && static_cast<int>((value[0])) > 0)
-    {
-        if (value[0] == 1 /* abs(-1) */)
-        {
+    if (len == 1 && static_cast<int>((value[0])) > 0) {
+        if (value[0] == 1 /* abs(-1) */) {
             *this = s_bnMinusOneInt;
-        }
-        else if (value[0] == kuMaskHighBit /* abs(Int32.MinValue) */)
-        {
+        } else if (value[0] == kuMaskHighBit /* abs(Int32.MinValue) */) {
             *this = s_bnMinInt;
-        }
-        else
-        {
-            _sign = (-1) * ((int)value[0]);
+        } else {
+            _sign = (-1) * ((int) value[0]);
         }
     }
-    // The number is represented by multiple dwords.
-    // Trim off any wasted uint values when possible.
-    else if (len != static_cast<int>(value.size()))
-    {
+        // The number is represented by multiple dwords.
+        // Trim off any wasted uint values when possible.
+    else if (len != static_cast<int>(value.size())) {
         _sign = -1;
         _bits = uint_array(value.begin(), value.begin() + len);
     }
-    // No trimming is possible.  Assign value directly to _bits.
-    else
-    {
+        // No trimming is possible.  Assign value directly to _bits.
+    else {
         _sign = -1;
         _bits = value;
     }
@@ -414,9 +326,7 @@ BigInteger::BigInteger(uint_array value)
 }
 
 
-
-BigInteger::BigInteger(uint_array value, bool negative)
-{
+BigInteger::BigInteger(uint_array value, bool negative) {
     int len;
 
     // Try to conserve space as much as possible by checking for wasted leading uint[] entries
@@ -425,17 +335,14 @@ BigInteger::BigInteger(uint_array value, bool negative)
 
     if (len == 0)
         *this = s_bnZeroInt;
-    // Values like (Int32.MaxValue+1) are stored as "0x80000000" and as such cannot be packed into _sign
-    else if (len == 1 && value[0] < kuMaskHighBit)
-    {
-        _sign = (negative ? -(int)value[0] : (int)value[0]);
+        // Values like (Int32.MaxValue+1) are stored as "0x80000000" and as such cannot be packed into _sign
+    else if (len == 1 && value[0] < kuMaskHighBit) {
+        _sign = (negative ? -(int) value[0] : (int) value[0]);
         _bits = uint_array();
         // Although Int32.MinValue fits in _sign, we represent this case differently for negate
         if (_sign == std::numeric_limits<int>::min())
             *this = s_bnMinInt;
-    }
-    else
-    {
+    } else {
         _sign = negative ? -1 : +1;
         _bits.swap(value);
     }
@@ -446,8 +353,7 @@ BigInteger::BigInteger(uint_array value, bool negative)
     assert_valid();
 }
 
-bool BigInteger::is_power_of_two() const
-{
+bool BigInteger::is_power_of_two() const {
     assert_valid();
 
     if (_bits.size() == 0)
@@ -460,8 +366,7 @@ bool BigInteger::is_power_of_two() const
     if ((_bits[iu] & (_bits[iu] - 1)) != 0)
         return false;
 
-    while (--iu >= 0)
-    {
+    while (--iu >= 0) {
         if (_bits[iu] != 0)
             return false;
     }
@@ -469,54 +374,45 @@ bool BigInteger::is_power_of_two() const
     return true;
 }
 
-bool BigInteger::is_zero() const
-{
+bool BigInteger::is_zero() const {
     assert_valid();
     return _sign == 0;
 }
 
-bool BigInteger::is_one() const
-{
+bool BigInteger::is_one() const {
     assert_valid();
     return _sign == 1 && _bits.size() == 0;
 }
 
-bool BigInteger::is_even() const
-{
+bool BigInteger::is_even() const {
     assert_valid();
     return _bits.size() == 0 ? (_sign & 1) == 0 : (_bits[0] & 1) == 0;
 }
 
-BigInteger BigInteger::add(BigInteger& lhs, const BigInteger& rhs)
-{
+BigInteger BigInteger::add(BigInteger& lhs, const BigInteger& rhs) {
     lhs.assert_valid();
     return lhs + rhs;
 }
 
-BigInteger BigInteger::subtract(BigInteger& lhs, const BigInteger& rhs)
-{
+BigInteger BigInteger::subtract(BigInteger& lhs, const BigInteger& rhs) {
     return lhs - rhs;
 }
 
-BigInteger BigInteger::add(const uint_array& lhs, int lhsSign, const uint_array& rhs, int rhsSign)
-{
+BigInteger BigInteger::add(const uint_array& lhs, int lhsSign, const uint_array& rhs, int rhsSign) {
     bool trivialLeft = lhs.empty();
     bool trivialRight = rhs.empty();
 
-    if (trivialLeft && trivialRight)
-    {
+    if (trivialLeft && trivialRight) {
         return BigInteger(static_cast<int64_t>(lhsSign) + rhsSign);
     }
 
-    if (trivialLeft)
-    {
+    if (trivialLeft) {
         assert(!rhs.empty());
         uint_array bits = BigIntegerCalculator::add(rhs, std::abs(lhsSign));
         return BigInteger(bits, lhsSign < 0);
     }
 
-    if (trivialRight)
-    {
+    if (trivialRight) {
         assert(!lhs.empty());
         uint_array bits = BigIntegerCalculator::add(lhs, std::abs(rhsSign));
         return BigInteger(bits, lhsSign < 0);
@@ -524,37 +420,30 @@ BigInteger BigInteger::add(const uint_array& lhs, int lhsSign, const uint_array&
 
     assert(!lhs.empty() && !rhs.empty());
 
-    if (lhs.size() < rhs.size())
-    {
+    if (lhs.size() < rhs.size()) {
         uint_array bits = BigIntegerCalculator::add(rhs, lhs);
         return BigInteger(bits, lhsSign < 0);
-    }
-    else
-    {
+    } else {
         uint_array bits = BigIntegerCalculator::add(lhs, rhs);
         return BigInteger(bits, lhsSign < 0);
     }
 }
 
-BigInteger BigInteger::subtract(const uint_array& lhs, int lhsSign, const uint_array& rhs, int rhsSign)
-{
+BigInteger BigInteger::subtract(const uint_array& lhs, int lhsSign, const uint_array& rhs, int rhsSign) {
     bool trivialLeft = lhs.empty();
     bool trivialRight = rhs.empty();
 
-    if (trivialLeft && trivialRight)
-    {
+    if (trivialLeft && trivialRight) {
         return BigInteger(static_cast<int64_t>(lhsSign) - rhsSign);
     }
 
-    if (trivialLeft)
-    {
+    if (trivialLeft) {
         assert(!rhs.empty());
         uint_array bits = BigIntegerCalculator::subtract(rhs, std::abs(lhsSign));
         return BigInteger(bits, lhsSign >= 0);
     }
 
-    if (trivialRight)
-    {
+    if (trivialRight) {
         assert(!lhs.empty());
         uint_array bits = BigIntegerCalculator::subtract(lhs, std::abs(rhsSign));
         return BigInteger(bits, lhsSign < 0);
@@ -562,13 +451,10 @@ BigInteger BigInteger::subtract(const uint_array& lhs, int lhsSign, const uint_a
 
     assert(!lhs.empty() && !rhs.empty());
 
-    if (BigIntegerCalculator::compare(lhs, rhs) < 0)
-    {
+    if (BigIntegerCalculator::compare(lhs, rhs) < 0) {
         uint_array bits = BigIntegerCalculator::subtract(rhs, lhs);
         return BigInteger(bits, lhsSign >= 0);
-    }
-    else
-    {
+    } else {
         uint_array bits = BigIntegerCalculator::subtract(lhs, rhs);
         return BigInteger(bits, lhsSign < 0);
     }
@@ -579,8 +465,7 @@ BigInteger operator-(BigInteger lhs, const BigInteger& rhs) {
     return lhs;
 }
 
-BigInteger& BigInteger::operator-=(const BigInteger& rhs)
-{
+BigInteger& BigInteger::operator-=(const BigInteger& rhs) {
     BigInteger lhs = *this;
     lhs.assert_valid();
     rhs.assert_valid();
@@ -598,8 +483,7 @@ BigInteger operator*(BigInteger lhs, const BigInteger& rhs) {
     return lhs;
 }
 
-BigInteger& BigInteger::operator*=(const BigInteger& rhs)
-{
+BigInteger& BigInteger::operator*=(const BigInteger& rhs) {
     BigInteger lhs = *this;
     lhs.assert_valid();
     rhs.assert_valid();
@@ -612,16 +496,14 @@ BigInteger& BigInteger::operator*=(const BigInteger& rhs)
         return *this;
     }
 
-    if (trivialLeft)
-    {
+    if (trivialLeft) {
         assert(!rhs._bits.empty());
         uint_array bits = BigIntegerCalculator::multiply(rhs._bits, std::abs(lhs._sign));
         *this = BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
         return *this;
     }
 
-    if (trivialRight)
-    {
+    if (trivialRight) {
         assert(!lhs._bits.empty());
         uint_array bits = BigIntegerCalculator::multiply(lhs._bits, std::abs(rhs._sign));
         *this = BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
@@ -630,29 +512,24 @@ BigInteger& BigInteger::operator*=(const BigInteger& rhs)
 
     assert(!lhs._bits.empty() && !rhs._bits.empty());
 
-    if (lhs._bits == rhs._bits)
-    {
+    if (lhs._bits == rhs._bits) {
         uint_array bits = BigIntegerCalculator::square(lhs._bits);
         *this = BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
         return *this;
     }
 
-    if (lhs._bits.size() < rhs._bits.size())
-    {
+    if (lhs._bits.size() < rhs._bits.size()) {
         uint_array bits = BigIntegerCalculator::multiply(rhs._bits, lhs._bits);
         *this = BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
         return *this;
-    }
-    else
-    {
+    } else {
         uint_array bits = BigIntegerCalculator::multiply(lhs._bits, rhs._bits);
         *this = BigInteger(bits, (lhs._sign < 0) ^ (rhs._sign < 0));
         return *this;
     }
 }
 
-BigInteger BigInteger::multiply(BigInteger& lhs, const BigInteger& rhs)
-{
+BigInteger BigInteger::multiply(BigInteger& lhs, const BigInteger& rhs) {
     return lhs * rhs;
 }
 
@@ -661,8 +538,7 @@ BigInteger operator%(BigInteger lhs, const BigInteger& rhs) {
     return lhs;
 }
 
-BigInteger& BigInteger::operator%=(const BigInteger& div)
-{
+BigInteger& BigInteger::operator%=(const BigInteger& div) {
     BigInteger divisor = div;
     BigInteger& dividend = *this;
     dividend.assert_valid();
@@ -671,23 +547,20 @@ BigInteger& BigInteger::operator%=(const BigInteger& div)
     bool trivialDividend = dividend._bits.empty();
     bool trivialDivisor = divisor._bits.empty();
 
-    if (trivialDividend && trivialDivisor)
-    {
+    if (trivialDividend && trivialDivisor) {
         if (divisor._sign == 0)
             throw DivideByZero();
         *this = dividend._sign % divisor._sign;
         return *this;
     }
 
-    if (trivialDividend)
-    {
+    if (trivialDividend) {
         // The divisor is non-trivial
         // and therefore the bigger one
         return dividend;
     }
 
-    if (trivialDivisor)
-    {
+    if (trivialDivisor) {
         assert(!dividend._bits.empty());
         int64_t remainder = BigIntegerCalculator::remainder(dividend._bits, std::abs(divisor._sign));
         *this = dividend._sign < 0 ? -1 * remainder : remainder;
@@ -696,8 +569,7 @@ BigInteger& BigInteger::operator%=(const BigInteger& div)
 
     assert(!dividend._bits.empty() && !divisor._bits.empty());
 
-    if (dividend._bits.size() < divisor._bits.size())
-    {
+    if (dividend._bits.size() < divisor._bits.size()) {
         return dividend;
     }
 
@@ -706,87 +578,74 @@ BigInteger& BigInteger::operator%=(const BigInteger& div)
     return *this;
 }
 
-BigInteger BigInteger::div_rem(BigInteger& dividend, BigInteger& divisor, BigInteger& remainder)
-{
+BigInteger BigInteger::div_rem(BigInteger& dividend, BigInteger& divisor, BigInteger& remainder) {
     dividend.assert_valid();
     divisor.assert_valid();
 
-   bool trivialDividend = dividend.get_bits().empty() ;
-   bool trivialDivisor = divisor.get_bits().empty();
+    bool trivialDividend = dividend.get_bits().empty();
+    bool trivialDivisor = divisor.get_bits().empty();
 
-   if (trivialDividend && trivialDivisor)
-   {
-       if (divisor._sign == 0)
-           throw DivideByZero();
-       remainder = dividend._sign % divisor._sign;
-       return dividend._sign / divisor._sign;
-   }
+    if (trivialDividend && trivialDivisor) {
+        if (divisor._sign == 0)
+            throw DivideByZero();
+        remainder = dividend._sign % divisor._sign;
+        return dividend._sign / divisor._sign;
+    }
 
-   if (trivialDividend)
-   {
-       // The divisor is non-trivial
-       // and therefore the bigger one
-       remainder = dividend;
-       return BigInteger::zero();
-   }
+    if (trivialDividend) {
+        // The divisor is non-trivial
+        // and therefore the bigger one
+        remainder = dividend;
+        return BigInteger::zero();
+    }
 
-   if (trivialDivisor)
-   {
-       uint32_t rest;
-       uint_array rbits = dividend.get_bits();
-       uint_array bits = BigIntegerCalculator::divide(rbits, std::abs(divisor._sign), rest);
+    if (trivialDivisor) {
+        uint32_t rest;
+        uint_array rbits = dividend.get_bits();
+        uint_array bits = BigIntegerCalculator::divide(rbits, std::abs(divisor._sign), rest);
 
-       remainder = dividend._sign < 0 ? -1 * rest : rest;
-       return BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
-   }
+        remainder = dividend._sign < 0 ? -1 * rest : rest;
+        return BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
+    }
 
-   if (dividend.get_bits().size() < divisor.get_bits().size())
-   {
-       remainder = dividend;
-       return BigInteger::zero();
-   }
-   else
-   {
-       uint_array rest;
-       uint_array lbits = dividend.get_bits();
-       uint_array rbits = divisor.get_bits();
-       uint_array bits = BigIntegerCalculator::divide(lbits, rbits, rest);
+    if (dividend.get_bits().size() < divisor.get_bits().size()) {
+        remainder = dividend;
+        return BigInteger::zero();
+    } else {
+        uint_array rest;
+        uint_array lbits = dividend.get_bits();
+        uint_array rbits = divisor.get_bits();
+        uint_array bits = BigIntegerCalculator::divide(lbits, rbits, rest);
 
-       remainder = BigInteger(rest, dividend._sign < 0);
-       return BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
-   }
+        remainder = BigInteger(rest, dividend._sign < 0);
+        return BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
+    }
 }
 
-BigInteger BigInteger::operator -()
-{
+BigInteger BigInteger::operator-() {
     return BigInteger(-(*this)._sign, (*this)._bits);
 }
 
-BigInteger BigInteger::operator+()
-{
+BigInteger BigInteger::operator+() {
     return BigInteger(+(*this)._sign, (*this)._bits);
 }
 
-BigInteger& BigInteger::operator++()
-{
+BigInteger& BigInteger::operator++() {
     *this += BigInteger::one();
     return *this;
 }
 
-BigInteger& BigInteger::operator++(int dummy)
-{
+BigInteger& BigInteger::operator++(int dummy) {
     return ++(*this);
 }
 
-BigInteger& BigInteger::operator--()
-{
+BigInteger& BigInteger::operator--() {
     //value.assert_valid();
     *this -= BigInteger::one();
     return *this;
 }
 
-BigInteger& BigInteger::operator--(int unused)
-{
+BigInteger& BigInteger::operator--(int unused) {
     return --(*this);
 }
 
@@ -796,8 +655,7 @@ BigInteger operator+(BigInteger lhs, const BigInteger& rhs) {
     return lhs;
 }
 
-BigInteger& BigInteger::operator+=(const BigInteger& rhs)
-{
+BigInteger& BigInteger::operator+=(const BigInteger& rhs) {
     auto& lhs = *this;
     lhs.assert_valid();
     rhs.assert_valid();
@@ -810,14 +668,12 @@ BigInteger& BigInteger::operator+=(const BigInteger& rhs)
     return *this;
 }
 
-BigInteger operator/(BigInteger lhs, const BigInteger& rhs)
-{
+BigInteger operator/(BigInteger lhs, const BigInteger& rhs) {
     lhs /= rhs;
     return lhs;
 }
 
-BigInteger& BigInteger::operator/=(const BigInteger& div)
-{
+BigInteger& BigInteger::operator/=(const BigInteger& div) {
     auto& divisor = div;
     BigInteger dividend = *this;
     dividend.assert_valid();
@@ -833,16 +689,14 @@ BigInteger& BigInteger::operator/=(const BigInteger& div)
         return *this;
     }
 
-    if (trivialDividend)
-    {
+    if (trivialDividend) {
         // The divisor is non-trivial
         // and therefore the bigger one
         *this = BigInteger::s_bnZeroInt;
         return *this;
     }
 
-    if (trivialDivisor)
-    {
+    if (trivialDivisor) {
         assert(!dividend._bits.empty());
         uint_array bits = BigIntegerCalculator::divide(dividend._bits, std::abs(divisor._sign));
         *this = BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
@@ -851,38 +705,31 @@ BigInteger& BigInteger::operator/=(const BigInteger& div)
 
     assert(!dividend._bits.empty() && !divisor._bits.empty());
 
-    if (dividend._bits.size() < divisor._bits.size())
-    {
+    if (dividend._bits.size() < divisor._bits.size()) {
         *this = BigInteger::s_bnZeroInt;
         return *this;
-    }
-    else
-    {
+    } else {
         uint_array bits = BigIntegerCalculator::divide(dividend._bits, divisor._bits);
         *this = BigInteger(bits, (dividend._sign < 0) ^ (divisor._sign < 0));
         return *this;
     }
 }
 
-BigInteger BigInteger::divide(BigInteger& dividend, const BigInteger& divisor)
-{
+BigInteger BigInteger::divide(BigInteger& dividend, const BigInteger& divisor) {
     return dividend / divisor;
 }
 
-int BigInteger::compare_to(const BigInteger& other) const
-{
+int BigInteger::compare_to(const BigInteger& other) const {
     assert_valid();
     other.assert_valid();
 
-    if ((_sign ^ other._sign) < 0)
-    {
+    if ((_sign ^ other._sign) < 0) {
         // Different signs, so the comparison is easy.
         return _sign < 0 ? -1 : +1;
     }
 
     // Same signs
-    if (_bits.empty())
-    {
+    if (_bits.empty()) {
         if (other._bits.empty())
             return _sign < other._sign ? -1 : _sign > other._sign ? +1 : 0;
         return -other._sign;
@@ -899,44 +746,36 @@ int BigInteger::compare_to(const BigInteger& other) const
     return _bits[cuDiff - 1] < other._bits[cuDiff - 1] ? -_sign : _sign;
 }
 
-int BigInteger::get_diff_length(const uint_array& rgu1, const uint_array& rgu2, int cu)
-{
-    for (int iv = cu; --iv >= 0;)
-    {
+int BigInteger::get_diff_length(const uint_array& rgu1, const uint_array& rgu2, int cu) {
+    for (int iv = cu; --iv >= 0;) {
         if (rgu1[iv] != rgu2[iv])
             return iv + 1;
     }
     return 0;
 }
 
-BigInteger BigInteger::zero()
-{
-	return BigInteger(0);
+BigInteger BigInteger::zero() {
+    return BigInteger(0);
 }
 
-BigInteger BigInteger::one()
-{
-	return BigInteger(1);
+BigInteger BigInteger::one() {
+    return BigInteger(1);
 }
 
-BigInteger BigInteger::minus_one()
-{
-	return BigInteger(-1);
+BigInteger BigInteger::minus_one() {
+    return BigInteger(-1);
 }
 
-int BigInteger::sign() const
-{
+int BigInteger::sign() const {
     assert_valid();
     return (_sign >> (kcbitUint - 1)) - (-_sign >> (kcbitUint - 1));
 }
 
-uint_array BigInteger::get_bits() const
-{
+uint_array BigInteger::get_bits() const {
     return _bits;
 }
 
-bool BigInteger::equals(const BigInteger& other) const
-{
+bool BigInteger::equals(const BigInteger& other) const {
     assert_valid();
     other.assert_valid();
 
@@ -955,8 +794,7 @@ bool BigInteger::equals(const BigInteger& other) const
     return cuDiff == 0;
 }
 
-bool BigInteger::try_parse(const std::string& s, BigInteger& result)
-{
+bool BigInteger::try_parse(const std::string& s, BigInteger& result) {
     try {
         result = parse(s);
         return true;
@@ -965,8 +803,7 @@ bool BigInteger::try_parse(const std::string& s, BigInteger& result)
     }
 }
 
-BigInteger BigInteger::parse(const std::string& s)
-{
+BigInteger BigInteger::parse(const std::string& s) {
     auto b = BigInteger::zero();
     bool is_negative = false;
     unsigned int start_idx = 0;
@@ -992,116 +829,96 @@ BigInteger BigInteger::parse(const std::string& s)
     return b;
 }
 
-std::string BigInteger::to_string() const
-{
+std::string BigInteger::to_string() const {
     // Direct port of the following without format specifier support.
     // https://github.com/dotnet/runtime/blob/b93d5707caa7421ca4696746384b6a14c3e28d63/src/libraries/System.Runtime.Numerics/src/System/Numerics/BigNumber.cs#L601
-        if (_bits.size() == 0)
-        {
-            return std::to_string(_sign);
+    if (_bits.size() == 0) {
+        return std::to_string(_sign);
+    }
+
+    // First convert to base 10^9.
+    const uint32_t kuBase = 1000000000; // 10^9
+    const int kcchBase = 9;
+
+    int cuSrc = _bits.size();
+    int cuMax;
+
+    if (cuSrc > std::numeric_limits<int32_t>::max() / 10) {
+        throw std::overflow_error("SR.Format_TooLarge");
+    } else {
+        cuMax = cuSrc * 10 / 9 + 2;
+    }
+
+    uint_array rguDst(cuMax);
+    int cuDst = 0;
+
+    for (int iuSrc = cuSrc; --iuSrc >= 0;) {
+        uint32_t uCarry = _bits[iuSrc];
+        for (int iuDst = 0; iuDst < cuDst; iuDst++) {
+            assert(rguDst[iuDst] < kuBase);
+            uint64_t uuRes = NumericsHelpers::make_ulong(rguDst[iuDst], uCarry);
+            rguDst[iuDst] = static_cast<uint32_t>(uuRes % kuBase);
+            uCarry = static_cast<uint32_t>(uuRes / kuBase);
         }
 
-        // First convert to base 10^9.
-        const uint32_t kuBase = 1000000000; // 10^9
-        const int kcchBase = 9;
-
-        int cuSrc = _bits.size();
-        int cuMax;
-
-        if (cuSrc > std::numeric_limits<int32_t>::max()/10)
-        {
-            throw std::overflow_error("SR.Format_TooLarge");
-        }
-        else
-        {
-            cuMax = cuSrc * 10 / 9 + 2;
-        }
-
-        uint_array rguDst(cuMax);
-        int cuDst = 0;
-
-        for (int iuSrc = cuSrc; --iuSrc >= 0;)
-        {
-            uint32_t uCarry = _bits[iuSrc];
-            for (int iuDst = 0; iuDst < cuDst; iuDst++)
-            {
-                assert(rguDst[iuDst] < kuBase);
-                uint64_t uuRes = NumericsHelpers::make_ulong(rguDst[iuDst], uCarry);
-                rguDst[iuDst] = static_cast<uint32_t>(uuRes % kuBase);
-                uCarry = static_cast<uint32_t>(uuRes / kuBase);
-            }
-
+        if (uCarry != 0) {
+            rguDst[cuDst++] = uCarry % kuBase;
+            uCarry /= kuBase;
             if (uCarry != 0)
-            {
-                rguDst[cuDst++] = uCarry % kuBase;
-                uCarry /= kuBase;
-                if (uCarry != 0)
-                    rguDst[cuDst++] = uCarry;
-            }
-
+                rguDst[cuDst++] = uCarry;
         }
 
-        int cchMax;
-        if (cuDst > std::numeric_limits<int32_t>::max() / kcchBase)
-        {
-            throw std::overflow_error("SR.Format_TooLarge");
-        } else {
-            cchMax = cuDst * kcchBase;
-        }
+    }
 
-        // We'll pass the rgch buffer to native code, which is going to treat it like a string of digits, so it needs
-        // to be null terminated.  Let's ensure that we can allocate a buffer of that size.
-        int rgchBufSize;
-        if (cchMax == std::numeric_limits<int32_t>::max()) {
-            throw std::overflow_error("SR.Format_TooLarge");
-        } else {
-            rgchBufSize = cchMax + 1;
-        }
+    int cchMax;
+    if (cuDst > std::numeric_limits<int32_t>::max() / kcchBase) {
+        throw std::overflow_error("SR.Format_TooLarge");
+    } else {
+        cchMax = cuDst * kcchBase;
+    }
 
-        char rgch[rgchBufSize];
-        int ichDst = cchMax;
-        for (int iuDst = 0; iuDst < cuDst - 1; iuDst++)
-        {
-            uint32_t uDig = rguDst[iuDst];
-            assert(uDig < kuBase);
-            for (int cch = kcchBase; --cch >= 0;)
-            {
-                rgch[--ichDst] = static_cast<char>('0' + (uDig % 10));
-                uDig /= 10;
-            }
-        }
+    // We'll pass the rgch buffer to native code, which is going to treat it like a string of digits, so it needs
+    // to be null terminated.  Let's ensure that we can allocate a buffer of that size.
+    int rgchBufSize;
+    if (cchMax == std::numeric_limits<int32_t>::max()) {
+        throw std::overflow_error("SR.Format_TooLarge");
+    } else {
+        rgchBufSize = cchMax + 1;
+    }
 
-        for (uint32_t uDig = rguDst[cuDst - 1]; uDig != 0;)
-        {
-            rgch[--ichDst] = static_cast<char>('0' + uDig % 10);
+    char rgch[rgchBufSize];
+    int ichDst = cchMax;
+    for (int iuDst = 0; iuDst < cuDst - 1; iuDst++) {
+        uint32_t uDig = rguDst[iuDst];
+        assert(uDig < kuBase);
+        for (int cch = kcchBase; --cch >= 0;) {
+            rgch[--ichDst] = static_cast<char>('0' + (uDig % 10));
             uDig /= 10;
         }
+    }
 
-        if (_sign < 0)
-        {
-            std::string negativeSign = "-";
-            for (int i = negativeSign.size() - 1; i > -1; i--)
-                rgch[--ichDst] = negativeSign[i];
-        }
+    for (uint32_t uDig = rguDst[cuDst - 1]; uDig != 0;) {
+        rgch[--ichDst] = static_cast<char>('0' + uDig % 10);
+        uDig /= 10;
+    }
 
-        return std::string(&rgch[ichDst], cchMax - ichDst);
+    if (_sign < 0) {
+        std::string negativeSign = "-";
+        for (int i = negativeSign.size() - 1; i > -1; i--)
+            rgch[--ichDst] = negativeSign[i];
+    }
+
+    return std::string(&rgch[ichDst], cchMax - ichDst);
 }
 
-bool BigInteger::get_parts_for_bit_manipulation(const BigInteger& x, uint_array& xd, int& xl)
-{
-    if (x.get_bits().size() == 0)
-    {
-        if (x._sign < 0)
-        {
+bool BigInteger::get_parts_for_bit_manipulation(const BigInteger& x, uint_array& xd, int& xl) {
+    if (x.get_bits().size() == 0) {
+        if (x._sign < 0) {
             xd.push_back(static_cast<uint32_t>(-x._sign));
-        }
-        else
-        {
+        } else {
             xd.push_back(static_cast<uint32_t>(x._sign));
         }
-    }
-    else
-    {
+    } else {
         xd = x.get_bits();
     }
     xl = (x.get_bits().size() == 0 ? 1 : x.get_bits().size());
@@ -1113,19 +930,13 @@ BigInteger operator<<(BigInteger lhs, const int shift) {
     return lhs;
 }
 
-BigInteger& BigInteger::operator<<=(const int shift)
-{
-    if (shift == 0)
-    {
+BigInteger& BigInteger::operator<<=(const int shift) {
+    if (shift == 0) {
         return *this;
-    }
-    else if (shift == std::numeric_limits<int>::min())
-    {
-        *this = ((*this>> std::numeric_limits<int>::max()) >> 1);
+    } else if (shift == std::numeric_limits<int>::min()) {
+        *this = ((*this >> std::numeric_limits<int>::max()) >> 1);
         return *this;
-    }
-    else if (shift < 0)
-    {
+    } else if (shift < 0) {
         *this = *this >> -shift;
         return *this;
     }
@@ -1133,26 +944,23 @@ BigInteger& BigInteger::operator<<=(const int shift)
     int digitShift = shift / kcbitUint;
     int smallShift = shift - (digitShift * kcbitUint);
 
-    uint_array xd; int xl; bool negx;
+    uint_array xd;
+    int xl;
+    bool negx;
     negx = get_parts_for_bit_manipulation(*this, xd, xl);
 
     int zl = xl + digitShift + 1;
     uint_array zd(zl, 0);
 
-    if (smallShift == 0)
-    {
-        for (int i = 0; i < xl; i++)
-        {
+    if (smallShift == 0) {
+        for (int i = 0; i < xl; i++) {
             zd[i + digitShift] = xd[i];
         }
-    }
-    else
-    {
+    } else {
         int carryShift = kcbitUint - smallShift;
         uint32_t carry = 0;
         int i;
-        for (i = 0; i < xl; i++)
-        {
+        for (i = 0; i < xl; i++) {
             unsigned int rot = xd[i];
             zd[i + digitShift] = rot << smallShift | carry;
             carry = rot >> carryShift;
@@ -1163,35 +971,28 @@ BigInteger& BigInteger::operator<<=(const int shift)
     return *this;
 }
 
-uint_array BigInteger::to_uint32_array() const
-{
+uint_array BigInteger::to_uint32_array() const {
     if (_bits.size() == 0 && _sign == 0)
         return uint_array();
 
     uint_array dwords;
     uint32_t highDWord;
 
-    if (_bits.size() == 0)
-    {
+    if (_bits.size() == 0) {
         dwords = uint_array{static_cast<uint32_t>(_sign)};
         highDWord = (_sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
-    }
-    else if (_sign == -1)
-    {
+    } else if (_sign == -1) {
         dwords = _bits;
         NumericsHelpers::dangerous_make_twos_complement(dwords);  // Mutates dwords
         highDWord = std::numeric_limits<uint32_t>::max();
-    }
-    else
-    {
+    } else {
         dwords = _bits;
         highDWord = 0;
     }
 
     // Find highest significant byte
     int msb;
-    for (msb = dwords.size() - 1; msb > 0; msb--)
-    {
+    for (msb = dwords.size() - 1; msb > 0; msb--) {
         if (dwords[msb] != highDWord) break;
     }
     // Ensure high bit is 0 if positive, 1 if negative
@@ -1199,7 +1000,7 @@ uint_array BigInteger::to_uint32_array() const
 
     //uint_array trimmed = new uint[msb + 1 + (needExtraByte ? 1 : 0)];
     uint_array trimmed(msb + 1 + (needExtraByte ? 1 : 0), 0);
-    std::copy(dwords.begin(), dwords.begin()+(msb+1), trimmed.begin());
+    std::copy(dwords.begin(), dwords.begin() + (msb + 1), trimmed.begin());
 
     if (needExtraByte) trimmed[trimmed.size() - 1] = highDWord;
     return trimmed;
@@ -1210,11 +1011,9 @@ BigInteger operator^(BigInteger lhs, const BigInteger& rhs) {
     return lhs;
 }
 
-BigInteger& BigInteger::operator^=(const BigInteger& rhs)
-{
+BigInteger& BigInteger::operator^=(const BigInteger& rhs) {
     BigInteger lhs = *this;
-    if (lhs._bits.size() == 0 && rhs._bits.size() == 0)
-    {
+    if (lhs._bits.size() == 0 && rhs._bits.size() == 0) {
         *this = lhs._sign ^ rhs._sign;
         return *this;
     }
@@ -1225,8 +1024,7 @@ BigInteger& BigInteger::operator^=(const BigInteger& rhs)
     uint32_t xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
     uint32_t yExtend = (rhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
 
-    for (size_t i = 0; i < z.size(); i++)
-    {
+    for (size_t i = 0; i < z.size(); i++) {
         uint32_t xu = (i < x.size()) ? x[i] : xExtend;
         uint32_t yu = (i < y.size()) ? y[i] : yExtend;
         z[i] = xu ^ yu;
@@ -1241,19 +1039,13 @@ BigInteger operator>>(BigInteger lhs, const int shift) {
     return lhs;
 }
 
-BigInteger& BigInteger::operator>>=(const int shift)
-{
-    if (shift == 0)
-    {
+BigInteger& BigInteger::operator>>=(const int shift) {
+    if (shift == 0) {
         return *this;
-    }
-    else if (shift == std::numeric_limits<int>::min())
-    {
+    } else if (shift == std::numeric_limits<int>::min()) {
         *this = ((*this << std::numeric_limits<int>::max()) << 1);
         return *this;
-    }
-    else if (shift < 0)
-    {
+    } else if (shift < 0) {
         *this <<= -shift;
         return *this;
     }
@@ -1261,13 +1053,13 @@ BigInteger& BigInteger::operator>>=(const int shift)
     int digitShift = shift / kcbitUint;
     int smallShift = shift - (digitShift * kcbitUint);
 
-    uint_array xd; int xl; bool negx;
+    uint_array xd;
+    int xl;
+    bool negx;
     negx = get_parts_for_bit_manipulation(*this, xd, xl);
 
-    if (negx)
-    {
-        if (shift >= (kcbitUint * xl))
-        {
+    if (negx) {
+        if (shift >= (kcbitUint * xl)) {
             *this = s_bnMinusOneInt;
             return *this;
         }
@@ -1280,19 +1072,14 @@ BigInteger& BigInteger::operator>>=(const int shift)
     if (zl < 0) zl = 0;
     uint_array zd(zl, 0);
 
-    if (smallShift == 0)
-    {
-        for (int i = xl - 1; i >= digitShift; i--)
-        {
+    if (smallShift == 0) {
+        for (int i = xl - 1; i >= digitShift; i--) {
             zd[i - digitShift] = xd[i];
         }
-    }
-    else
-    {
+    } else {
         int carryShift = kcbitUint - smallShift;
         uint32_t carry = 0;
-        for (int i = xl - 1; i >= digitShift; i--)
-        {
+        for (int i = xl - 1; i >= digitShift; i--) {
             uint32_t rot = xd[i];
             if (negx && i == xl - 1)
                 // Sign-extend the first shift for negative ints then let the carry propagate
@@ -1302,8 +1089,7 @@ BigInteger& BigInteger::operator>>=(const int shift)
             carry = rot << carryShift;
         }
     }
-    if (negx)
-    {
+    if (negx) {
         NumericsHelpers::dangerous_make_twos_complement(zd); // Mutates zd
     }
     *this = BigInteger(zd, negx);
@@ -1315,17 +1101,14 @@ BigInteger operator&(BigInteger lhs, const BigInteger& rhs) {
     return lhs;
 }
 
-BigInteger& BigInteger::operator&=(const BigInteger& rhs)
-{
+BigInteger& BigInteger::operator&=(const BigInteger& rhs) {
     BigInteger lhs = *this;
-    if (lhs.is_zero() || rhs.is_zero())
-    {
+    if (lhs.is_zero() || rhs.is_zero()) {
         *this = BigInteger::zero();
         return *this;
     }
 
-    if (lhs.get_bits().size() == 0 && rhs.get_bits().size() == 0)
-    {
+    if (lhs.get_bits().size() == 0 && rhs.get_bits().size() == 0) {
         *this = lhs._sign & rhs._sign;
         return *this;
     }
@@ -1336,8 +1119,7 @@ BigInteger& BigInteger::operator&=(const BigInteger& rhs)
     uint xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
     uint yExtend = (rhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
 
-    for (size_t i = 0; i < z.size(); i++)
-    {
+    for (size_t i = 0; i < z.size(); i++) {
         uint xu = (i < x.size()) ? x[i] : xExtend;
         uint yu = (i < y.size()) ? y[i] : yExtend;
         z[i] = xu & yu;
@@ -1346,25 +1128,21 @@ BigInteger& BigInteger::operator&=(const BigInteger& rhs)
     return *this;
 }
 
-BigInteger BigInteger::negate(const BigInteger& value)
-{
+BigInteger BigInteger::negate(const BigInteger& value) {
     return BigInteger(-value._sign, value._bits);
 }
 
-int Compare(BigInteger& lhs, BigInteger& rhs)
-{
+int Compare(BigInteger& lhs, BigInteger& rhs) {
     return lhs.compare_to(rhs);
 }
 
-static BigInteger& Max(BigInteger& lhs, BigInteger& rhs)
-{
+static BigInteger& Max(BigInteger& lhs, BigInteger& rhs) {
     if (lhs.compare_to(rhs) < 0)
         return rhs;
     return lhs;
 }
 
-static BigInteger& Min(BigInteger& lhs, BigInteger& rhs)
-{
+static BigInteger& Min(BigInteger& lhs, BigInteger& rhs) {
     if (lhs.compare_to(rhs) <= 0)
         return lhs;
     return rhs;
@@ -1375,8 +1153,7 @@ BigInteger operator|(BigInteger lhs, const BigInteger& rhs) {
     return lhs;
 }
 
-BigInteger& BigInteger::operator|=(const BigInteger& rhs)
-{
+BigInteger& BigInteger::operator|=(const BigInteger& rhs) {
     BigInteger lhs = *this;
     if (lhs.is_zero()) {
         *this = rhs;
@@ -1386,8 +1163,7 @@ BigInteger& BigInteger::operator|=(const BigInteger& rhs)
         return *this;
     }
 
-    if (lhs._bits.size() == 0 && rhs._bits.size() == 0)
-    {
+    if (lhs._bits.size() == 0 && rhs._bits.size() == 0) {
         *this = lhs._sign | rhs._sign;
         return *this;
     }
@@ -1398,8 +1174,7 @@ BigInteger& BigInteger::operator|=(const BigInteger& rhs)
     uint xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
     uint yExtend = (rhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
 
-    for (size_t i = 0; i < z.size(); i++)
-    {
+    for (size_t i = 0; i < z.size(); i++) {
         uint xu = (i < x.size()) ? x[i] : xExtend;
         uint yu = (i < y.size()) ? y[i] : yExtend;
         z[i] = xu | yu;
@@ -1408,37 +1183,31 @@ BigInteger& BigInteger::operator|=(const BigInteger& rhs)
     return *this;
 }
 
-int BigInteger::get_byte_count(bool isUnsigned) const
-{
+int BigInteger::get_byte_count(bool isUnsigned) const {
     int bytesWritten = 0;
     this->to_byte_array(GetBytesMode::Count, isUnsigned, false, &bytesWritten);
     return bytesWritten;
 }
 
-byte_array BigInteger::to_byte_array(bool isUnsigned, bool isBigEndian) const
-{
+byte_array BigInteger::to_byte_array(bool isUnsigned, bool isBigEndian) const {
     int ignored = 0;
     return this->to_byte_array(GetBytesMode::AllocateArray, isUnsigned, isBigEndian, &ignored);
 }
 
-byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool isBigEndian, int* bytesWritten) const
-{
+byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool isBigEndian, int* bytesWritten) const {
     int sign = _sign;
-    if (sign == 0)
-    {
-        switch (mode)
-        {
+    if (sign == 0) {
+        switch (mode) {
             case GetBytesMode::Count:
                 *bytesWritten = 1;
                 return byte_array();
             default:
                 *bytesWritten = 1;
-                return byte_array(1,0);
+                return byte_array(1, 0);
         }
     }
 
-    if (isUnsigned && sign < 0)
-    {
+    if (isUnsigned && sign < 0) {
         throw std::runtime_error("Overflow error can't have unsigned & sing < 0");
     }
 
@@ -1446,13 +1215,10 @@ byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool is
     int nonZeroDwordIndex = 0;
     uint32_t highDword;
     uint_array bits = _bits;
-    if (bits.size() == 0)
-    {
+    if (bits.size() == 0) {
         highByte = static_cast<byte>((sign < 0) ? 0xff : 0x00);
         highDword = static_cast<uint32_t>(sign);
-    }
-    else if (sign == -1)
-    {
+    } else if (sign == -1) {
         highByte = 0xff;
 
         // If sign is -1, we will need to two's complement bits.
@@ -1466,21 +1232,17 @@ byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool is
         // would be encoded as _bits = null and _sign = 0.
         assert(bits.size() > 0);
         assert(bits[bits.size() - 1] != 0);
-        while (bits[nonZeroDwordIndex] == 0U)
-        {
+        while (bits[nonZeroDwordIndex] == 0U) {
             nonZeroDwordIndex++;
         }
 
         highDword = ~bits[bits.size() - 1];
-        if (bits.size() - 1 == nonZeroDwordIndex)
-        {
+        if (bits.size() - 1 == nonZeroDwordIndex) {
             // This will not overflow because highDword is less than or equal to uint.MaxValue - 1.
             assert(highDword <= std::numeric_limits<uint32_t>::max() - 1);
             highDword += 1U;
         }
-    }
-    else
-    {
+    } else {
         assert(sign == 1);
         highByte = 0x00;
         highDword = bits[bits.size() - 1];
@@ -1488,20 +1250,13 @@ byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool is
 
     byte msb;
     int msbIndex;
-    if ((msb = static_cast<byte>((highDword >> 24))) != highByte)
-    {
+    if ((msb = static_cast<byte>((highDword >> 24))) != highByte) {
         msbIndex = 3;
-    }
-    else if ((msb = static_cast<byte>((highDword >> 16))) != highByte)
-    {
+    } else if ((msb = static_cast<byte>((highDword >> 16))) != highByte) {
         msbIndex = 2;
-    }
-    else if ((msb = static_cast<byte>((highDword >> 8))) != highByte)
-    {
+    } else if ((msb = static_cast<byte>((highDword >> 8))) != highByte) {
         msbIndex = 1;
-    }
-    else
-    {
+    } else {
         msb = static_cast<byte>(highDword);
         msbIndex = 0;
     }
@@ -1509,14 +1264,12 @@ byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool is
     // Ensure high bit is 0 if positive, 1 if negative
     bool needExtraByte = (msb & 0x80) != (highByte & 0x80) && !isUnsigned;
     int length = msbIndex + 1 + (needExtraByte ? 1 : 0);
-    if (bits.size() != 0)
-    {
+    if (bits.size() != 0) {
         length = 4 * (bits.size() - 1) + length;
     }
 
     byte_array destination;
-    switch (mode)
-    {
+    switch (mode) {
         case GetBytesMode::Count:
             *bytesWritten = length;
             return byte_array();
@@ -1528,17 +1281,13 @@ byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool is
     int curByte = isBigEndian ? length - 1 : 0;
     int increment = isBigEndian ? -1 : 1;
 
-    if (bits.size() != 0)
-    {
-        for (size_t i = 0; i < bits.size() - 1; i++)
-        {
+    if (bits.size() != 0) {
+        for (size_t i = 0; i < bits.size() - 1; i++) {
             uint dword = bits[i];
 
-            if (sign == -1)
-            {
+            if (sign == -1) {
                 dword = ~dword;
-                if (i <= nonZeroDwordIndex)
-                {
+                if (i <= nonZeroDwordIndex) {
                     dword = dword + 1U;
                 }
 
@@ -1557,16 +1306,13 @@ byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool is
 
     assert(msbIndex >= 0 && msbIndex <= 3);
     destination[curByte] = static_cast<byte>(highDword);
-    if (msbIndex != 0)
-    {
+    if (msbIndex != 0) {
         curByte += increment;
         destination[curByte] = static_cast<byte>((highDword >> 8));
-        if (msbIndex != 1)
-        {
+        if (msbIndex != 1) {
             curByte += increment;
             destination[curByte] = static_cast<byte>((highDword >> 16));
-            if (msbIndex != 2)
-            {
+            if (msbIndex != 2) {
                 curByte += increment;
                 destination[curByte] = static_cast<byte>((highDword >> 24));
             }
@@ -1578,8 +1324,7 @@ byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool is
     // Assert we're little endian, or big endian consistency holds.
     assert(!isBigEndian || (!needExtraByte && curByte == 0) || (needExtraByte && curByte == 1));
 
-    if (needExtraByte)
-    {
+    if (needExtraByte) {
         curByte += increment;
         destination[curByte] = highByte;
     }
@@ -1587,18 +1332,14 @@ byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool is
     return destination;
 }
 
-void BigInteger::assert_valid() const
-{
+void BigInteger::assert_valid() const {
 
-    if (!_bits.empty())
-    {
+    if (!_bits.empty()) {
         assert(_sign == 1 || _sign == -1);
         assert(_bits.size() > 0);
         assert(_bits.size() > 1 || _bits[0] >= kuMaskHighBit);
         assert(_bits[_bits.size() - 1] != 0);
-    }
-    else
-    {
+    } else {
         assert(_sign > std::numeric_limits<int>::min());
     }
 }
@@ -1689,7 +1430,7 @@ BigInteger::operator double() {
             return -std::numeric_limits<double>::infinity();
     }
 
-    unsigned long h = _bits[length -1];
+    unsigned long h = _bits[length - 1];
     unsigned long m = length > 1 ? _bits[length - 2] : 0;
     unsigned long l = length > 2 ? _bits[length - 3] : 0;
 
@@ -1730,7 +1471,8 @@ double BigInteger::log(const BigInteger& value, double baseValue) {
     int64_t b = static_cast<int64_t>(value._bits.size() * 32 - c);
 
     uint64_t x = (h << (32 + c)) | (m << c) | (l >> (32 - c));
-    return NumericsHelpers::csharp_log_wrapper(x, baseValue) + (b - 64) / NumericsHelpers::csharp_log_wrapper(baseValue, 2);
+    return NumericsHelpers::csharp_log_wrapper(x, baseValue) +
+           (b - 64) / NumericsHelpers::csharp_log_wrapper(baseValue, 2);
 }
 
 double BigInteger::log10(const BigInteger& value) {
@@ -1759,12 +1501,11 @@ BigInteger BigInteger::pow(const BigInteger& value, int exponent) {
             return value;
     }
     uint_array bits = trivialValue
-            ? BigIntegerCalculator::pow(std::abs(value._sign), std::abs(exponent))
-            : BigIntegerCalculator::pow(value._bits, std::abs(exponent));
+                      ? BigIntegerCalculator::pow(std::abs(value._sign), std::abs(exponent))
+                      : BigIntegerCalculator::pow(value._bits, std::abs(exponent));
 
     return BigInteger(bits, value._sign < 0 && (exponent & 1) != 0);
 }
-
 
 
 BigInteger BigInteger::mod_pow(const BigInteger& value, const BigInteger& exponent, const BigInteger& modulus) {
@@ -1797,7 +1538,7 @@ BigInteger BigInteger::mod_pow(const BigInteger& value, const BigInteger& expone
     } else {
         uint_array bits;
         if (trivialValue && trivialExponent) {
-                bits = BigIntegerCalculator::pow(std::abs(value._sign), std::abs(exponent._sign), modulus._bits);
+            bits = BigIntegerCalculator::pow(std::abs(value._sign), std::abs(exponent._sign), modulus._bits);
         } else {
             if (trivialValue)
                 bits = BigIntegerCalculator::pow(std::abs(value._sign), exponent._bits, modulus._bits);
@@ -1812,8 +1553,7 @@ BigInteger BigInteger::mod_pow(const BigInteger& value, const BigInteger& expone
     }
 }
 
-BigInteger BigInteger::remainder(BigInteger& dividend, const BigInteger& divisor)
-{
+BigInteger BigInteger::remainder(BigInteger& dividend, const BigInteger& divisor) {
     return dividend % divisor;
 }
 
@@ -1824,13 +1564,11 @@ BigInteger BigInteger::greatest_common_divisor(const BigInteger& left, const Big
     bool trivialLeft = left._bits.empty();
     bool trivialRight = right._bits.empty();
 
-    if (trivialLeft && trivialRight)
-    {
+    if (trivialLeft && trivialRight) {
         return BigIntegerCalculator::gcd((uint32_t) std::abs(left._sign), std::abs(right._sign));
     }
 
-    if (trivialLeft)
-    {
+    if (trivialLeft) {
         assert(!right._bits.empty());
         if (left._sign != 0) {
             auto result = BigIntegerCalculator::gcd(right._bits, std::abs(left._sign));
@@ -1840,8 +1578,7 @@ BigInteger BigInteger::greatest_common_divisor(const BigInteger& left, const Big
         }
     }
 
-    if (trivialRight)
-    {
+    if (trivialRight) {
         assert(!left._bits.empty());
         if (right._sign != 0) {
             auto result = BigIntegerCalculator::gcd(left._bits, std::abs(right._sign));
@@ -1853,29 +1590,23 @@ BigInteger BigInteger::greatest_common_divisor(const BigInteger& left, const Big
 
     assert(!left._bits.empty() && !right._bits.empty());
 
-    if (BigIntegerCalculator::compare(left._bits, right._bits) < 0)
-    {
+    if (BigIntegerCalculator::compare(left._bits, right._bits) < 0) {
         return greatest_common_divisor(right._bits, left._bits);
-    }
-    else
-    {
+    } else {
         return greatest_common_divisor(left._bits, right._bits);
     }
 }
 
-BigInteger BigInteger::greatest_common_divisor(const uint_array& leftBits, const uint_array& rightBits)
-{
+BigInteger BigInteger::greatest_common_divisor(const uint_array& leftBits, const uint_array& rightBits) {
     assert(BigIntegerCalculator::compare(leftBits, rightBits) >= 0);
 
     // Short circuits to spare some allocations...
-    if (rightBits.size() == 1)
-    {
+    if (rightBits.size() == 1) {
         uint temp = BigIntegerCalculator::remainder(leftBits, rightBits[0]);
         return BigIntegerCalculator::gcd(rightBits[0], temp);
     }
 
-    if (rightBits.size() == 2)
-    {
+    if (rightBits.size() == 2) {
         auto tempBits = BigIntegerCalculator::remainder(leftBits, rightBits);
 
         uint64_t left = (static_cast<uint64_t>(rightBits[1]) << 32) | rightBits[0];
@@ -1894,18 +1625,15 @@ BigInteger BigInteger::operator~() {
     return -(res);
 }
 
-BigInteger BigInteger::abs(BigInteger &value) {
+BigInteger BigInteger::abs(BigInteger& value) {
     return (value >= zero()) ? value : -value;
 }
 
 BigInteger::BigInteger(double value) {
-    if (!double_IsFinite(value))
-    {
-        if (double_IsInfinity(value))
-        {
+    if (!double_IsFinite(value)) {
+        if (double_IsInfinity(value)) {
             throw std::overflow_error("SR.Overflow_BigIntInfinity");
-        }
-        else // NaN
+        } else // NaN
         {
             throw std::overflow_error("SR.Overflow_NotANumber");
         }
@@ -1920,8 +1648,7 @@ BigInteger::BigInteger(double value) {
     NumericsHelpers::get_double_parts(value, sign, exp, man, fFinite);
     assert(sign == +1 || sign == -1);
 
-    if (man == 0)
-    {
+    if (man == 0) {
         *this = zero();
         return;
     }
@@ -1929,25 +1656,19 @@ BigInteger::BigInteger(double value) {
     assert(man < (1UL << 53));
     assert(exp <= 0 || man >= (1UL << 52));
 
-    if (exp <= 0)
-    {
-        if (exp <= -kcbitUlong)
-        {
+    if (exp <= 0) {
+        if (exp <= -kcbitUlong) {
             *this = zero();
             return;
         }
         *this = man >> -exp;
         if (sign < 0)
             _sign = -_sign;
-    }
-    else if (exp <= 11)
-    {
+    } else if (exp <= 11) {
         *this = man << exp;
         if (sign < 0)
             _sign = -_sign;
-    }
-    else
-    {
+    } else {
         // Overflow into at least 3 uints.
         // Move the leading 1 to the high bit.
         man <<= 11;
@@ -1960,8 +1681,8 @@ BigInteger::BigInteger(double value) {
         assert(cu >= 1);
 
         // Populate the uints.
-        _bits = uint_array(cu+2, 0);
-        _bits[cu + 1] = (uint)(man >> (cbit + kcbitUint));
+        _bits = uint_array(cu + 2, 0);
+        _bits[cu + 1] = (uint) (man >> (cbit + kcbitUint));
         _bits[cu] = static_cast<unsigned int>((man >> cbit));
         if (cbit > 0)
             _bits[cu - 1] = static_cast<unsigned int>(man) << (kcbitUint - cbit);
@@ -1973,17 +1694,17 @@ BigInteger::BigInteger(double value) {
 }
 
 bool BigInteger::double_IsFinite(double value) {
-    auto bits = *((long*)&value);
+    auto bits = *((long*) &value);
     return (bits & 0x7FFFFFFFFFFFFFFF) < 0x7FF0000000000000;
 }
 
 bool BigInteger::double_IsNaN(double value) {
-    auto bits = *((long*)&value);
+    auto bits = *((long*) &value);
     return (bits & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000;
 }
 
 bool BigInteger::double_IsInfinity(double value) {
-    auto bits = *((long*)&value);
+    auto bits = *((long*) &value);
     return (bits & 0x7FFFFFFFFFFFFFFF) == 0x7FF0000000000000;
 }
 

@@ -1,8 +1,7 @@
 #include "../../include/BigIntegerCalculator.h"
 #include <cassert>
 
-uint_array BigIntegerCalculator::add(const uint_array& lhs, uint32_t rhs)
-{
+uint_array BigIntegerCalculator::add(const uint_array& lhs, uint32_t rhs) {
     assert(!lhs.empty());
     assert(lhs.size() >= 1);
 
@@ -16,8 +15,7 @@ uint_array BigIntegerCalculator::add(const uint_array& lhs, uint32_t rhs)
     bits[0] = static_cast<uint32_t>(digit);
     long carry = digit >> 32;
 
-    for (size_t i = 1; i < lhs.size(); i++)
-    {
+    for (size_t i = 1; i < lhs.size(); i++) {
         digit = lhs[i] + carry;
         bits[i] = static_cast<uint32_t>(digit);
         carry = digit >> 32;
@@ -27,8 +25,7 @@ uint_array BigIntegerCalculator::add(const uint_array& lhs, uint32_t rhs)
     return bits;
 }
 
-uint_array BigIntegerCalculator::add(const uint_array& lhs, const uint_array& rhs)
-{
+uint_array BigIntegerCalculator::add(const uint_array& lhs, const uint_array& rhs) {
     assert(!lhs.empty());
     assert(!rhs.empty());
     assert(lhs.size() >= rhs.size());
@@ -40,8 +37,8 @@ uint_array BigIntegerCalculator::add(const uint_array& lhs, const uint_array& rh
     return bits;
 }
 
-void BigIntegerCalculator::add(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint32_t* bits, int bitsLength)
-{
+void BigIntegerCalculator::add(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint32_t* bits,
+                               int bitsLength) {
     assert(lhsLength >= 0);
     assert(rhsLength >= 0);
     assert(lhsLength >= rhsLength);
@@ -50,15 +47,13 @@ void BigIntegerCalculator::add(const uint32_t* lhs, int lhsLength, const uint32_
     int i = 0;
     uint64_t carry = 0L;
 
-    for (; i < rhsLength; i++)
-    {
+    for (; i < rhsLength; i++) {
         uint64_t digit = (lhs[i] + carry) + rhs[i];
         bits[i] = static_cast<uint32_t>(digit);
         carry = digit >> 32;
     }
 
-    for (; i < lhsLength; i++)
-    {
+    for (; i < lhsLength; i++) {
         uint64_t digit = lhs[i] + carry;
         bits[i] = static_cast<uint32_t>(digit);
         carry = digit >> 32;
@@ -67,8 +62,7 @@ void BigIntegerCalculator::add(const uint32_t* lhs, int lhsLength, const uint32_
     bits[i] = static_cast<uint32_t>(carry);
 }
 
-void BigIntegerCalculator::add_self(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength)
-{
+void BigIntegerCalculator::add_self(uint32_t* lhs, int lhsLength, uint32_t* rhs, int rhsLength) {
     assert(*lhs >= 0);
     assert(*rhs >= 0);
     assert(lhsLength >= rhsLength);
@@ -80,14 +74,12 @@ void BigIntegerCalculator::add_self(uint32_t* lhs, int lhsLength, uint32_t* rhs,
     int i = 0;
     long carry = 0L;
 
-    for (; i < rhsLength; i++)
-    {
+    for (; i < rhsLength; i++) {
         long digit = lhs[i] + carry + rhs[i];
         lhs[i] = static_cast<uint32_t>(digit);
         carry = digit >> 32;
     }
-    for (; carry != 0 && i < lhsLength; i++)
-    {
+    for (; carry != 0 && i < lhsLength; i++) {
         long digit = lhs[i] + carry;
         lhs[i] = static_cast<uint>(digit);
         carry = digit >> 32;
@@ -96,8 +88,7 @@ void BigIntegerCalculator::add_self(uint32_t* lhs, int lhsLength, uint32_t* rhs,
     assert(carry == 0);
 }
 
-uint_array BigIntegerCalculator::subtract(const uint_array& lhs, uint32_t rhs)
-{
+uint_array BigIntegerCalculator::subtract(const uint_array& lhs, uint32_t rhs) {
     assert(!lhs.empty());
     assert(lhs.size() >= 1);
     assert(lhs[0] >= rhs || lhs.size() >= 2);
@@ -108,12 +99,11 @@ uint_array BigIntegerCalculator::subtract(const uint_array& lhs, uint32_t rhs)
 
     uint_array bits(lhs.size());
 
-    long digit = (long)lhs[0] - rhs;
+    long digit = (long) lhs[0] - rhs;
     bits[0] = static_cast<uint32_t>(digit);
     long carry = digit >> 32;
 
-    for (size_t i = 1; i < lhs.size(); i++)
-    {
+    for (size_t i = 1; i < lhs.size(); i++) {
         digit = lhs[i] + carry;
         bits[i] = static_cast<uint32_t>(digit);
         carry = digit >> 32;
@@ -122,8 +112,7 @@ uint_array BigIntegerCalculator::subtract(const uint_array& lhs, uint32_t rhs)
     return bits;
 }
 
-uint_array BigIntegerCalculator::subtract(const uint_array& lhs, const uint_array& rhs)
-{
+uint_array BigIntegerCalculator::subtract(const uint_array& lhs, const uint_array& rhs) {
     assert(!lhs.empty());
     assert(!rhs.empty());
     assert(lhs.size() >= rhs.size());
@@ -136,8 +125,9 @@ uint_array BigIntegerCalculator::subtract(const uint_array& lhs, const uint_arra
     return bits;
 }
 
-void BigIntegerCalculator::subtract(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint32_t* bits, int bitsLength)
-{
+void
+BigIntegerCalculator::subtract(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength, uint32_t* bits,
+                               int bitsLength) {
     assert(lhsLength >= 0);
     assert(rhsLength >= 0);
     assert(lhsLength >= rhsLength);
@@ -152,14 +142,12 @@ void BigIntegerCalculator::subtract(const uint32_t* lhs, int lhsLength, const ui
     int i = 0;
     long carry = 0L;
 
-    for (; i < rhsLength; i++)
-    {
+    for (; i < rhsLength; i++) {
         long digit = lhs[i] + carry - rhs[i];
         bits[i] = static_cast<uint32_t>(digit);
         carry = digit >> 32;
     }
-    for (; i < lhsLength; i++)
-    {
+    for (; i < lhsLength; i++) {
         long digit = lhs[i] + carry;
         bits[i] = static_cast<uint32_t>(digit);
         carry = digit >> 32;
@@ -168,7 +156,7 @@ void BigIntegerCalculator::subtract(const uint32_t* lhs, int lhsLength, const ui
     assert(carry == 0);
 }
 
-void BigIntegerCalculator::subtract_self(uint32_t *left, int leftLength, uint32_t *right, int rightLength) {
+void BigIntegerCalculator::subtract_self(uint32_t* left, int leftLength, uint32_t* right, int rightLength) {
     int i = 0;
     long carry = 0;
 
@@ -184,8 +172,7 @@ void BigIntegerCalculator::subtract_self(uint32_t *left, int leftLength, uint32_
     }
 }
 
-int BigIntegerCalculator::compare(uint_array lhs, uint_array rhs)
-{
+int BigIntegerCalculator::compare(uint_array lhs, uint_array rhs) {
     assert(!lhs.empty());
     assert(!rhs.empty());
 
@@ -194,8 +181,7 @@ int BigIntegerCalculator::compare(uint_array lhs, uint_array rhs)
     if (lhs.size() > rhs.size())
         return 1;
 
-    for (int i = lhs.size() - 1; i >= 0; i--)
-    {
+    for (int i = lhs.size() - 1; i >= 0; i--) {
         if (lhs[i] < rhs[i])
             return -1;
         if (lhs[i] > rhs[i])
@@ -204,8 +190,7 @@ int BigIntegerCalculator::compare(uint_array lhs, uint_array rhs)
     return 0;
 }
 
-int BigIntegerCalculator::compare(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength)
-{
+int BigIntegerCalculator::compare(const uint32_t* lhs, int lhsLength, const uint32_t* rhs, int rhsLength) {
     assert(lhsLength >= 0);
     assert(rhsLength >= 0);
 
@@ -214,8 +199,7 @@ int BigIntegerCalculator::compare(const uint32_t* lhs, int lhsLength, const uint
     if (lhsLength > rhsLength)
         return 1;
 
-    for (int i = lhsLength - 1; i >= 0; i--)
-    {
+    for (int i = lhsLength - 1; i >= 0; i--) {
         if (lhs[i] < rhs[i])
             return -1;
         if (lhs[i] > rhs[i])

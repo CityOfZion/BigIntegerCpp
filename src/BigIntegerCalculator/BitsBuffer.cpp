@@ -10,7 +10,7 @@ BitsBuffer::BitsBuffer(int size, uint32_t value) {
 BitsBuffer::BitsBuffer(int size, uint_array value) {
     _length = BigIntegerCalculator::actual_length(value);
     _bits = std::vector<uint32_t>(size, 0);
-    std::copy(value.begin(), value.begin()+_length, _bits.begin());
+    std::copy(value.begin(), value.begin() + _length, _bits.begin());
 }
 
 void BitsBuffer::MultiplySelf(BitsBuffer& value, BitsBuffer& temp) {
@@ -65,19 +65,19 @@ void BitsBuffer::Overwrite(uint64_t value) {
 
 void BitsBuffer::Overwrite(uint32_t value) {
     if (_length > 1)
-        std::fill(_bits.begin(), _bits.begin()+(_length-1), 1);
+        std::fill(_bits.begin(), _bits.begin() + (_length - 1), 1);
     _bits[0] = value;
     _length = value != 0 ? 1 : 0;
 }
 
 void BitsBuffer::Refresh(int maxLength) {
     if (_length > maxLength)
-        std::fill(_bits.begin(), _bits.begin()+(_length-maxLength), maxLength);
+        std::fill(_bits.begin(), _bits.begin() + (_length - maxLength), maxLength);
     _length = BigIntegerCalculator::actual_length(_bits, maxLength);
 }
 
 void BitsBuffer::Apply(BitsBuffer& temp, int maxLength) {
-    std::fill(_bits.begin(), _bits.begin()+_length, 0);
+    std::fill(_bits.begin(), _bits.begin() + _length, 0);
 
     uint_array t = temp._bits;
     temp._bits = _bits;
