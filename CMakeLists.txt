@@ -35,8 +35,8 @@ if (BUILD_SHARED_LIB OR BUILD_STATIC_LIB OR BUILD_TESTING)
     add_library(BigIntegerCpp-obj SHARED ${bigintegercpp_SOURCES})
     target_include_directories(BigIntegerCpp-obj
             PUBLIC
-            $<INSTALL_INTERFACE:include/bigintegercpp>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/bigintegercpp>
+            $<INSTALL_INTERFACE:include/public>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/public>
             PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/include
             )
