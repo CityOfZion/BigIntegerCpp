@@ -994,6 +994,8 @@ BigInteger BigInteger::parse(const std::string& s)
 
 std::string BigInteger::to_string() const
 {
+    // Direct port of the following without format specifier support.
+    // https://github.com/dotnet/runtime/blob/b93d5707caa7421ca4696746384b6a14c3e28d63/src/libraries/System.Runtime.Numerics/src/System/Numerics/BigNumber.cs#L601
         if (_bits.size() == 0)
         {
             return std::to_string(_sign);
