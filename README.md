@@ -20,7 +20,7 @@ You can define various options during the configure stage to control the output
 |-----------------------|---------|------------------------------|
 | BUILD_SHARED_LIB      | ON      |                              |
 | BUILD_STATIC_LIB      | OFF     |                              |
-| BUILD_TESTSING        | OFF     |                              |
+| BUILD_TESTING         | OFF     |                              |
 | BUILD_PYTHON_BINDINGS | OFF     | For more information go [here](bindings/python/README.md) |
 
 ### Running the tests
@@ -69,7 +69,7 @@ Source.cpp
 
    It is purpose build for use in relationship to the [NEO blockchain](https://github.com/neo-project/) project. 
    In order to create a compliant port of their virtual machine a need for a compliant BigInteger implementation exists. 
-   Any difference in for example the [modulo implementation](https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition) can result in VM execution deviation. This is just one of the many problems we've encountered after creating a pure Python port. 
+   Any difference, in for example the [modulo implementation](https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition), can result in VM execution deviation. This is just one of the many problems we've encountered after creating a pure Python port. 
 
 2) Should I this project?
 
@@ -77,4 +77,11 @@ Source.cpp
 
 3) How fast is it?
     
-    We don't know. The focus has been on conformity to the C# BigInteger class, not on speed. If you want speed you might want to look at https://gmplib.org/
+   We don't know. The focus has been on conformity to the C# BigInteger class, not on speed. If you want speed you might want to look at https://gmplib.org/
+
+4) Are there any known behavioural deviations from the C# implementation?
+
+   The only known deviations are in the string parsing and conversion to string methods. Specifically, the overloads with `IFormatProvider` are not supported.
+   Only base10 parsing is supported. String input may be prepended with `+` or `-`. Any whitespace is considered the end of the input.
+   
+   Deviations in any other parts are considered bugs. Please report them.
