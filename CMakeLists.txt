@@ -5,13 +5,12 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
 
-option(BUILD_PYTHON_BINDINGS "Build the Python bindings" ON)
+option(BUILD_PYTHON_BINDINGS "Build the Python bindings" OFF)
 option(BUILD_SHARED_LIB "Build a shared library" ON)
 option(BUILD_STATIC_LIB "Build a static library" OFF)
 
 set(bigintegercpp_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/BigInteger.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/BigNumber.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/BigIntegerCalculator/AddSub.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/BigIntegerCalculator/BitsBuffer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/BigIntegerCalculator/DivRem.cpp
@@ -23,7 +22,6 @@ set(bigintegercpp_SOURCES
 set(bigintegercpp_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include/public/bigintegercpp/BigInteger.h)
 set(bigintegercpp_PRIVATE_INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/BigIntegerCalculator.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/BigNumber.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/BitsBuffer.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/exceptions.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/FastReducer.h

@@ -51,8 +51,8 @@ class BigInteger {
         static BigInteger one();
         static BigInteger minus_one();
 
-        static BigInteger parse(std::string value);
-        static bool try_parse(std::string value, BigInteger& result);
+        static BigInteger parse(const std::string& s);
+        static bool try_parse(const std::string& s, BigInteger& result);
 
         static BigInteger negate(const BigInteger& value);
         static BigInteger abs(BigInteger& value);

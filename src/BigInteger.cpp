@@ -1,5 +1,4 @@
 #include "../include/public/bigintegercpp/BigInteger.h"
-#include "../include/BigNumber.h"
 #include "../include/NumericsHelpers.h"
 #include "../include/exceptions.h"
 
@@ -956,19 +955,134 @@ bool BigInteger::equals(const BigInteger& other) const
     return cuDiff == 0;
 }
 
-bool BigInteger::try_parse(std::string value, BigInteger& result)
+bool BigInteger::try_parse(const std::string& s, BigInteger& result)
 {
-    return BigNumber::try_parse_biginteger(value, result);
+    try {
+        result = parse(s);
+        return true;
+    } catch (...) {
+        return false;
+    }
 }
 
-BigInteger BigInteger::parse(std::string value)
+BigInteger BigInteger::parse(const std::string& s)
 {
-    return BigNumber::parse_biginteger(value);
+    auto b = BigInteger::zero();
+    bool is_negative = false;
+    unsigned int start_idx = 0;
+    if (s[0] == '-') {
+        is_negative = true;
+        start_idx = 1;
+    } else if (s[0] == '+') {
+        start_idx = 1;
+    }
+
+    for (auto it = s.begin() + start_idx; it != s.end(); it++) {
+        auto ch = *it;
+        if (ch >= '0' && ch <= '9') {
+            b *= 10;
+            b += static_cast<unsigned int>(ch - '0');
+        } else {
+            break;
+        }
+    }
+
+    if (is_negative)
+        b = -b;
+    return b;
 }
 
 std::string BigInteger::to_string() const
 {
-    return BigNumber::format_biginteger(*this);
+        if (_bits.size() == 0)
+        {
+            return std::to_string(_sign);
+        }
+
+        // First convert to base 10^9.
+        const uint32_t kuBase = 1000000000; // 10^9
+        const int kcchBase = 9;
+
+        int cuSrc = _bits.size();
+        int cuMax;
+
+        if (cuSrc > std::numeric_limits<int32_t>::max()/10)
+        {
+            throw std::overflow_error("SR.Format_TooLarge");
+        }
+        else
+        {
+            cuMax = cuSrc * 10 / 9 + 2;
+        }
+
+        uint_array rguDst(cuMax);
+        int cuDst = 0;
+
+        for (int iuSrc = cuSrc; --iuSrc >= 0;)
+        {
+            uint32_t uCarry = _bits[iuSrc];
+            for (int iuDst = 0; iuDst < cuDst; iuDst++)
+            {
+                assert(rguDst[iuDst] < kuBase);
+                uint64_t uuRes = NumericsHelpers::make_ulong(rguDst[iuDst], uCarry);
+                rguDst[iuDst] = static_cast<uint32_t>(uuRes % kuBase);
+                uCarry = static_cast<uint32_t>(uuRes / kuBase);
+            }
+
+            if (uCarry != 0)
+            {
+                rguDst[cuDst++] = uCarry % kuBase;
+                uCarry /= kuBase;
+                if (uCarry != 0)
+                    rguDst[cuDst++] = uCarry;
+            }
+
+        }
+
+        int cchMax;
+        if (cuDst > std::numeric_limits<int32_t>::max() / kcchBase)
+        {
+            throw std::overflow_error("SR.Format_TooLarge");
+        } else {
+            cchMax = cuDst * kcchBase;
+        }
+
+        // We'll pass the rgch buffer to native code, which is going to treat it like a string of digits, so it needs
+        // to be null terminated.  Let's ensure that we can allocate a buffer of that size.
+        int rgchBufSize;
+        if (cchMax == std::numeric_limits<int32_t>::max()) {
+            throw std::overflow_error("SR.Format_TooLarge");
+        } else {
+            rgchBufSize = cchMax + 1;
+        }
+
+        char rgch[rgchBufSize];
+        int ichDst = cchMax;
+        for (int iuDst = 0; iuDst < cuDst - 1; iuDst++)
+        {
+            uint32_t uDig = rguDst[iuDst];
+            assert(uDig < kuBase);
+            for (int cch = kcchBase; --cch >= 0;)
+            {
+                rgch[--ichDst] = static_cast<char>('0' + (uDig % 10));
+                uDig /= 10;
+            }
+        }
+
+        for (uint32_t uDig = rguDst[cuDst - 1]; uDig != 0;)
+        {
+            rgch[--ichDst] = static_cast<char>('0' + uDig % 10);
+            uDig /= 10;
+        }
+
+        if (_sign < 0)
+        {
+            std::string negativeSign = "-";
+            for (int i = negativeSign.size() - 1; i > -1; i--)
+                rgch[--ichDst] = negativeSign[i];
+        }
+
+        return std::string(&rgch[ichDst], cchMax - ichDst);
 }
 
 bool BigInteger::get_parts_for_bit_manipulation(const BigInteger& x, uint_array& xd, int& xl)
@@ -1307,10 +1421,6 @@ byte_array BigInteger::to_byte_array(bool isUnsigned, bool isBigEndian) const
 
 byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool isBigEndian, int* bytesWritten) const
 {
-    //int bytesWritten = 0;
-    //assert(mode == GetBytesMode.AllocateArray || mode == GetBytesMode.Count || mode == GetBytesMode.Span, $"Unexpected mode {mode}.");
-    //assert(mode == GetBytesMode.Span || destination.IsEmpty, $"If we're not in span mode, we shouldn't have been passed a destination.");
-
     int sign = _sign;
     if (sign == 0)
     {
