@@ -14,7 +14,7 @@ add_executable(
         bigint_test_sa.cpp
         BigInteger_AddTests.cpp
         BigInteger_SubtractTests.cpp
-        TobyteArray.cpp
+        ToByteArray.cpp
         MyBigInt.cpp
         MyBigInt.h
         Random.cpp
