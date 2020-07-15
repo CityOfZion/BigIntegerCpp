@@ -1,6 +1,8 @@
 ![](https://raw.githubusercontent.com/CityOfZion/visual-identity/develop/_CoZ%20Branding/_Logo/_Logo%20icon/_PNG%20200x178px/CoZ_Icon_DARKBLUE_200x178px.png)
     
 # BigIntegerCpp
+[![CircleCI](https://circleci.com/gh/CityOfZion/neo3-python.svg?style=svg)](https://circleci.com/gh/CityOfZion/neo3-python)
+
 A C++ port of the [C# BigInteger](https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger?view=netcore-3.1) class, with bindings for Python.
 
 # Building
@@ -71,7 +73,7 @@ Source.cpp
    In order to create a compliant port of their virtual machine a need for a compliant BigInteger implementation exists. 
    Any difference, in for example the [modulo implementation](https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition), can result in VM execution deviation. This is just one of the many problems we've encountered after creating a pure Python port. 
 
-2) Should I this project?
+2) Should I use this project?
 
    If you have to ask this question, then no.
 
