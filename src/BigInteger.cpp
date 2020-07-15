@@ -1333,7 +1333,7 @@ byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool is
 }
 
 void BigInteger::assert_valid() const {
-
+#ifndef NDEBUG
     if (!_bits.empty()) {
         assert(_sign == 1 || _sign == -1);
         assert(_bits.size() > 0);
@@ -1342,6 +1342,7 @@ void BigInteger::assert_valid() const {
     } else {
         assert(_sign > std::numeric_limits<int>::min());
     }
+#endif
 }
 
 BigInteger::operator int() {
