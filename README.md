@@ -28,7 +28,7 @@ You can define various options during the configure stage to control the output
 ### Running the tests
 Test can be ran as follows
 
-    cmake -D BUILD_TESTS=ON ..
+    cmake -D BUILD_TESTING=ON ..
     cmake --build .
     ./tests/unit_tests
 
