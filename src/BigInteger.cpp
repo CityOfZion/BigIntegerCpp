@@ -8,6 +8,7 @@
 #include <any>
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 #include "../include/BigIntegerCalculator.h"
 
 const BigInteger BigInteger::s_bnMinInt = BigInteger(-1, uint_array{kuMaskHighBit});
@@ -886,7 +887,8 @@ std::string BigInteger::to_string() const {
         rgchBufSize = cchMax + 1;
     }
 
-    char rgch[rgchBufSize];
+//    char rgch[rgchBufSize];
+    char *rgch = new char[rgchBufSize];
     int ichDst = cchMax;
     for (int iuDst = 0; iuDst < cuDst - 1; iuDst++) {
         uint32_t uDig = rguDst[iuDst];
@@ -908,7 +910,9 @@ std::string BigInteger::to_string() const {
             rgch[--ichDst] = negativeSign[i];
     }
 
-    return std::string(&rgch[ichDst], cchMax - ichDst);
+    auto s = std::string(&rgch[ichDst], cchMax - ichDst);
+    delete [] rgch;
+    return s;
 }
 
 bool BigInteger::get_parts_for_bit_manipulation(const BigInteger& x, uint_array& xd, int& xl) {
@@ -1116,12 +1120,12 @@ BigInteger& BigInteger::operator&=(const BigInteger& rhs) {
     uint_array x = lhs.to_uint32_array();
     uint_array y = rhs.to_uint32_array();
     uint_array z(std::max(x.size(), y.size()), 0);
-    uint xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
-    uint yExtend = (rhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+    unsigned int xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+    unsigned int yExtend = (rhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
 
     for (size_t i = 0; i < z.size(); i++) {
-        uint xu = (i < x.size()) ? x[i] : xExtend;
-        uint yu = (i < y.size()) ? y[i] : yExtend;
+        unsigned int xu = (i < x.size()) ? x[i] : xExtend;
+        unsigned int yu = (i < y.size()) ? y[i] : yExtend;
         z[i] = xu & yu;
     }
     *this = BigInteger(z);
@@ -1171,12 +1175,12 @@ BigInteger& BigInteger::operator|=(const BigInteger& rhs) {
     uint_array x = lhs.to_uint32_array();
     uint_array y = rhs.to_uint32_array();
     uint_array z(std::max(x.size(), y.size()));
-    uint xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
-    uint yExtend = (rhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+    unsigned int xExtend = (lhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
+    unsigned int yExtend = (rhs._sign < 0) ? std::numeric_limits<uint32_t>::max() : 0;
 
     for (size_t i = 0; i < z.size(); i++) {
-        uint xu = (i < x.size()) ? x[i] : xExtend;
-        uint yu = (i < y.size()) ? y[i] : yExtend;
+        unsigned int xu = (i < x.size()) ? x[i] : xExtend;
+        unsigned int yu = (i < y.size()) ? y[i] : yExtend;
         z[i] = xu | yu;
     }
     *this = BigInteger(z);
@@ -1283,7 +1287,7 @@ byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool is
 
     if (bits.size() != 0) {
         for (size_t i = 0; i < bits.size() - 1; i++) {
-            uint dword = bits[i];
+            unsigned int dword = bits[i];
 
             if (sign == -1) {
                 dword = ~dword;
@@ -1603,7 +1607,7 @@ BigInteger BigInteger::greatest_common_divisor(const uint_array& leftBits, const
 
     // Short circuits to spare some allocations...
     if (rightBits.size() == 1) {
-        uint temp = BigIntegerCalculator::remainder(leftBits, rightBits[0]);
+        unsigned int temp = BigIntegerCalculator::remainder(leftBits, rightBits[0]);
         return BigIntegerCalculator::gcd(rightBits[0], temp);
     }
 
@@ -1683,7 +1687,7 @@ BigInteger::BigInteger(double value) {
 
         // Populate the uints.
         _bits = uint_array(cu + 2, 0);
-        _bits[cu + 1] = (uint) (man >> (cbit + kcbitUint));
+        _bits[cu + 1] = (unsigned int) (man >> (cbit + kcbitUint));
         _bits[cu] = static_cast<unsigned int>((man >> cbit));
         if (cbit > 0)
             _bits[cu - 1] = static_cast<unsigned int>(man) << (kcbitUint - cbit);

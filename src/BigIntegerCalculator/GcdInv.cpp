@@ -7,7 +7,7 @@ uint32_t BigIntegerCalculator::gcd(uint32_t left, uint32_t right) {
     // https://en.wikipedia.org/wiki/Euclidean_algorithm
 
     while (right != 0) {
-        uint temp = left % right;
+        unsigned int temp = left % right;
         left = right;
         right = temp;
     }
@@ -25,7 +25,7 @@ uint64_t BigIntegerCalculator::gcd(uint64_t left, uint64_t right) {
     }
 
     if (right != 0)
-        return gcd((uint) right, (uint) (left % right));
+        return gcd((unsigned int) right, (unsigned int) (left % right));
 
     return left;
 }
@@ -72,8 +72,8 @@ void BigIntegerCalculator::gcd(BitsBuffer& left, BitsBuffer& right) {
 
         extract_digits(left, right, x, y);
 
-        uint a = 1U, b = 0U;
-        uint c = 0U, d = 1U;
+        unsigned int a = 1U, b = 0U;
+        unsigned int c = 0U, d = 1U;
 
         int iteration = 0;
 
@@ -96,8 +96,8 @@ void BigIntegerCalculator::gcd(BitsBuffer& left, BitsBuffer& right) {
             if (t < s || t + r > y - c)
                 break;
 
-            a = (uint) r;
-            b = (uint) s;
+            a = (unsigned int) r;
+            b = (unsigned int) s;
             x = t;
 
             ++iteration;
@@ -119,8 +119,8 @@ void BigIntegerCalculator::gcd(BitsBuffer& left, BitsBuffer& right) {
             if (t < s || t + r > x - b)
                 break;
 
-            d = (uint) r;
-            c = (uint) s;
+            d = (unsigned int) r;
+            c = (unsigned int) s;
             y = t;
 
             ++iteration;
@@ -211,7 +211,7 @@ void BigIntegerCalculator::extract_digits(BitsBuffer& xBuffer, BitsBuffer& yBuff
     }
 
     // Use all the bits but one, see [hac] 14.58 (ii)
-    int z = leading_zeros((uint) xh);
+    int z = leading_zeros((unsigned int) xh);
 
     x = ((xh << (32 + z)) | (xm << z) | (xl >> (32 - z))) >> 1;
     y = ((yh << (32 + z)) | (ym << z) | (yl >> (32 - z))) >> 1;

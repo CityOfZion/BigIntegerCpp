@@ -123,7 +123,7 @@ public:
         }
     }
 
-    static uint combine_hash(uint u1, uint u2) {
+    static unsigned int combine_hash(unsigned int u1, unsigned int u2) {
         return ((u1 << 7) | (u1 >> 25)) ^ u2;
     }
 

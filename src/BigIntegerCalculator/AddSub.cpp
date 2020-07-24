@@ -81,7 +81,7 @@ void BigIntegerCalculator::add_self(uint32_t* lhs, int lhsLength, uint32_t* rhs,
     }
     for (; carry != 0 && i < lhsLength; i++) {
         long digit = lhs[i] + carry;
-        lhs[i] = static_cast<uint>(digit);
+        lhs[i] = static_cast<unsigned int>(digit);
         carry = digit >> 32;
     }
 

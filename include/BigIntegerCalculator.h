@@ -82,7 +82,7 @@ public:
     divide(uint_array& lhs, uint32_t rhs, uint32_t& remainder); // maybe change to a more explicit out parameter
     static uint_array divide(uint_array& lhs, uint32_t rhs);
 
-    static uint32_t remainder(const uint_array& lhs, const uint rhs);
+    static uint32_t remainder(const uint_array& lhs, const unsigned int rhs);
 
     static uint_array divide(uint_array& lhs, uint_array& rhs, uint_array& remainder);
 
