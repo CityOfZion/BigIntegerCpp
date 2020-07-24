@@ -337,10 +337,7 @@ void BigIntegerCalculator::subtract_core(uint32_t* lhs, int lhsLength, uint32_t*
 
     for (; carry != 0 && i < coreLength; i++) {
         long digit = core[i] + carry;
-        core[i] = (uint) digit;
+        core[i] = (unsigned int) digit;
         carry = digit >> 32;
     }
 }
-
-
-

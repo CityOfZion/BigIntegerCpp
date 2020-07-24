@@ -48,7 +48,7 @@ uint_array BigIntegerCalculator::divide(uint_array& lhs, uint32_t rhs) {
     return quotient;
 }
 
-uint32_t BigIntegerCalculator::remainder(const uint_array& lhs, const uint rhs) {
+uint32_t BigIntegerCalculator::remainder(const uint_array& lhs, const unsigned int rhs) {
     assert(!lhs.empty());
     assert(lhs.size() >= 1);
 
@@ -142,7 +142,7 @@ void BigIntegerCalculator::divide(uint32_t* lhs, int lhsLength, const uint32_t* 
 
     // And, we make sure the most significant bit is set
     if (shift > 0) {
-        uint divNx = rhsLength > 2 ? rhs[rhsLength - 3] : 0;
+        unsigned int divNx = rhsLength > 2 ? rhs[rhsLength - 3] : 0;
 
         divHi = (divHi << shift) | (divLo >> backShift);
         divLo = (divLo << shift) | (divNx >> backShift);
@@ -194,7 +194,7 @@ void BigIntegerCalculator::divide(uint32_t* lhs, int lhsLength, const uint32_t* 
 
         // We have the digit!
         if (bitsLength != 0)
-            bits[n] = (uint) digit;
+            bits[n] = (unsigned int) digit;
         if (i < lhsLength)
             lhs[i] = 0;
     }
