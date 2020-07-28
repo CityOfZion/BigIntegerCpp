@@ -68,46 +68,48 @@ endif()
 ##############
 # Installation
 
-include(GNUInstallDirs)
+if (BUILD_SHARED_LIB OR BUILD_STATIC_LIB OR BUILD_TESTING)
+    include(GNUInstallDirs)
 
 
-# can't use generator expression for target list
-if (BUILD_SHARED_LIB AND BUILD_STATIC_LIB)
-    install(TARGETS BigIntegerCpp-shared BigIntegerCpp-static
-            EXPORT BigIntegerCpp-targets
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-elseif (BUILD_SHARED_LIB)
-    install(TARGETS BigIntegerCpp-shared
-            EXPORT BigIntegerCpp-targets
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-elseif (BUILD_STATIC_LIB)
-    install(TARGETS BigIntegerCpp-static
-            EXPORT BigIntegerCpp-targets
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    # can't use generator expression for target list
+    if (BUILD_SHARED_LIB AND BUILD_STATIC_LIB)
+        install(TARGETS BigIntegerCpp-shared BigIntegerCpp-static
+                EXPORT BigIntegerCpp-targets
+                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    elseif (BUILD_SHARED_LIB)
+        install(TARGETS BigIntegerCpp-shared
+                EXPORT BigIntegerCpp-targets
+                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    elseif (BUILD_STATIC_LIB)
+        install(TARGETS BigIntegerCpp-static
+                EXPORT BigIntegerCpp-targets
+                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    endif()
+
+    install(DIRECTORY include/public/bigintegercpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+    install(EXPORT BigIntegerCpp-targets
+            FILE BigIntegerCppTargets.cmake
+            NAMESPACE BigIntegerCpp::
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/BigIntegerCpp)
+
+    #Create a ConfigVersion.cmake file
+    include(CMakePackageConfigHelpers)
+    write_basic_package_version_file(
+            ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfigVersion.cmake
+            VERSION ${PROJECT_VERSION}
+            COMPATIBILITY AnyNewerVersion
+    )
+
+    include(${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfigVersion.cmake)
+    configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/BigIntegerCppConfig.cmake.in
+            ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfig.cmake
+            INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            )
+
+    export(EXPORT BigIntegerCpp-targets
+            FILE ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppTargets.cmake
+            NAMESPACE BigIntegerCpp::)
 endif()
-
-install(DIRECTORY include/public/bigintegercpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-install(EXPORT BigIntegerCpp-targets
-        FILE BigIntegerCppTargets.cmake
-        NAMESPACE BigIntegerCpp::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/BigIntegerCpp)
-
-#Create a ConfigVersion.cmake file
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-        ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfigVersion.cmake
-        VERSION ${PROJECT_VERSION}
-        COMPATIBILITY AnyNewerVersion
-)
-
-include(${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfigVersion.cmake)
-configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/BigIntegerCppConfig.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppConfig.cmake
-        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        )
-
-export(EXPORT BigIntegerCpp-targets
-        FILE ${CMAKE_CURRENT_BINARY_DIR}/BigIntegerCppTargets.cmake
-        NAMESPACE BigIntegerCpp::)
