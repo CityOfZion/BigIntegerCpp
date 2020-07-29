@@ -32,31 +32,31 @@ class BigIntegerTestCase(unittest.TestCase):
         b5 = BigInteger(uint64_max)
         self.assertEqual(uint64_max, b5)
 
-    def test_bytes_and_to_bytes(self):
+    def test_bytes_and_to_array(self):
         b = bytes(BigInteger(456))
         self.assertEqual(b'\xc8\x01', b)
 
         b = BigInteger(33022)
-        bb = b.to_bytes()
+        bb = b.to_array()
         self.assertEqual(b'\xFE\x80\x00', bb)
-        bb = b.to_bytes(is_unsigned=False, is_bigendian=False)
+        bb = b.to_array(is_unsigned=False, is_bigendian=False)
         self.assertEqual(b'\xFE\x80\x00', bb)
 
-        bb = b.to_bytes(is_unsigned=False, is_bigendian=True)
+        bb = b.to_array(is_unsigned=False, is_bigendian=True)
         self.assertEqual(b'\x00\x80\xFE', bb)
 
-        bb = b.to_bytes(is_unsigned=True, is_bigendian=False)
+        bb = b.to_array(is_unsigned=True, is_bigendian=False)
         self.assertEqual(b'\xFE\x80', bb)
 
-        bb = b.to_bytes(is_unsigned=True, is_bigendian=True)
+        bb = b.to_array(is_unsigned=True, is_bigendian=True)
         self.assertEqual(b'\x80\xFE', bb)
 
         b = BigInteger(0x78)
-        bb = b.to_bytes(is_unsigned=False, is_bigendian=False)
+        bb = b.to_array(is_unsigned=False, is_bigendian=False)
         self.assertEqual(b'\x78', bb)
 
         b = BigInteger(0x80)
-        bb = b.to_bytes(is_unsigned=False, is_bigendian=False)
+        bb = b.to_array(is_unsigned=False, is_bigendian=False)
         self.assertEqual(b'\x80\x00', bb)
 
     def test_add(self):
