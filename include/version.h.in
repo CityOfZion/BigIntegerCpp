@@ -1,0 +1,3 @@
+#pragma once
+
+static constexpr auto BIGINTEGERCPP_VERSION = "${PROJECT_VERSION}";
