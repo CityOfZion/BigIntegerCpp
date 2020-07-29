@@ -1,26 +1,25 @@
- # Building
+ # Building bindings
 
-In order to build the bindings you will have to configure the project with `BUILD_PYTHON_BINDINGS=ON`. 
-A binary distribution is automatically created using `wheel` and stored in the build folder under `<build_root>/bindings/python/`. 
-If the `wheel` package is not found CMake will do one attempt to install it via `pip`.
+### Python-bindings
+To build the Pythong bindings use `setup.py` in the root folder. 
 
-    mkdir build
-    cd build
-    cmake -D BUILD_PYTHON_BINDINGS=ON ..
-    cmake --build .
+    pip install wheel
+    python setup.py bdist_wheel
 
-# Usage
+After a successful build the bindings can be found under `<project root>/dist/`
+
+#### Usage
 
 Install the wheel via pip. e.g
 
-    pip install pybiginteger.<build-version>.whl
+    pip install pybiginteger<build-version>.whl
 
 Import
 
     from pybiginteger import BigInteger
     print(help(BigInteger))
     
-# Wrong Python version
+#### Wrong Python version
 
 By default CMake will attempt to detect the correct Python executable. 
 
@@ -32,7 +31,7 @@ Configure example output
 
 If it detects the wrong version or instance (e.g. in case you're using a virtual environment) you can set the `PYTHON_EXECUTABLE` variable to point to your desired instance.
 
-The following example uses the virtual environment found under `<root>/venv/`. 
+The following example uses the virtual environment found under `<project root>/venv/` executing the commands from `<project root>/build/`. 
 
      cmake -D PYTHON_EXECUTABLE=../venv/bin/python3 -D BUILD_PYTHON_BINDINGS=ON ..
      cmake --build . 
