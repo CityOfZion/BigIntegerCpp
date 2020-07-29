@@ -71,13 +71,13 @@ PYBIND11_MODULE(pybiginteger, m) {
     py::class_<BigInteger>(m, "BigInteger")
             .def_property_readonly_static("__version__", [](py::object self) { return BIGINTEGERCPP_VERSION; }, R"(C++ code version)")
             .def_property_readonly_static("__version_bindings__", [](py::object self){ return VERSION_BINDINGS; }, R"(Binding version)")
-            .def(py::init<int32_t>())
-            .def(py::init<uint32_t>())
-            .def(py::init<int64_t>())
-            .def(py::init<uint64_t>())
+            .def(py::init<int32_t>(), py::arg("value"))
+            .def(py::init<uint32_t>(), py::arg("value"))
+            .def(py::init<int64_t>(), py::arg("value"))
+            .def(py::init<uint64_t>(), py::arg("value"))
             .def(py::init([](py::int_& i) {
                 return to_biginteger(i);
-            }))
+            }), py::arg("value"))
             .def(py::init([](py::buffer const b) {
                 py::buffer_info info = b.request();
                 if (info.format != py::format_descriptor<unsigned char>::format() || info.ndim != 1)
@@ -86,7 +86,7 @@ PYBIND11_MODULE(pybiginteger, m) {
                 auto data_ptr = static_cast<unsigned char *>(info.ptr);
                 std::vector<unsigned char> data(data_ptr, data_ptr + info.size);
                 return BigInteger(data);
-            }))
+            }), py::arg("value"))
             .def("__lt__", [](BigInteger& self, BigInteger& other) {
                 return self < other;
             })
