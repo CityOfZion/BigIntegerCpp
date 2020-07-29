@@ -23,7 +23,10 @@ You can define various options during the configure stage to control the output
 | BUILD_SHARED_LIB      | ON      |                              |
 | BUILD_STATIC_LIB      | OFF     |                              |
 | BUILD_TESTING         | OFF     |                              |
-| BUILD_PYTHON_BINDINGS | OFF     | For more information go [here](bindings/python/README.md) |
+
+### Building the bindings
+
+Read [here](bindings/README.md).
 
 ### Running the tests
 Test can be ran as follows
