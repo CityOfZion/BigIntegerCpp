@@ -297,7 +297,7 @@ PYBIND11_MODULE(pybiginteger, m) {
                 Return the value of the BigInteger in little endian order.
                 For more information on the byte representation see:
                 https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger.tobytearray?view=netcore-3.1)")
-            .def("to_bytes",
+            .def("to_array",
                  [](BigInteger& self, bool is_unsigned, bool is_bigendian) {
                      auto v_bytes = self.to_byte_array(is_unsigned, is_bigendian);
                      return py::bytes(std::string(v_bytes.begin(), v_bytes.end()));
