@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include "../../include/public/bigintegercpp/BigInteger.h"
+#include "../../include/public/bigintegercpp/version.h"
 #include <chrono>
 namespace py = pybind11;
 
@@ -63,10 +64,13 @@ py::int_ to_py_int(const BigInteger& value, bool is_signed = true, bool is_bigen
     return py::reinterpret_steal<py::int_>(obj);
 }
 
+static constexpr auto VERSION_BINDINGS = "1.1";
 
 PYBIND11_MODULE(pybiginteger, m) {
     m.doc() = "A C++ port of the C# BigInteger class";
     py::class_<BigInteger>(m, "BigInteger")
+            .def_property_readonly_static("__version__", [](py::object self) { return BIGINTEGERCPP_VERSION; }, R"(C++ code version)")
+            .def_property_readonly_static("__version_bindings__", [](py::object self){ return VERSION_BINDINGS; }, R"(Binding version)")
             .def(py::init<int32_t>())
             .def(py::init<uint32_t>())
             .def(py::init<int64_t>())
@@ -305,5 +309,20 @@ PYBIND11_MODULE(pybiginteger, m) {
                  py::arg("is_bigendian") = false)
             .def("__int__", [](BigInteger& self) { return to_py_int(self); })   // support int()
             .def("__index__", [](BigInteger& self) { return to_py_int(self); }) // support range()
-            .def("__str__", &BigInteger::to_string);
+            .def("__str__", &BigInteger::to_string)
+            .def_static("zero", &BigInteger::zero)
+            .def_static("one", &BigInteger::one)
+            .def_static("minus_one", &BigInteger::minus_one)
+            .def("is_power_of_two", &BigInteger::is_power_of_two)
+            .def("is_even", &BigInteger::is_even)
+            .def_static("log", [](const BigInteger& value) { return BigInteger::log(value); }, py::arg("value"))
+            .def_static("log", [](py::int_& value) { return BigInteger::log(to_biginteger(value)); }, py::arg("value"))
+            .def_static("log", [](const BigInteger& value, double base_value) {
+                return BigInteger::log(value, base_value);
+                }, py::arg("value"), py::arg("base_value"))
+            .def_static("log", [](py::int_& value, double base_value) {
+                return BigInteger::log(to_biginteger(value), base_value);
+                }, py::arg("value"), py::arg("base_value"))
+            .def_static("log10", &BigInteger::log10, py::arg("value"))
+            .def_static("log10", [](py::int_& value) { return BigInteger::log10(to_biginteger(value)); }, py::arg("value"));
 }

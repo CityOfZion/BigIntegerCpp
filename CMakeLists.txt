@@ -9,6 +9,8 @@ option(BUILD_PYTHON_BINDINGS "Build the Python bindings" OFF)
 option(BUILD_SHARED_LIB "Build a shared library" ON)
 option(BUILD_STATIC_LIB "Build a static library" OFF)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/public/bigintegercpp/version.h)
+
 set(bigintegercpp_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/BigInteger.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/BigIntegerCalculator/AddSub.cpp
@@ -19,7 +21,10 @@ set(bigintegercpp_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/BigIntegerCalculator/PowMod.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/BigIntegerCalculator/SquMul.cpp
         )
-set(bigintegercpp_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include/public/bigintegercpp/BigInteger.h)
+set(bigintegercpp_INCLUDE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/bigintegercpp/BigInteger.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/public/bigintegercpp/version.h
+        )
 set(bigintegercpp_PRIVATE_INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/BigIntegerCalculator.h
         ${CMAKE_CURRENT_SOURCE_DIR}/include/BitsBuffer.h

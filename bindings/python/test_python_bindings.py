@@ -1,7 +1,5 @@
 import unittest
 from collections import abc
-import sys
-sys.path.append('/Users/erik/Documents/code/BigIntegerCpp/build/bindings/pybiginteger/')
 from pybiginteger import BigInteger
 
 
@@ -422,3 +420,38 @@ class BigIntegerTestCase(unittest.TestCase):
         # test __invert__
         b = BigInteger(9)
         self.assertEqual(-10, ~b)
+
+    def test_others(self):
+        zero = BigInteger.zero()
+        self.assertEqual(BigInteger(0), zero)
+
+        one = BigInteger.one()
+        self.assertEqual(BigInteger(1), one)
+
+        m_one = BigInteger.minus_one()
+        self.assertEqual(BigInteger(-1), m_one)
+
+        self.assertTrue(zero.is_even())
+        self.assertFalse(one.is_even())
+
+        self.assertTrue(BigInteger(2).is_power_of_two())
+        self.assertFalse(BigInteger(3).is_power_of_two())
+
+        self.assertTrue(hasattr(BigInteger, "__version__"))
+        self.assertTrue(hasattr(BigInteger, "__version_bindings__"))
+
+    def test_log(self):
+        l1 = BigInteger.log(2)
+        l1_big = BigInteger.log(BigInteger(2))
+        self.assertEqual(0.6931471805599453, l1)
+        self.assertEqual(l1, l1_big)
+
+        l2 = BigInteger.log(2, 10.1)
+        l2_big = BigInteger.log(BigInteger(2), 10.1)
+        self.assertEqual(0.29973472986061406, l2)
+        self.assertEqual(l2, l2_big)
+
+        l3 = BigInteger.log10(2)
+        l3_big = BigInteger.log10(BigInteger(2))
+        self.assertEqual(0.30102999566398114, l3)
+        self.assertEqual(l3, l3_big)
