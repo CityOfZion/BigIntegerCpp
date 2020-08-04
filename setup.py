@@ -86,7 +86,7 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     version=version,
-    url='https://github.com/CityOfZion/pybiginteger',
+    url='https://github.com/CityOfZion/BigIntegerCpp',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
