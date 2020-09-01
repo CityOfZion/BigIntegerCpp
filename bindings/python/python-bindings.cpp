@@ -3,7 +3,11 @@
 #include "../../include/public/bigintegercpp/version.h"
 namespace py = pybind11;
 
-BigInteger to_biginteger(py::int_& value, bool is_signed = true, bool is_bigendian = false) {
+BigInteger to_biginteger(py::int_& value, bool is_bigendian = false) {
+    bool is_signed = false;
+    if (value < py::int_(0))
+        is_signed = true;
+
     if (value.is(py::int_(0)))
         return BigInteger::zero();
 
@@ -16,7 +20,7 @@ BigInteger to_biginteger(py::int_& value, bool is_signed = true, bool is_bigendi
         throw std::invalid_argument("failed to cast");
     } else {
         if (!is_signed)
-            return BigInteger(buffer);
+            return BigInteger(buffer, true);
 
         // signed cases in C# use the shortest 2 complement representation possible, Python doesn't, thus we convert
         unsigned char high_byte;
