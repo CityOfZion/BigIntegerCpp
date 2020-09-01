@@ -5,9 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
 
-option(BUILD_PYTHON_BINDINGS "Build the Python bindings" OFF)
-option(BUILD_SHARED_LIB "Build a shared library" ON)
-option(BUILD_STATIC_LIB "Build a static library" OFF)
+option(BIGINTEGER_BUILD_PYTHON_BINDINGS "Build the Python bindings" OFF)
+option(BIGINTEGER_BUILD_SHARED_LIB "Build a shared library" ON)
+option(BIGINTEGER_BUILD_STATIC_LIB "Build a static library" OFF)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/include/public/bigintegercpp/version.h)
 
@@ -36,7 +36,7 @@ set(bigintegercpp_PRIVATE_INCLUDE
 # expose ${bigintegercpp_INCLUDE_DIRS} for downstream projects to consume
 set(bigintegercpp_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include/public/ CACHE INTERNAL "")
 
-if (BUILD_SHARED_LIB OR BUILD_STATIC_LIB OR BUILD_TESTING)
+if (BIGINTEGER_BUILD_SHARED_LIB OR BIGINTEGER_BUILD_STATIC_LIB OR BUILD_TESTING)
     add_library(BigIntegerCpp-obj SHARED ${bigintegercpp_SOURCES})
     target_include_directories(BigIntegerCpp-obj
             PUBLIC
@@ -48,7 +48,7 @@ if (BUILD_SHARED_LIB OR BUILD_STATIC_LIB OR BUILD_TESTING)
     set_target_properties(BigIntegerCpp-obj PROPERTIES
             POSITION_INDEPENDENT_CODE ON
             )
-    if (BUILD_SHARED_LIB)
+    if (BIGINTEGER_BUILD_SHARED_LIB)
         add_library(BigIntegerCpp-shared SHARED $<TARGET_OBJECTS:BigIntegerCpp-obj>)
         set_target_properties(BigIntegerCpp-shared
                 PROPERTIES
@@ -56,13 +56,13 @@ if (BUILD_SHARED_LIB OR BUILD_STATIC_LIB OR BUILD_TESTING)
                 )
         add_library(BigIntegerCpp::BigIntegerCpp ALIAS BigIntegerCpp-shared)
     endif()
-    if (BUILD_STATIC_LIB)
+    if (BIGINTEGER_BUILD_STATIC_LIB)
         add_library(BigIntegerCpp-static STATIC $<TARGET_OBJECTS:BigIntegerCpp-obj>)
         add_library(BigIntegerCpp::BigIntegerCpp-static ALIAS BigIntegerCpp-static)
     endif()
 endif()
 
-if (BUILD_PYTHON_BINDINGS)
+if (BIGINTEGER_BUILD_PYTHON_BINDINGS)
     add_subdirectory(bindings/python)
 endif()
 
@@ -73,21 +73,21 @@ endif()
 ##############
 # Installation
 
-if (BUILD_SHARED_LIB OR BUILD_STATIC_LIB OR BUILD_TESTING)
+if (BIGINTEGER_BUILD_SHARED_LIB OR BIGINTEGER_BUILD_STATIC_LIB OR BUILD_TESTING)
     include(GNUInstallDirs)
 
 
     # can't use generator expression for target list
-    if (BUILD_SHARED_LIB AND BUILD_STATIC_LIB)
+    if (BIGINTEGER_BUILD_SHARED_LIB AND BIGINTEGER_BUILD_STATIC_LIB)
         install(TARGETS BigIntegerCpp-shared BigIntegerCpp-static
                 EXPORT BigIntegerCpp-targets
                 LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    elseif (BUILD_SHARED_LIB)
+    elseif (BIGINTEGER_BUILD_SHARED_LIB)
         install(TARGETS BigIntegerCpp-shared
                 EXPORT BigIntegerCpp-targets
                 LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    elseif (BUILD_STATIC_LIB)
+    elseif (BIGINTEGER_BUILD_STATIC_LIB)
         install(TARGETS BigIntegerCpp-static
                 EXPORT BigIntegerCpp-targets
                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
