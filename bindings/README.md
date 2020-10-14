@@ -33,5 +33,5 @@ If it detects the wrong version or instance (e.g. in case you're using a virtual
 
 The following example uses the virtual environment found under `<project root>/venv/` executing the commands from `<project root>/build/`. 
 
-     cmake -D PYTHON_EXECUTABLE=../venv/bin/python3 -D BUILD_PYTHON_BINDINGS=ON ..
+     cmake -D PYTHON_EXECUTABLE=../venv/bin/python3 -D BIGINTEGER_BUILD_PYTHON_BINDINGS=ON ..
      cmake --build . 

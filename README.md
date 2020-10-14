@@ -1,7 +1,7 @@
 ![](https://raw.githubusercontent.com/CityOfZion/visual-identity/develop/_CoZ%20Branding/_Logo/_Logo%20icon/_PNG%20200x178px/CoZ_Icon_DARKBLUE_200x178px.png)
     
 # BigIntegerCpp
-[![CircleCI](https://circleci.com/gh/CityOfZion/neo3-python.svg?style=shield)](https://circleci.com/gh/CityOfZion/neo3-python)
+[![CircleCI](https://circleci.com/gh/CityOfZion/BigIntegerCpp.svg?style=shield)](https://circleci.com/gh/CityOfZion/BigIntegerCpp)
 
 A C++ port of the [C# BigInteger](https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger?view=netcore-3.1) class, with bindings for Python.
 
@@ -18,11 +18,11 @@ The default configuration builds a shared library
 
 You can define various options during the configure stage to control the output
 
-| Var                   | Default | Comment                      |
-|-----------------------|---------|------------------------------|
-| BUILD_SHARED_LIB      | ON      |                              |
-| BUILD_STATIC_LIB      | OFF     |                              |
-| BUILD_TESTING         | OFF     |                              |
+| Var                              | Default | Comment                      |
+|----------------------------------|---------|------------------------------|
+| BIGINTEGER_BUILD_SHARED_LIB      | ON      |                              |
+| BIGINTEGER_BUILD_STATIC_LIB      | OFF     |                              |
+| BIGINTEGER_BUILD_TESTING         | OFF     |                              |
 
 ### Building the bindings
 
