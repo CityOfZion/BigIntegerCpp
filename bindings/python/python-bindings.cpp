@@ -1,10 +1,13 @@
 #include <pybind11/pybind11.h>
 #include "../../include/public/bigintegercpp/BigInteger.h"
 #include "../../include/public/bigintegercpp/version.h"
-#include <chrono>
 namespace py = pybind11;
 
-BigInteger to_biginteger(py::int_& value, bool is_signed = true, bool is_bigendian = false) {
+BigInteger to_biginteger(py::int_& value, bool is_bigendian = false) {
+    bool is_signed = false;
+    if (value < py::int_(0))
+        is_signed = true;
+
     if (value.is(py::int_(0)))
         return BigInteger::zero();
 
@@ -17,7 +20,7 @@ BigInteger to_biginteger(py::int_& value, bool is_signed = true, bool is_bigendi
         throw std::invalid_argument("failed to cast");
     } else {
         if (!is_signed)
-            return BigInteger(buffer);
+            return BigInteger(buffer, true);
 
         // signed cases in C# use the shortest 2 complement representation possible, Python doesn't, thus we convert
         unsigned char high_byte;
@@ -64,28 +67,24 @@ py::int_ to_py_int(const BigInteger& value, bool is_signed = true, bool is_bigen
     return py::reinterpret_steal<py::int_>(obj);
 }
 
-static constexpr auto VERSION_BINDINGS = "1.1";
+static constexpr auto VERSION_BINDINGS = "1.2";
 
 PYBIND11_MODULE(pybiginteger, m) {
     m.doc() = "A C++ port of the C# BigInteger class";
     py::class_<BigInteger>(m, "BigInteger")
             .def_property_readonly_static("__version__", [](py::object self) { return BIGINTEGERCPP_VERSION; }, R"(C++ code version)")
             .def_property_readonly_static("__version_bindings__", [](py::object self){ return VERSION_BINDINGS; }, R"(Binding version)")
-            .def(py::init<int32_t>(), py::arg("value"))
-            .def(py::init<uint32_t>(), py::arg("value"))
-            .def(py::init<int64_t>(), py::arg("value"))
-            .def(py::init<uint64_t>(), py::arg("value"))
             .def(py::init([](py::int_& i) {
-                return to_biginteger(i);
+              return to_biginteger(i);
             }), py::arg("value"))
             .def(py::init([](py::buffer const b) {
-                py::buffer_info info = b.request();
-                if (info.format != py::format_descriptor<unsigned char>::format() || info.ndim != 1)
-                    throw std::runtime_error("Incompatible buffer format!");
+              py::buffer_info info = b.request();
+              if (info.format != py::format_descriptor<unsigned char>::format() || info.ndim != 1)
+                  throw std::runtime_error("Incompatible buffer format!");
 
-                auto data_ptr = static_cast<unsigned char *>(info.ptr);
-                std::vector<unsigned char> data(data_ptr, data_ptr + info.size);
-                return BigInteger(data);
+              auto data_ptr = static_cast<unsigned char *>(info.ptr);
+              std::vector<unsigned char> data(data_ptr, data_ptr + info.size);
+              return BigInteger(data);
             }), py::arg("value"))
             .def("__lt__", [](BigInteger& self, BigInteger& other) {
                 return self < other;
@@ -324,5 +323,6 @@ PYBIND11_MODULE(pybiginteger, m) {
                 return BigInteger::log(to_biginteger(value), base_value);
                 }, py::arg("value"), py::arg("base_value"))
             .def_static("log10", &BigInteger::log10, py::arg("value"))
-            .def_static("log10", [](py::int_& value) { return BigInteger::log10(to_biginteger(value)); }, py::arg("value"));
+            .def_static("log10", [](py::int_& value) { return BigInteger::log10(to_biginteger(value)); }, py::arg("value"))
+            .def_property_readonly("sign", &BigInteger::sign);
 }

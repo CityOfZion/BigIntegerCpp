@@ -1212,7 +1212,7 @@ byte_array BigInteger::to_byte_array(GetBytesMode mode, bool isUnsigned, bool is
     }
 
     if (isUnsigned && sign < 0) {
-        throw std::runtime_error("Overflow error can't have unsigned & sing < 0");
+        throw std::runtime_error("Overflow error can't have unsigned & sign < 0");
     }
 
     byte highByte;

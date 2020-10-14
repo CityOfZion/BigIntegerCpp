@@ -1,4 +1,6 @@
 language: python
+python:
+  - "3.8"
 
 jobs:
   include:
@@ -30,6 +32,10 @@ install:
 script:
   # build the wheels, put them into './wheelhouse'
   - python3 -m cibuildwheel --output-dir wheelhouse
+  #- |
+  #  if [[ "$TRAVIS_OS_NAME" = linux ]]; then
+  #    python3 tools/generate-stubs.py wheelhouse linux pybiginteger
+  #  fi
 
 deploy:
   provider: releases
