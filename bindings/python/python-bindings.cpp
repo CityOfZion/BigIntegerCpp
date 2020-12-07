@@ -67,7 +67,7 @@ py::int_ to_py_int(const BigInteger& value, bool is_signed = true, bool is_bigen
     return py::reinterpret_steal<py::int_>(obj);
 }
 
-static constexpr auto VERSION_BINDINGS = "1.2";
+static constexpr auto VERSION_BINDINGS = "1.2.1";
 
 PYBIND11_MODULE(pybiginteger, m) {
     m.doc() = "A C++ port of the C# BigInteger class";
@@ -306,7 +306,8 @@ PYBIND11_MODULE(pybiginteger, m) {
                 https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger.tobytearray?view=netcore-3.1#System_Numerics_BigInteger_ToByteArray_System_Boolean_System_Boolean_)",
                  py::arg("is_unsigned") = false,
                  py::arg("is_bigendian") = false)
-            .def("__int__", [](BigInteger& self) { return to_py_int(self); })   // support int()
+            .def("__int__", [](BigInteger& self) { return to_py_int(self); }) // support int()
+            .def("__float__", [](BigInteger& self) { return py::float_(to_py_int(self)); }) // support float() for Python < 3.8
             .def("__index__", [](BigInteger& self) { return to_py_int(self); }) // support range()
             .def("__str__", &BigInteger::to_string)
             .def_static("zero", &BigInteger::zero)
