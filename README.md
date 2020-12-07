@@ -74,7 +74,7 @@ Source.cpp
 
    It is purpose build for use in relationship to the [NEO blockchain](https://github.com/neo-project/) project. 
    In order to create a compliant port of their virtual machine a need for a compliant BigInteger implementation exists. 
-   Any difference, in for example the [modulo implementation](https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition), can result in VM execution deviation. This is just one of the many problems we've encountered after creating a pure Python port. 
+   Any difference, in for example the [modulo implementation](https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition), can result in VM execution deviation. This is just one of the many problems we've encountered after attemping to wrap Python's native `int` to produce identical behaviour. 
 
 2) Should I use this project?
 
