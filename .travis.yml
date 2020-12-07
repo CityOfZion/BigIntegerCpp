@@ -15,9 +15,11 @@ jobs:
     - os: windows
       language: shell
       before_install:
-        - choco install python --version 3.8.0
+        - choco install python --version 3.8.6
         - export PATH="/c/Python38:/c/Python38/Scripts:$PATH"
         - ln -s /c/Python38/python.exe /c/Python38/python3.exe
+        # Update root certificates to fix SSL error
+        - powershell "md C:\temp\certs; CertUtil -generateSSTFromWU C:\temp\certs\RootStore.sst; Get-ChildItem -Path C:\\temp\certs\Rootstore.sst | Import-Certificate -CertStoreLocation Cert:\\LocalMachine\\Root\\ | out-null"
 
 env:
   global:
