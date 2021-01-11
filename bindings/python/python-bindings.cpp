@@ -58,7 +58,7 @@ BigInteger to_biginteger(py::int_& value, bool is_bigendian = false) {
 }
 
 py::int_ to_py_int(const BigInteger& value, bool is_signed = true, bool is_bigendian = false) {
-    const auto data = value.to_byte_array(is_signed, is_bigendian);
+    const auto data = value.to_byte_array(!is_signed, is_bigendian);
 
     auto obj = static_cast<PyObject*>(_PyLong_FromByteArray(data.data(),
             data.size(),
@@ -67,7 +67,7 @@ py::int_ to_py_int(const BigInteger& value, bool is_signed = true, bool is_bigen
     return py::reinterpret_steal<py::int_>(obj);
 }
 
-static constexpr auto VERSION_BINDINGS = "1.2.1";
+static constexpr auto VERSION_BINDINGS = "1.2.2";
 
 PYBIND11_MODULE(pybiginteger, m) {
     m.doc() = "A C++ port of the C# BigInteger class";
