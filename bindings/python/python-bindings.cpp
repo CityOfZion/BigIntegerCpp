@@ -67,7 +67,7 @@ py::int_ to_py_int(const BigInteger& value, bool is_signed = true, bool is_bigen
     return py::reinterpret_steal<py::int_>(obj);
 }
 
-static constexpr auto VERSION_BINDINGS = "1.2.2";
+static constexpr auto VERSION_BINDINGS = "1.2.3";
 
 PYBIND11_MODULE(pybiginteger, m) {
     m.doc() = "A C++ port of the C# BigInteger class";
@@ -310,6 +310,10 @@ PYBIND11_MODULE(pybiginteger, m) {
             .def("__float__", [](BigInteger& self) { return py::float_(to_py_int(self)); }) // support float() for Python < 3.8
             .def("__index__", [](BigInteger& self) { return to_py_int(self); }) // support range()
             .def("__str__", &BigInteger::to_string)
+            .def("__deepcopy__", [](BigInteger& self, py::object memodict) {
+                BigInteger copy = self;
+                return copy;
+            })
             .def_static("zero", &BigInteger::zero)
             .def_static("one", &BigInteger::one)
             .def_static("minus_one", &BigInteger::minus_one)
