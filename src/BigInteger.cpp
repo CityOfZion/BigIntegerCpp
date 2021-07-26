@@ -1193,6 +1193,62 @@ int BigInteger::get_byte_count(bool isUnsigned) const {
     return bytesWritten;
 }
 
+unsigned int leading_zeros_count(unsigned int value) {
+    if (value == 0) {
+        return 32;
+    }
+    static const char debruijn32[32] = {
+            0, 31, 9, 30, 3, 8, 13, 29, 2, 5, 7, 21, 12, 24, 28, 19,
+            1, 10, 4, 14, 6, 22, 25, 20, 11, 15, 23, 26, 16, 27, 17, 18
+    };
+    value |= value >>1;
+    value |= value >>2;
+    value |= value >>4;
+    value |= value >>8;
+    value |= value >>16;
+    value++;
+    return debruijn32[value * 0x076be629>>27];
+}
+
+uint64_t BigInteger::get_bit_length() const {
+    assert_valid();
+
+    unsigned int highValue;
+    int bitsArrayLength;
+    int sign = _sign;
+
+    if (_bits.empty()) {
+        bitsArrayLength = 1;
+        highValue = (unsigned int)(sign < 0 ? -sign : sign);
+    } else {
+        bitsArrayLength = _bits.size();
+        highValue = _bits[bitsArrayLength - 1];
+    }
+
+    long bitLength = bitsArrayLength * 32L - leading_zeros_count(highValue);
+
+    if (sign >= 0)
+        return bitLength;
+
+    // When negative and IsPowerOfTwo, the answer is (bitLength - 1)
+
+    // Check highValue
+    if ((highValue & (highValue - 1)) != 0)
+        return bitLength;
+
+    // Check the rest of the bits (if present)
+    for (int i = bitsArrayLength - 2; i >= 0; i--)
+    {
+        // bits array is always non-null when bitsArrayLength >= 2
+        if (_bits[i] == 0)
+            continue;
+
+        return bitLength;
+    }
+
+    return bitLength - 1;
+}
+
 byte_array BigInteger::to_byte_array(bool isUnsigned, bool isBigEndian) const {
     int ignored = 0;
     return this->to_byte_array(GetBytesMode::AllocateArray, isUnsigned, isBigEndian, &ignored);

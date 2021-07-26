@@ -67,7 +67,7 @@ py::int_ to_py_int(const BigInteger& value, bool is_signed = true, bool is_bigen
     return py::reinterpret_steal<py::int_>(obj);
 }
 
-static constexpr auto VERSION_BINDINGS = "1.2.3";
+static constexpr auto VERSION_BINDINGS = "1.2.4";
 
 PYBIND11_MODULE(pybiginteger, m) {
     m.doc() = "A C++ port of the C# BigInteger class";
@@ -329,5 +329,6 @@ PYBIND11_MODULE(pybiginteger, m) {
                 }, py::arg("value"), py::arg("base_value"))
             .def_static("log10", &BigInteger::log10, py::arg("value"))
             .def_static("log10", [](py::int_& value) { return BigInteger::log10(to_biginteger(value)); }, py::arg("value"))
+            .def("get_bit_Length", &BigInteger::get_bit_length)
             .def_property_readonly("sign", &BigInteger::sign);
 }

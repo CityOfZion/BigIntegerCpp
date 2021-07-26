@@ -174,6 +174,8 @@ public:
 
     int get_byte_count(bool isUnsigned = false) const;
 
+    uint64_t get_bit_length() const;
+
     static bool double_IsFinite(double value);
 
     static bool double_IsInfinity(double value);
