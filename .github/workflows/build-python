@@ -1,0 +1,39 @@
+# Builds Python wheels (including stubs) and creates a draft release
+name: Build Python release
+
+on: [workflow_dispatch]
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-10.15]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.1.1
+        env:
+            CIBW_BEFORE_BUILD_LINUX: "python3 -m pip install cmake"
+            CIBW_BUILD: "cp38-macosx_x86_64 cp38-manylinux_x86_64"
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - if: matrix.os == 'ubuntu-20.04'
+        name: Create stubs
+        run: |
+          python -m pip install wheel
+          python ./tools/generate-stubs.py ./wheelhouse linux pybiginteger
+      - name: Deploy
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: Draft
+          name: Draft
+          draft: true
+          files: |
+            ./wheelhouse/*.whl
+        env:
+          GITHUB_TOKEN: ${{ secrets.deploy }}
