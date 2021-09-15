@@ -30,7 +30,7 @@ jobs:
           command: |
             mkdir build-gcc
             cd build-gcc
-            cmake -D BUILD_TESTING=ON ..
+            cmake -D BIGINTEGER_BUILD_TESTING=ON ..
       - run:
           name: Build release w/GCC
           working_directory: ~/project/build-gcc
@@ -45,7 +45,7 @@ jobs:
             mkdir build-clang
             cd build-clang
             export CXX=/usr/bin/clang++-10
-            cmake -D BUILD_TESTING=ON ..
+            cmake -D BIGINTEGER_BUILD_TESTING=ON ..
       - run:
           name: Build release w/Clang
           working_directory: ~/project/build-clang
