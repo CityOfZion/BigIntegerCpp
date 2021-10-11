@@ -8,8 +8,8 @@ from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
-if sys.version_info < (3, 7):
-    sys.exit('Python < 3.7 is not supported')
+if sys.version_info < (3, 8):
+    sys.exit('Python < 3.8 is not supported')
 
 with open('bindings/python/python-bindings.cpp','r') as f:
     text = f.read()
@@ -82,17 +82,16 @@ setup(
     author='Erik van den Brink (ixje), merl111',
     author_email='erik@coz.io',
     name='pybiginteger',
+    python_requires='>=3.8.*,<3.10',
     description="C++ port of the C# BigInteger class",
     long_description=readme,
     long_description_content_type="text/markdown",
     version=version,
     url='https://github.com/CityOfZion/BigIntegerCpp',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
         "Programming Language :: C++"
     ],
     ext_modules=[CMakeExtension('pybiginteger', sourcedir='')],
