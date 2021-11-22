@@ -1,11 +1,11 @@
-set(PYBIND11_CPP_STANDARD -std=c++1z) # Experimental C++17 support
+#set(PYBIND11_CPP_STANDARD -std=c++1z) # Experimental C++17 support
 message(STATUS "Using Python: ${PYTHON_EXECUTABLE}")
 
 if (NOT pybind11_FOUND)
     FetchContent_Declare(
             pybind11
             GIT_REPOSITORY https://github.com/pybind/pybind11.git
-            GIT_TAG        v2.5.0
+            GIT_TAG        v2.8.1
     )
     FetchContent_MakeAvailable(pybind11)
 endif()
