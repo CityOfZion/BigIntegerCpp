@@ -82,7 +82,6 @@ setup(
     author='Erik van den Brink (ixje), merl111',
     author_email='erik@coz.io',
     name='pybiginteger',
-    python_requires='>=3.8.*,<3.10',
     description="C++ port of the C# BigInteger class",
     long_description=readme,
     long_description_content_type="text/markdown",
