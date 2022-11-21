@@ -17,6 +17,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.11.2
         env:
             CIBW_BEFORE_BUILD_LINUX: "python3 -m pip install cmake"
+            CIBW_ARCHS_MACOS: "x86_64 arm64"
             CIBW_BUILD: "cp310-macosx_x86_64 cp310-macosx_arm64 cp310-win_amd64 cp310-manylinux_x86_64"
       - name: Setup python
         uses: actions/setup-python@v2
