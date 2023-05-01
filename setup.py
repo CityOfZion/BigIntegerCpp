@@ -8,8 +8,8 @@ from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
-if sys.version_info < (3, 8):
-    sys.exit('Python < 3.8 is not supported')
+if sys.version_info < (3, 10):
+    sys.exit('Python < 3.10 is not supported')
 
 with open('bindings/python/python-bindings.cpp','r') as f:
     text = f.read()
