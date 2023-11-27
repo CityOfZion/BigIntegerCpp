@@ -13,11 +13,12 @@ import sys
 import os
 import subprocess
 import re
+import platform
 
 
-def install_pkg(package_name, wheel_dir, platform):
+def install_pkg(package_name, wheel_dir, unused):
     for file in os.listdir(wheel_dir):
-        if 'cp310' in file and platform in file and file.endswith('.whl'):
+        if 'cp310' in file and platform.machine() in file and "manylinux" in file and file.endswith('.whl'):
             # install without dependencies, because it depends on the stub files which we're building here
             subprocess.run(['pip', 'install', wheel_dir + '/' + file, '--no-dependencies', '--force-reinstall'])
             version = re.search(f"{package_name}-(.+?)-.*", file).group(1)
