@@ -49,7 +49,7 @@ def main():
     platform = sys.argv[2]
     package_name = sys.argv[3]
     # prepare by installing the extension and stubgen toll
-    subprocess.check_call(['python', '-m', 'pip', 'install', 'pybind11-stubgen'])
+    subprocess.check_call(['python', '-m', 'pip', 'install', 'pybind11-stubgen==0.16.2'])
     package_version = install_pkg(package_name, wheel_dir, platform)
     # generate stubs
     subprocess.check_call(['pybind11-stubgen', '--skip-signature-downgrade', '--ignore-invalid=all', '--no-setup-py', '-o', '.', package_name], cwd=wheel_dir)
