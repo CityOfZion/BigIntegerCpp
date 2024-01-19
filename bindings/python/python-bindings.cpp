@@ -67,7 +67,7 @@ py::int_ to_py_int(const BigInteger& value, bool is_signed = true, bool is_bigen
     return py::reinterpret_steal<py::int_>(obj);
 }
 
-static constexpr auto VERSION_BINDINGS = "1.3.2";
+static constexpr auto VERSION_BINDINGS = "1.3.3";
 
 PYBIND11_MODULE(pybiginteger, m) {
     m.doc() = "A C++ port of the C# BigInteger class";
