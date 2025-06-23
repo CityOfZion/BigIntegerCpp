@@ -16,7 +16,7 @@ BigInteger to_biginteger(py::int_& value, bool is_bigendian = false) {
         n_bytes += 1;
 
     std::vector<unsigned char> buffer(n_bytes, 0);
-    if (_PyLong_AsByteArray(reinterpret_cast<PyLongObject *>(value.ptr()), buffer.data(), n_bytes, !is_bigendian, is_signed) < 0) {
+    if (_PyLong_AsByteArray(reinterpret_cast<PyLongObject *>(value.ptr()), buffer.data(), n_bytes, !is_bigendian, is_signed, -1) < 0) {
         throw std::invalid_argument("failed to cast");
     } else {
         if (!is_signed)
