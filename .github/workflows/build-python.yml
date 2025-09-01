@@ -25,7 +25,7 @@ jobs:
             CIBW_ARCHS_MACOS: "x86_64 arm64"
             CIBW_ARCHS_LINUX: "auto aarch64"
             CIBW_BUILD: "cp312-macosx_x86_64 cp312-macosx_arm64 cp312-win_amd64 cp312-manylinux_x86_64 cp312-musllinux_x86_64 cp312-manylinux_aarch64 cp312-musllinux_aarch64 cp313-macosx_x86_64 cp313-macosx_arm64 cp313-win_amd64 cp313-manylinux_x86_64 cp313-musllinux_x86_64 cp313-manylinux_aarch64 cp313-musllinux_aarch64"
-            CIBW_TEST_SOURCES: "bindings/python/test_python_bindings.py"
+            CIBW_TEST_SOURCES: "bindings/python/test_python_bindings.py:test_python_bindings.py"
             CIBW_TEST_COMMAND: "python -m unittest {project}/test_python_bindings.py"
       - name: Set up Python
         uses: actions/setup-python@v4
