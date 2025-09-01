@@ -6,10 +6,10 @@ namespace py = pybind11;
 
 #if PY_VERSION_HEX >= 0x030D0000  // Python 3.13+
 #define PY_LONG_AS_BYTEARRAY(pyobj, buf, n, little, signed_) \
-_PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(pyobj), buf, n, little, signed_, -1)
+_PyLong_AsByteArray(pyobj, buf, n, little, signed_, -1)
 #else
 #define PY_LONG_AS_BYTEARRAY(pyobj, buf, n, little, signed_) \
-_PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(pyobj), buf, n, little, signed_)
+_PyLong_AsByteArray(pyobj, buf, n, little, signed_)
 #endif
 
 
@@ -77,7 +77,7 @@ py::int_ to_py_int(const BigInteger& value, bool is_signed = true, bool is_bigen
     return py::reinterpret_steal<py::int_>(obj);
 }
 
-static constexpr auto VERSION_BINDINGS = "1.3.3";
+static constexpr auto VERSION_BINDINGS = "1.3.4";
 
 PYBIND11_MODULE(pybiginteger, m) {
     m.doc() = "A C++ port of the C# BigInteger class";
