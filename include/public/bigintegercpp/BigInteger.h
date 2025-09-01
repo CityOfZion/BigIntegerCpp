@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <cstdint>
 
 using uint_array = std::vector<uint32_t>;
 using byte_array = std::vector<unsigned char>;
