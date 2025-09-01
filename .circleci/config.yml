@@ -3,19 +3,22 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: "debian:buster"
+      - image: "debian:bookworm"
     steps:
-      - checkout
       - run:
           name: Installing build essentials
           command: |
-             apt-get update
-             apt-get install -y ca-certificates
-             echo "deb [trusted=yes] http://apt.llvm.org/buster/ llvm-toolchain-buster-10 main" | tee -a /etc/apt/sources.list.d/llvm.list
-             echo "deb-src [trusted=yes] http://apt.llvm.org/buster/ llvm-toolchain-buster-10 main" | tee -a /etc/apt/sources.list.d/llvm.list
-             apt-get update
-             apt-get install -y gcc g++ build-essential git clang-10 lldb-10 lld-10
-             gcc --version
+            apt-get update
+            apt-get install -y ca-certificates git openssh-client wget lsb-release software-properties-common gnupg build-essential
+            wget https://apt.llvm.org/llvm.sh
+            chmod +x llvm.sh
+            ./llvm.sh 17
+            gcc --version
+            rm llvm.sh
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:hhaDbTWq/OPaKSkPxt3KrZSr69GE/d95KX4DsbjdxGM"
+      - checkout
       - run:
           name: Install CMAKE
           command: |
@@ -44,7 +47,7 @@ jobs:
           command: |
             mkdir build-clang
             cd build-clang
-            export CXX=/usr/bin/clang++-10
+            export CXX=/usr/bin/clang++-17
             cmake -D BUILD_TESTING=ON ..
       - run:
           name: Build release w/Clang
