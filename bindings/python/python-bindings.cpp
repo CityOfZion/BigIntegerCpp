@@ -1,7 +1,17 @@
 #include <pybind11/pybind11.h>
 #include "../../include/public/bigintegercpp/BigInteger.h"
 #include "../../include/public/bigintegercpp/version.h"
+#include <Python.h>
 namespace py = pybind11;
+
+#if PY_VERSION_HEX >= 0x030D0000  // Python 3.13+
+#define PY_LONG_AS_BYTEARRAY(pyobj, buf, n, little, signed_) \
+_PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(pyobj), buf, n, little, signed_, -1)
+#else
+#define PY_LONG_AS_BYTEARRAY(pyobj, buf, n, little, signed_) \
+_PyLong_AsByteArray(reinterpret_cast<PyLongObject*>(pyobj), buf, n, little, signed_)
+#endif
+
 
 BigInteger to_biginteger(py::int_& value, bool is_bigendian = false) {
     bool is_signed = false;
@@ -16,7 +26,7 @@ BigInteger to_biginteger(py::int_& value, bool is_bigendian = false) {
         n_bytes += 1;
 
     std::vector<unsigned char> buffer(n_bytes, 0);
-    if (_PyLong_AsByteArray(reinterpret_cast<PyLongObject *>(value.ptr()), buffer.data(), n_bytes, !is_bigendian, is_signed) < 0) {
+    if (PY_LONG_AS_BYTEARRAY(reinterpret_cast<PyLongObject *>(value.ptr()), buffer.data(), n_bytes, !is_bigendian, is_signed) < 0) {
         throw std::invalid_argument("failed to cast");
     } else {
         if (!is_signed)
