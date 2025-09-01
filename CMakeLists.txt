@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(BigIntegerCpp VERSION 1.2)
+project(BigIntegerCpp VERSION 1.3)
 
 set(CMAKE_CXX_STANDARD 17)
 

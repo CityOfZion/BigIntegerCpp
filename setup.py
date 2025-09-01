@@ -6,10 +6,10 @@ import subprocess
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
-from distutils.version import LooseVersion
+from packaging.version import Version
 
-if sys.version_info < (3, 11):
-    sys.exit('Python < 3.11 is not supported')
+if sys.version_info < (3, 12):
+    sys.exit('Python < 3.12 is not supported')
 
 with open('bindings/python/python-bindings.cpp','r') as f:
     text = f.read()
@@ -33,8 +33,8 @@ class CMakeBuild(build_ext):
                                ", ".join(e.name for e in self.extensions))
 
         if platform.system() == "Windows":
-            cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
-            if cmake_version < '3.15.0':
+            cmake_version = Version(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
+            if cmake_version < Version('3.15.0'):
                 raise RuntimeError("CMake >= 3.15.0 is required on Windows")
 
         for ext in self.extensions:
@@ -95,7 +95,6 @@ setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
         "Programming Language :: C++"
     ],
     ext_modules=[CMakeExtension('pybiginteger', sourcedir='')],
